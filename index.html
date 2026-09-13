@@ -4,88 +4,71 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>PULSE Rewards</title>
+  <title>PULSE Token</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap"
-    rel="stylesheet"
-  >
-
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 
 <body>
 
-  <div class="background-glow glow-one"></div>
-  <div class="background-glow glow-two"></div>
-  <div class="background-glow glow-three"></div>
+  <div class="space space-1"></div>
+  <div class="space space-2"></div>
+  <div class="space space-3"></div>
 
   <main class="app">
 
-    <!-- BRAND -->
+    <!-- PULSE LOGO -->
     <header class="brand">
-      <div class="logo-wrap">
-        <img
-          src="pulse-logo.png"
-          alt="PULSE"
-          class="logo"
-        >
-      </div>
-
-      <div class="brand-text">
-        <div class="pulse-wordmark">PULSE</div>
-        <p>Complete • Earn • Get Rewarded</p>
-      </div>
+      <img
+        src="pulse-logo.png"
+        alt="PULSE Token"
+        class="logo"
+      >
     </header>
 
 
-    <!-- LOGIN / SIGN UP -->
-    <section id="auth" class="auth-card">
-
-      <div class="card-glow"></div>
-
-      <div class="auth-icon">⚡</div>
+    <!-- LOGIN -->
+    <section id="auth" class="card auth-card">
 
       <h1>Welcome to PULSE</h1>
 
-      <p class="subtext">
+      <p class="subtitle">
         Complete tasks and earn rewards.
       </p>
 
-      <div class="input-group">
-        <label for="email">EMAIL</label>
+      <div class="input-wrap">
+        <span class="input-icon">✉</span>
         <input
           id="email"
           type="email"
-          placeholder="Enter your email"
+          placeholder="Email"
           autocomplete="email"
         >
       </div>
 
-      <div class="input-group">
-        <label for="password">PASSWORD</label>
+      <div class="input-wrap">
+        <span class="input-icon">♙</span>
         <input
           id="password"
           type="password"
-          placeholder="Enter your password"
+          placeholder="Password"
           autocomplete="current-password"
         >
       </div>
 
-      <div class="actions">
-        <button id="signup" class="primary">
+      <div class="auth-buttons">
+        <button id="signup" class="gradient-button">
           Create Account
         </button>
 
-        <button id="login" class="outline">
+        <button id="login" class="outline-button">
           Sign In
         </button>
       </div>
 
-      <p id="authMsg" class="status"></p>
+      <p id="authMsg" class="status">
+        Status: Ready
+      </p>
 
     </section>
 
@@ -96,47 +79,44 @@
       <!-- BALANCE -->
       <section class="balance-card">
 
-        <div class="balance-info">
-          <span class="eyebrow">YOUR PULSE BALANCE</span>
+        <div>
+          <div class="balance-title">
+            YOUR PULSE BALANCE
+          </div>
 
-          <div class="balance-number" id="points">
+          <div id="points" class="balance-number">
             0
           </div>
 
-          <span class="balance-label">
+          <div class="balance-label">
             POINTS
-          </span>
+          </div>
         </div>
 
-        <div class="balance-icon">
+        <div class="balance-lightning">
           ⚡
         </div>
 
       </section>
 
 
-      <!-- TASKS -->
-      <section class="section">
+      <!-- AVAILABLE TASKS -->
+      <section class="panel">
 
-        <div class="section-title">
+        <div class="panel-heading">
+          <h2>
+            <span class="blue-icon">⚡</span>
+            Available Tasks
+          </h2>
 
-          <div>
-            <h2>
-              <span class="live-icon">⚡</span>
-              Available Tasks
-            </h2>
-
-            <p>Earn points by completing tasks.</p>
-          </div>
-
-          <span class="section-badge">
-            EARN POINTS
+          <span class="earn-label">
+            Earn Points
           </span>
-
         </div>
 
         <div id="tasks">
-          <div class="loading">
+          <div class="loading-box">
+            <span>♙</span>
             Loading tasks...
           </div>
         </div>
@@ -145,23 +125,18 @@
 
 
       <!-- SUBMISSIONS -->
-      <section class="section">
+      <section class="panel">
 
-        <div class="section-title">
-
-          <div>
-            <h2>
-              <span class="section-symbol">📋</span>
-              My Submissions
-            </h2>
-
-            <p>Track your completed tasks.</p>
-          </div>
-
+        <div class="panel-heading">
+          <h2>
+            <span class="blue-icon">▣</span>
+            My Submissions
+          </h2>
         </div>
 
         <div id="submissions">
-          <div class="loading">
+          <div class="loading-box">
+            <span>◌</span>
             Loading...
           </div>
         </div>
@@ -170,23 +145,18 @@
 
 
       <!-- ACTIVITY -->
-      <section class="section">
+      <section class="panel">
 
-        <div class="section-title">
-
-          <div>
-            <h2>
-              <span class="section-symbol">📊</span>
-              Points Activity
-            </h2>
-
-            <p>Your recent point history.</p>
-          </div>
-
+        <div class="panel-heading">
+          <h2>
+            <span class="blue-icon">▥</span>
+            Points Activity
+          </h2>
         </div>
 
         <div id="activity">
-          <div class="loading">
+          <div class="loading-box">
+            <span>◌</span>
             Loading...
           </div>
         </div>
@@ -197,70 +167,71 @@
       <!-- REWARDS -->
       <section class="reward-card">
 
-        <div class="reward-icon">
-          🎁
-        </div>
+        <div class="reward-heading">
+          <span class="reward-icon">🎁</span>
 
-        <div class="reward-content">
+          <div>
+            <div class="reward-label">
+              REWARDS
+            </div>
 
-          <span class="eyebrow">
-            REWARDS
-          </span>
+            <h2>
+              Redeem Your Points
+            </h2>
 
-          <h2>
-            Redeem Your Points
-          </h2>
-
-          <p>
-            Turn your earned points into rewards.
-          </p>
-
+            <p>
+              Turn your earned points into rewards.
+            </p>
+          </div>
         </div>
 
         <div class="reward-form">
 
-          <input
-            id="redeemAmount"
-            type="number"
-            min="1"
-            placeholder="Points to redeem"
-          >
+          <div class="input-wrap">
+            <span class="input-icon">◉</span>
+            <input
+              id="redeemAmount"
+              type="number"
+              min="1"
+              placeholder="Points to redeem"
+            >
+          </div>
 
-          <input
-            id="redeemNote"
-            type="text"
-            placeholder="Optional note"
-          >
+          <div class="input-wrap">
+            <span class="input-icon">▣</span>
+            <input
+              id="redeemNote"
+              type="text"
+              placeholder="Optional note"
+            >
+          </div>
 
-          <button id="redeem" class="primary full">
+          <button id="redeem" class="gradient-button full">
             Request Reward
           </button>
 
         </div>
 
-        <p id="redeemMsg" class="status"></p>
+        <p id="redeemMsg" class="status">
+          Status: Ready
+        </p>
 
       </section>
 
 
-      <!-- REDEMPTIONS -->
-      <section class="section">
+      <!-- MY REWARDS -->
+      <section class="panel">
 
-        <div class="section-title">
-
-          <div>
-            <h2>
-              <span class="section-symbol">🎁</span>
-              My Rewards
-            </h2>
-
-            <p>View your reward requests.</p>
-          </div>
-
+        <div class="panel-heading">
+          <h2>
+            <span class="blue-icon">🎁</span>
+            My Rewards
+          </h2>
         </div>
 
         <div id="redemptions">
-          <div class="loading">
+          <div class="loading-box">
+            <span>◌</span>
             Loading...
           </div>
         </div>
@@ -269,35 +240,26 @@
 
 
       <!-- NOTIFICATIONS -->
-      <section class="section">
+      <section class="panel notifications-panel">
 
-        <div class="section-title notification-title">
+        <div class="panel-heading">
 
-          <div>
-            <h2>
+          <h2>
+            <span class="blue-icon bell">♧</span>
+            Notifications
 
-              <span class="bell-icon">
-                🔔
-              </span>
-
-              Notifications
-
-              <span
-                id="notificationCount"
-                class="notification-count"
-                hidden
-              >
-                0
-              </span>
-
-            </h2>
-
-            <p>Stay updated on your account.</p>
-          </div>
+            <span
+              id="notificationCount"
+              class="notification-count"
+              hidden
+            >
+              0
+            </span>
+          </h2>
 
           <button
             id="markNotificationsRead"
-            class="small-button"
+            class="mark-read"
           >
             Mark Read
           </button>
@@ -321,9 +283,7 @@
   </main>
 
 
-  <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script src="config.js"></script>
   <script src="app.js"></script>
 
