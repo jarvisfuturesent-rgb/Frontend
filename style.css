@@ -55,7 +55,6 @@ body {
 ========================= */
 
 .brand {
-
   display: flex;
 
   align-items: center;
@@ -73,7 +72,6 @@ body {
 ========================= */
 
 .logo-wrap {
-
   position: relative;
 
   display: flex;
@@ -87,7 +85,6 @@ body {
 }
 
 .logo-wrap::before {
-
   content: "";
 
   position: absolute;
@@ -108,7 +105,6 @@ body {
 }
 
 .logo {
-
   position: relative;
 
   width: 82px;
@@ -125,21 +121,13 @@ body {
 
 
 /* =========================
-   PULSE WAVE LOGO
+   PULSE WORDMARK
 ========================= */
 
-.pulse-wave {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 2px;
-
-  min-height: 52px;
+.pulse-wordmark {
 
   font-family:
-    "Audiowide",
+    "Orbitron",
     sans-serif;
 
   font-size: 43px;
@@ -148,129 +136,31 @@ body {
 
   letter-spacing: 2px;
 
+  line-height: 1;
+
   text-transform: uppercase;
 
-  color: #f4f6f8;
+  transform: skewX(-10deg);
+
+  background:
+    linear-gradient(
+      100deg,
+      #8b3dff 0%,
+      #6d5cff 35%,
+      #287dff 68%,
+      #00eaff 100%
+    );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  color: transparent;
 
   filter:
     drop-shadow(
-      0 0 5px
-      rgba(255,255,255,.5)
-    )
-    drop-shadow(
-      0 0 14px
-      rgba(0,234,255,.35)
+      0 0 7px
+      rgba(80,120,255,.5)
     );
-}
-
-
-/*
-  Individual letters.
-
-  They don't fade.
-
-  They move horizontally and vertically
-  like a small signal wave.
-*/
-
-.pulse-wave span {
-
-  display: inline-block;
-
-  position: relative;
-
-  color: #f4f6f8;
-
-  text-shadow:
-    0 2px 0 #747b84,
-    0 4px 0 #3a3f46,
-    0 0 8px rgba(255,255,255,.35);
-
-  transform: translateX(0);
-
-  will-change:
-    transform;
-}
-
-
-/* The actual wave movement */
-
-.pulse-wave span.wave-letter {
-
-  animation:
-    pulseWave .9s
-    cubic-bezier(.22,.61,.36,1)
-    both;
-}
-
-
-/*
-  Each letter gets a slightly different
-  movement, creating the wave.
-*/
-
-.pulse-wave span:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.pulse-wave span:nth-child(2) {
-  animation-delay: .14s;
-}
-
-.pulse-wave span:nth-child(3) {
-  animation-delay: .28s;
-}
-
-.pulse-wave span:nth-child(4) {
-  animation-delay: .42s;
-}
-
-.pulse-wave span:nth-child(5) {
-  animation-delay: .56s;
-}
-
-
-@keyframes pulseWave {
-
-  0% {
-
-    transform:
-      translateX(-32px)
-      translateY(0);
-
-  }
-
-  25% {
-
-    transform:
-      translateX(-14px)
-      translateY(-7px);
-
-  }
-
-  50% {
-
-    transform:
-      translateX(0)
-      translateY(4px);
-
-  }
-
-  75% {
-
-    transform:
-      translateX(7px)
-      translateY(-2px);
-
-  }
-
-  100% {
-
-    transform:
-      translateX(0)
-      translateY(0);
-
-  }
 }
 
 
@@ -279,8 +169,7 @@ body {
 ========================= */
 
 .brand p {
-
-  margin: 4px 0 0;
+  margin: 7px 0 0;
 
   color: #9edfff;
 
@@ -820,7 +709,7 @@ button:active {
     height: 65px;
   }
 
-  .pulse-wave {
+  .pulse-wordmark {
     font-size: 30px;
     letter-spacing: 1px;
   }
