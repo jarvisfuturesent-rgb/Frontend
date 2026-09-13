@@ -9,46 +9,27 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-
-  font-family: system-ui, sans-serif;
-
-  color: #fff;
-
+  font-family: Arial, sans-serif;
   background:
-    radial-gradient(
-      circle at 20% 10%,
-      #6317a8 0,
-      transparent 30%
-    ),
-    radial-gradient(
-      circle at 90% 20%,
-      #005eff 0,
-      transparent 30%
-    ),
-    linear-gradient(
-      145deg,
-      #030414,
-      #080b24 55%,
-      #02030c
-    );
-
-  overflow-x: hidden;
+    radial-gradient(circle at top, rgba(77, 48, 160, .35), transparent 38%),
+    linear-gradient(135deg, #050816, #090d20 55%, #050816);
+  color: #fff;
 }
 
+button,
+input {
+  font: inherit;
+}
 
-/* =========================
-   APP
-========================= */
+button {
+  cursor: pointer;
+}
 
 .app {
-  width: 100%;
-  max-width: 850px;
-
-  margin: auto;
-
-  padding: 25px 18px 50px;
+  width: min(100% - 28px, 900px);
+  margin: 0 auto;
+  padding: 30px 0 50px;
 }
-
 
 /* =========================
    BRAND
@@ -56,657 +37,501 @@ body {
 
 .brand {
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   gap: 18px;
-
   margin-bottom: 30px;
 }
 
-
-/* =========================
-   LOGO
-========================= */
-
 .logo-wrap {
-  position: relative;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  animation:
-    logoFloat 4s ease-in-out infinite;
-}
-
-.logo-wrap::before {
-  content: "";
-
-  position: absolute;
-
-  width: 100%;
-  height: 100%;
-
-  border-radius: 50%;
-
+  width: 78px;
+  height: 78px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: rgba(20, 28, 65, .7);
+  border: 1px solid rgba(0, 220, 255, .25);
   box-shadow:
-    0 0 15px #8c27ff,
-    0 0 35px #0077ff;
-
-  opacity: .7;
-
-  animation:
-    logoGlow 4s ease-in-out infinite;
+    0 0 20px rgba(0, 190, 255, .18),
+    inset 0 0 20px rgba(90, 40, 255, .12);
 }
 
 .logo {
-  position: relative;
-
-  width: 82px;
-  height: 82px;
-
-  object-fit: cover;
-
-  border-radius: 50%;
-
-  box-shadow:
-    0 0 12px #8c27ff,
-    0 0 28px #0077ff;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
 }
 
-
-/* =========================
-   PULSE WORDMARK
-========================= */
+.brand-text {
+  text-align: left;
+}
 
 .pulse-wordmark {
-
-  font-family:
-    "Orbitron",
-    sans-serif;
-
+  font-family: "Orbitron", sans-serif;
   font-size: 43px;
-
   font-weight: 900;
-
   letter-spacing: 2px;
-
   line-height: 1;
-
   text-transform: uppercase;
-
   transform: skewX(-10deg);
-
-  background:
-    linear-gradient(
-      100deg,
-      #8b3dff 0%,
-      #6d5cff 35%,
-      #287dff 68%,
-      #00eaff 100%
-    );
-
+  background: linear-gradient(
+    100deg,
+    #8b3dff 0%,
+    #6d5cff 35%,
+    #287dff 68%,
+    #00eaff 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
-
   color: transparent;
-
-  filter:
-    drop-shadow(
-      0 0 7px
-      rgba(80,120,255,.5)
-    );
+  filter: drop-shadow(0 0 8px rgba(80, 120, 255, .5));
 }
 
-
-/* =========================
-   TAGLINE
-========================= */
-
-.brand p {
-  margin: 7px 0 0;
-
-  color: #9edfff;
-
+.brand-text p {
+  margin: 8px 0 0;
+  color: #aab6d8;
   font-size: 14px;
-
-  letter-spacing: .3px;
+  letter-spacing: .5px;
 }
-
 
 /* =========================
    CARDS
 ========================= */
 
 .auth-card,
-.section,
-.reward-card {
-
-  background:
-    rgba(10,15,42,.82);
-
-  border:
-    1px solid
-    rgba(95,117,255,.35);
-
-  border-radius: 20px;
-
-  padding: 22px;
-
-  margin: 18px 0;
-
+.reward-card,
+.welcome,
+.task,
+.history-row,
+.notice,
+.empty-card {
+  background: rgba(11, 17, 42, .78);
+  border: 1px solid rgba(105, 125, 190, .18);
   box-shadow:
-    0 10px 35px
-    rgba(0,0,0,.35);
-
-  backdrop-filter:
-    blur(12px);
+    0 12px 35px rgba(0, 0, 0, .25),
+    inset 0 0 25px rgba(70, 80, 160, .035);
+  backdrop-filter: blur(12px);
 }
 
-
-/* =========================
-   AUTH
-========================= */
-
 .auth-card {
-  text-align: center;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 28px;
+  border-radius: 22px;
 }
 
 .auth-card h2 {
-  margin-bottom: 5px;
+  margin: 0 0 8px;
 }
 
 .subtext {
-  color: #aeb9d8;
+  color: #9ba8ca;
+  margin: 0 0 22px;
 }
-
 
 /* =========================
    INPUTS
 ========================= */
 
 input {
-
-  display: block;
-
   width: 100%;
-
-  padding: 14px;
-
-  margin: 10px 0;
-
-  border:
-    1px solid #33468b;
-
+  padding: 14px 15px;
+  margin-bottom: 12px;
   border-radius: 12px;
-
-  background: #070b20;
-
-  color: white;
-
-  font-size: 16px;
-
+  border: 1px solid rgba(110, 130, 200, .25);
   outline: none;
-
-  transition:
-    border-color .2s ease,
-    box-shadow .2s ease;
-}
-
-input:focus {
-
-  border-color: #00eaff;
-
-  box-shadow:
-    0 0 12px
-    rgba(0,234,255,.2);
+  background: rgba(4, 8, 25, .85);
+  color: #fff;
 }
 
 input::placeholder {
-  color: #7e8aad;
+  color: #69779b;
 }
 
+input:focus {
+  border-color: rgba(0, 220, 255, .65);
+  box-shadow: 0 0 14px rgba(0, 200, 255, .12);
+}
 
 /* =========================
    BUTTONS
 ========================= */
 
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
 button {
-
   border: 0;
-
-  border-radius: 12px;
-
-  padding: 13px 18px;
-
-  margin: 6px 4px 6px 0;
-
-  cursor: pointer;
-
-  font-weight: 700;
-
-  font-size: 15px;
-
-  transition:
-    transform .2s ease,
-    box-shadow .2s ease;
+  border-radius: 11px;
+  padding: 12px 17px;
+  color: #fff;
+  transition: transform .15s ease, box-shadow .15s ease;
 }
 
 button:hover {
-  transform: translateY(-2px);
-}
-
-button:active {
-  transform: scale(.97);
+  transform: translateY(-1px);
 }
 
 .primary {
-
-  color: white;
-
-  background:
-    linear-gradient(
-      90deg,
-      #9b20ff,
-      #176cff
-    );
-
-  box-shadow:
-    0 0 18px
-    rgba(70,80,255,.35);
-}
-
-.primary:hover {
-
-  box-shadow:
-    0 0 25px
-    rgba(70,80,255,.65);
+  background: linear-gradient(100deg, #6f35ff, #237dff, #00dff5);
+  box-shadow: 0 0 18px rgba(40, 130, 255, .22);
 }
 
 .outline {
-
-  color: #b9dfff;
-
   background: transparent;
-
-  border:
-    1px solid #4166c9;
+  border: 1px solid rgba(100, 170, 255, .4);
 }
 
 .full {
   width: 100%;
 }
 
+.small-button {
+  padding: 7px 10px;
+  font-size: 12px;
+  background: rgba(80, 100, 160, .18);
+  border: 1px solid rgba(120, 140, 200, .2);
+}
+
+.logout {
+  width: 100%;
+  margin-top: 20px;
+  background: rgba(255, 60, 100, .08);
+  border: 1px solid rgba(255, 80, 110, .25);
+  color: #ff9aaa;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.status {
+  min-height: 20px;
+  margin: 12px 0 0;
+  color: #9caed4;
+  font-size: 14px;
+}
 
 /* =========================
    BALANCE
 ========================= */
 
 .welcome {
-
   display: flex;
-
-  justify-content: space-between;
-
   align-items: center;
-
+  justify-content: space-between;
   padding: 25px;
-
   border-radius: 22px;
-
-  margin-bottom: 20px;
-
+  margin-bottom: 25px;
   background:
-    linear-gradient(
-      135deg,
-      rgba(126,24,220,.7),
-      rgba(0,91,255,.65)
-    ),
-    #101631;
-
-  border:
-    1px solid #7088ff;
-
-  box-shadow:
-    0 0 25px
-    rgba(76,70,255,.3),
-
-    inset 0 0 30px
-    rgba(255,255,255,.04);
+    radial-gradient(circle at right, rgba(0, 220, 255, .12), transparent 35%),
+    rgba(11, 17, 42, .82);
 }
 
-.welcome span {
-
+.welcome span,
+.reward-card span {
   display: block;
-
-  color: #d5dfff;
-
+  color: #8290b6;
   font-size: 12px;
-
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
 }
 
 .welcome strong {
-
   display: block;
-
-  font-size: 48px;
-
-  line-height: 1.05;
-
   margin-top: 5px;
+  font-family: "Orbitron", sans-serif;
+  font-size: 42px;
+  background: linear-gradient(90deg, #8d4cff, #318cff, #00eaff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .welcome small {
-  color: #9eeaff;
+  color: #7280a4;
 }
-
-
-/* =========================
-   LIGHTNING
-========================= */
 
 .pulse-icon {
-
-  font-size: 45px;
-
-  filter:
-    drop-shadow(
-      0 0 8px #00eaff
-    )
-    drop-shadow(
-      0 0 20px #0077ff
-    );
-
-  animation:
-    lightningPulse 3s
-    ease-in-out infinite;
+  font-size: 38px;
+  filter: drop-shadow(0 0 12px rgba(0, 220, 255, .65));
 }
-
-.live-icon {
-
-  display: inline-block;
-
-  filter:
-    drop-shadow(
-      0 0 5px #00eaff
-    );
-
-  animation:
-    smallPulse 3s
-    ease-in-out infinite;
-}
-
 
 /* =========================
-   SECTION TITLES
+   SECTIONS
 ========================= */
 
+.section {
+  margin-top: 25px;
+}
+
 .section-title {
-
   display: flex;
-
-  justify-content: space-between;
-
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .section-title h2 {
-  margin: 0 0 12px;
+  margin: 0;
+  font-size: 18px;
 }
 
 .section-title > span {
-
-  color: #00eaff;
-
-  font-size: 13px;
+  color: #7180a5;
+  font-size: 12px;
 }
 
+.live-icon {
+  color: #00ddff;
+  filter: drop-shadow(0 0 7px rgba(0, 220, 255, .65));
+}
+
+.bell-icon {
+  font-size: 17px;
+}
 
 /* =========================
    TASKS
 ========================= */
 
 .task {
-
-  display: grid;
-
-  grid-template-columns:
-    1fr auto;
-
-  gap: 12px;
-
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px;
+  margin-bottom: 10px;
+  border-radius: 16px;
+}
 
-  padding: 17px 0;
+.task-main {
+  min-width: 0;
+  flex: 1;
+}
 
-  border-top:
-    1px solid #202b55;
+.task-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .task h3 {
-  margin: 0 0 5px;
+  margin: 0;
+  font-size: 16px;
 }
 
 .task p {
-
-  margin: 0;
-
-  color: #98a6c9;
+  margin: 8px 0 0;
+  color: #8f9cbe;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.task strong {
-
-  color: #00eaff;
-
+.points-badge {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(0, 220, 255, .09);
+  border: 1px solid rgba(0, 220, 255, .2);
+  color: #48e9ff;
+  font-size: 11px;
   white-space: nowrap;
 }
 
-.task button {
-
-  grid-column: 1 / -1;
-
-  width: 100%;
-
-  background: #121d46;
-
-  color: #bcefff;
-
-  border:
-    1px solid #3159c8;
+.task-button {
+  flex-shrink: 0;
+  background: linear-gradient(100deg, #6938ff, #227cff);
+  font-size: 13px;
 }
 
+/* =========================
+   HISTORY
+========================= */
+
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 15px 17px;
+  margin-bottom: 8px;
+  border-radius: 14px;
+}
+
+.history-row strong {
+  display: block;
+  font-size: 14px;
+}
+
+.history-row small {
+  display: block;
+  margin-top: 5px;
+  color: #7180a2;
+  font-size: 11px;
+}
+
+.status-pill {
+  padding: 5px 9px;
+  border-radius: 999px;
+  text-transform: capitalize;
+  font-size: 11px;
+  background: rgba(130, 140, 170, .12);
+  color: #b9c1d8;
+}
+
+.status-pill.approved {
+  background: rgba(40, 220, 150, .1);
+  color: #53e5a8;
+}
+
+.status-pill.paid {
+  background: rgba(0, 220, 255, .1);
+  color: #4ce8ff;
+}
+
+.status-pill.pending {
+  background: rgba(255, 190, 50, .1);
+  color: #ffd45c;
+}
+
+.status-pill.rejected {
+  background: rgba(255, 70, 100, .1);
+  color: #ff8198;
+}
+
+.amount-positive {
+  color: #52e6a5;
+}
+
+.amount-negative {
+  color: #ff718c;
+}
 
 /* =========================
    REWARDS
 ========================= */
 
 .reward-card {
-
+  margin-top: 25px;
+  padding: 22px;
+  border-radius: 20px;
   background:
-    radial-gradient(
-      circle at 100% 0,
-      rgba(0,234,255,.15),
-      transparent 35%
-    ),
-    rgba(10,15,42,.9);
-}
-
-.reward-card > div > span {
-
-  color: #00eaff;
-
-  font-size: 12px;
-
-  letter-spacing: 2px;
+    radial-gradient(circle at top right, rgba(100, 50, 255, .12), transparent 40%),
+    rgba(11, 17, 42, .8);
 }
 
 .reward-card h2 {
-  margin: 5px 0;
+  margin: 6px 0;
 }
 
 .reward-card p {
-  color: #99a8cc;
+  color: #8794b6;
+  font-size: 13px;
 }
-
 
 /* =========================
    NOTIFICATIONS
 ========================= */
 
-.bell-icon {
-
-  display: inline-block;
-
-  filter:
-    drop-shadow(
-      0 0 6px #00eaff
-    );
-
-  animation:
-    bellPulse 4s
-    ease-in-out infinite;
+.notification-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #6950ff;
+  color: white !important;
+  font-size: 10px !important;
 }
 
 .notice {
+  padding: 15px 17px;
+  margin-bottom: 8px;
+  border-radius: 14px;
+}
 
-  padding: 13px 4px;
+.notice.unread {
+  border-color: rgba(0, 210, 255, .3);
+  box-shadow: 0 0 18px rgba(0, 190, 255, .07);
+}
 
-  border-bottom:
-    1px solid #202b55;
-
-  color: #dbe5ff;
+.notice.read {
+  opacity: .65;
 }
 
 .notice b {
-  color: #00eaff;
+  font-size: 14px;
 }
 
+.notice p {
+  margin: 5px 0;
+  color: #929fc0;
+  font-size: 13px;
+}
+
+.notice small {
+  color: #687698;
+  font-size: 10px;
+}
 
 /* =========================
-   LOGOUT
+   EMPTY / LOADING
 ========================= */
 
-.logout {
-
-  width: 100%;
-
-  background: #11172e;
-
-  color: #9aa8c8;
-
-  border:
-    1px solid #29365f;
+.empty-card {
+  padding: 18px;
+  border-radius: 14px;
+  color: #8794b5;
 }
 
-
-/* =========================
-   ANIMATIONS
-========================= */
-
-@keyframes logoFloat {
-
-  0%, 100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.035);
-  }
+.empty-card strong {
+  display: block;
+  color: #d7dded;
+  margin-bottom: 5px;
 }
 
-@keyframes logoGlow {
-
-  0%, 100% {
-    opacity: .5;
-  }
-
-  50% {
-    opacity: .9;
-  }
+.empty-card small {
+  display: block;
+  color: #697799;
 }
 
-@keyframes lightningPulse {
-
-  0%, 100% {
-    transform: scale(1);
-    opacity: .9;
-  }
-
-  50% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #7d8aaa;
 }
-
-@keyframes smallPulse {
-
-  0%, 100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-@keyframes bellPulse {
-
-  0%, 84%, 100% {
-    transform:
-      rotate(0deg)
-      scale(1);
-  }
-
-  88% {
-    transform:
-      rotate(-7deg)
-      scale(1.06);
-  }
-
-  91% {
-    transform:
-      rotate(7deg)
-      scale(1.06);
-  }
-
-  94% {
-    transform:
-      rotate(-3deg)
-      scale(1.03);
-  }
-
-  97% {
-    transform:
-      rotate(0deg)
-      scale(1);
-  }
-}
-
 
 /* =========================
    MOBILE
 ========================= */
 
-@media(max-width:600px) {
+@media (max-width: 700px) {
 
   .app {
-    padding: 18px 12px 40px;
+    width: min(100% - 18px, 900px);
+    padding-top: 18px;
   }
 
   .brand {
-    margin-bottom: 22px;
     gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .logo-wrap {
+    width: 58px;
+    height: 58px;
+    border-radius: 17px;
   }
 
   .logo {
-    width: 65px;
-    height: 65px;
+    width: 48px;
+    height: 48px;
   }
 
   .pulse-wordmark {
@@ -714,38 +539,49 @@ button:active {
     letter-spacing: 1px;
   }
 
-  .brand p {
+  .brand-text p {
     font-size: 11px;
+    margin-top: 6px;
+  }
+
+  .auth-card {
+    padding: 21px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .welcome {
+    padding: 20px;
   }
 
   .welcome strong {
-    font-size: 40px;
+    font-size: 34px;
   }
 
   .pulse-icon {
-    font-size: 40px;
+    font-size: 30px;
   }
 
-  .auth-card,
-  .section,
+  .task {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .task-button {
+    width: 100%;
+  }
+
+  .section-title {
+    align-items: flex-start;
+  }
+
+  .section-title h2 {
+    font-size: 16px;
+  }
+
   .reward-card {
-    padding: 17px;
-  }
-}
-
-
-/* =========================
-   REDUCED MOTION
-========================= */
-
-@media(prefers-reduced-motion: reduce) {
-
-  *,
-  *::before,
-  *::after {
-
-    animation: none !important;
-
-    scroll-behavior: auto !important;
+    padding: 18px;
   }
 }
