@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>PULSE Rewards</title>
 
@@ -10,261 +10,322 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link
-    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap"
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 
 <body>
 
-<main class="app">
-
-  <!-- BRAND -->
-  <header class="brand">
-
-    <div class="logo-wrap">
-      <img
-        src="pulse-logo.png"
-        alt="PULSE Token"
-        class="logo"
-      >
-    </div>
-
-    <div class="brand-text">
-      <div class="pulse-wordmark">PULSE</div>
-      <p>Complete • Earn • Get Rewarded</p>
-    </div>
-
-  </header>
-
-
-  <!-- AUTH -->
-  <section id="auth" class="auth-card">
-
-    <h2>Welcome to PULSE</h2>
-
-    <p class="subtext">
-      Complete tasks and earn rewards.
-    </p>
-
-    <input
-      id="email"
-      type="email"
-      placeholder="Email"
-    >
-
-    <input
-      id="password"
-      type="password"
-      placeholder="Password"
-    >
-
-    <div class="actions">
-
-      <button id="signup" class="primary">
-        Create Account
-      </button>
-
-      <button id="login" class="outline">
-        Sign In
-      </button>
-
-    </div>
-
-    <p id="authMsg" class="status"></p>
-
-  </section>
-
-
-  <!-- DASHBOARD -->
-  <section id="dashboard" hidden>
-
-
-    <!-- BALANCE -->
-    <div class="welcome">
-
-      <div>
-
-        <span>YOUR PULSE BALANCE</span>
-
-        <strong id="points">0</strong>
-
-        <small>POINTS</small>
-
-      </div>
-
-      <div class="pulse-icon">⚡</div>
-
-    </div>
-
-
-    <!-- TASKS -->
-    <section class="section">
-
-      <div class="section-title">
-
-        <h2>
-          <span class="live-icon">⚡</span>
-          Available Tasks
-        </h2>
-
-        <span>Earn Points</span>
-
-      </div>
-
-      <div id="tasks">
-        Loading tasks...
-      </div>
-
-    </section>
-
-
-    <!-- SUBMISSIONS -->
-    <section class="section">
-
-      <div class="section-title">
-
-        <h2>📋 My Submissions</h2>
-
-      </div>
-
-      <div id="submissions">
-        Loading...
-      </div>
-
-    </section>
-
-
-    <!-- ACTIVITY -->
-    <section class="section">
-
-      <div class="section-title">
-
-        <h2>📊 Points Activity</h2>
-
-      </div>
-
-      <div id="activity">
-        Loading...
-      </div>
-
-    </section>
-
-
-    <!-- REWARDS -->
-    <section class="reward-card">
-
-      <div>
-
-        <span>REWARDS</span>
-
-        <h2>Redeem Your Points</h2>
-
-        <p>
-          Turn your earned points into rewards.
-        </p>
-
-      </div>
-
-      <input
-        id="redeemAmount"
-        type="number"
-        min="1"
-        placeholder="Points to redeem"
-      >
-
-      <input
-        id="redeemNote"
-        placeholder="Optional note"
-      >
-
-      <button
-        id="redeem"
-        class="primary full"
-      >
-        Request Reward
-      </button>
-
-      <p id="redeemMsg" class="status"></p>
-
-    </section>
-
-
-    <!-- MY REWARDS -->
-    <section class="section">
-
-      <div class="section-title">
-
-        <h2>🎁 My Rewards</h2>
-
-      </div>
-
-      <div id="redemptions">
-        Loading...
-      </div>
-
-    </section>
-
-
-    <!-- NOTIFICATIONS -->
-    <section class="section">
-
-      <div class="section-title">
-
-        <h2>
-
-          <span class="bell-icon">🔔</span>
-
-          Notifications
-
-          <span
-            id="notificationCount"
-            class="notification-count"
-          >
-            0
-          </span>
-
-        </h2>
-
-        <button
-          id="markNotificationsRead"
-          class="small-button"
+  <div class="background-glow glow-one"></div>
+  <div class="background-glow glow-two"></div>
+  <div class="background-glow glow-three"></div>
+
+  <main class="app">
+
+    <!-- BRAND -->
+    <header class="brand">
+      <div class="logo-wrap">
+        <img
+          src="pulse-logo.png"
+          alt="PULSE"
+          class="logo"
         >
-          Mark Read
+      </div>
+
+      <div class="brand-text">
+        <div class="pulse-wordmark">PULSE</div>
+        <p>Complete • Earn • Get Rewarded</p>
+      </div>
+    </header>
+
+
+    <!-- LOGIN / SIGN UP -->
+    <section id="auth" class="auth-card">
+
+      <div class="card-glow"></div>
+
+      <div class="auth-icon">⚡</div>
+
+      <h1>Welcome to PULSE</h1>
+
+      <p class="subtext">
+        Complete tasks and earn rewards.
+      </p>
+
+      <div class="input-group">
+        <label for="email">EMAIL</label>
+        <input
+          id="email"
+          type="email"
+          placeholder="Enter your email"
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="input-group">
+        <label for="password">PASSWORD</label>
+        <input
+          id="password"
+          type="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+        >
+      </div>
+
+      <div class="actions">
+        <button id="signup" class="primary">
+          Create Account
         </button>
 
+        <button id="login" class="outline">
+          Sign In
+        </button>
       </div>
 
-      <div id="notifications">
-        None
-      </div>
+      <p id="authMsg" class="status"></p>
 
     </section>
 
 
-    <!-- LOGOUT -->
-    <button
-      id="logout"
-      class="logout"
-    >
-      Sign Out
-    </button>
+    <!-- DASHBOARD -->
+    <section id="dashboard" hidden>
 
-  </section>
+      <!-- BALANCE -->
+      <section class="balance-card">
 
-</main>
+        <div class="balance-info">
+          <span class="eyebrow">YOUR PULSE BALANCE</span>
+
+          <div class="balance-number" id="points">
+            0
+          </div>
+
+          <span class="balance-label">
+            POINTS
+          </span>
+        </div>
+
+        <div class="balance-icon">
+          ⚡
+        </div>
+
+      </section>
 
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+      <!-- TASKS -->
+      <section class="section">
 
-<!-- CONFIG -->
-<script src="config.js"></script>
+        <div class="section-title">
 
-<!-- APP -->
-<script src="app.js"></script>
+          <div>
+            <h2>
+              <span class="live-icon">⚡</span>
+              Available Tasks
+            </h2>
+
+            <p>Earn points by completing tasks.</p>
+          </div>
+
+          <span class="section-badge">
+            EARN POINTS
+          </span>
+
+        </div>
+
+        <div id="tasks">
+          <div class="loading">
+            Loading tasks...
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- SUBMISSIONS -->
+      <section class="section">
+
+        <div class="section-title">
+
+          <div>
+            <h2>
+              <span class="section-symbol">📋</span>
+              My Submissions
+            </h2>
+
+            <p>Track your completed tasks.</p>
+          </div>
+
+        </div>
+
+        <div id="submissions">
+          <div class="loading">
+            Loading...
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ACTIVITY -->
+      <section class="section">
+
+        <div class="section-title">
+
+          <div>
+            <h2>
+              <span class="section-symbol">📊</span>
+              Points Activity
+            </h2>
+
+            <p>Your recent point history.</p>
+          </div>
+
+        </div>
+
+        <div id="activity">
+          <div class="loading">
+            Loading...
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- REWARDS -->
+      <section class="reward-card">
+
+        <div class="reward-icon">
+          🎁
+        </div>
+
+        <div class="reward-content">
+
+          <span class="eyebrow">
+            REWARDS
+          </span>
+
+          <h2>
+            Redeem Your Points
+          </h2>
+
+          <p>
+            Turn your earned points into rewards.
+          </p>
+
+        </div>
+
+        <div class="reward-form">
+
+          <input
+            id="redeemAmount"
+            type="number"
+            min="1"
+            placeholder="Points to redeem"
+          >
+
+          <input
+            id="redeemNote"
+            type="text"
+            placeholder="Optional note"
+          >
+
+          <button id="redeem" class="primary full">
+            Request Reward
+          </button>
+
+        </div>
+
+        <p id="redeemMsg" class="status"></p>
+
+      </section>
+
+
+      <!-- REDEMPTIONS -->
+      <section class="section">
+
+        <div class="section-title">
+
+          <div>
+            <h2>
+              <span class="section-symbol">🎁</span>
+              My Rewards
+            </h2>
+
+            <p>View your reward requests.</p>
+          </div>
+
+        </div>
+
+        <div id="redemptions">
+          <div class="loading">
+            Loading...
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- NOTIFICATIONS -->
+      <section class="section">
+
+        <div class="section-title notification-title">
+
+          <div>
+            <h2>
+
+              <span class="bell-icon">
+                🔔
+              </span>
+
+              Notifications
+
+              <span
+                id="notificationCount"
+                class="notification-count"
+                hidden
+              >
+                0
+              </span>
+
+            </h2>
+
+            <p>Stay updated on your account.</p>
+          </div>
+
+          <button
+            id="markNotificationsRead"
+            class="small-button"
+          >
+            Mark Read
+          </button>
+
+        </div>
+
+        <div id="notifications">
+          None
+        </div>
+
+      </section>
+
+
+      <!-- LOGOUT -->
+      <button id="logout" class="logout">
+        Sign Out
+      </button>
+
+    </section>
+
+  </main>
+
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
 
 </body>
 </html>
