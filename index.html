@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>PULSE Rewards</title>
 
-  <!-- Futuristic PULSE font -->
+  <!-- Futuristic PULSE wordmark font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link
-    href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap"
     rel="stylesheet"
   >
 
@@ -32,12 +33,8 @@
 
     <div class="brand-text">
 
-      <div class="pulse-wave" aria-label="PULSE">
-        <span>P</span>
-        <span>U</span>
-        <span>L</span>
-        <span>S</span>
-        <span>E</span>
+      <div class="pulse-wordmark" aria-label="PULSE">
+        PULSE
       </div>
 
       <p>Complete • Earn • Get Rewarded</p>
@@ -85,7 +82,6 @@
 
 
   <section id="dashboard" hidden>
-
 
     <div class="welcome">
 
@@ -201,53 +197,6 @@
 <script src="config.js"></script>
 
 <script src="app.js"></script>
-
-
-<script>
-
-/*
-  PULSE WAVE
-
-  The letters travel into position
-  instead of fading or shrinking.
-*/
-
-const pulseLetters =
-  document.querySelectorAll(".pulse-wave span");
-
-let pulseTimer = 0;
-
-function startPulseWave() {
-
-  pulseLetters.forEach((letter, index) => {
-
-    letter.style.animationDelay =
-      `${index * 0.14}s`;
-
-  });
-
-  pulseTimer = setInterval(() => {
-
-    pulseLetters.forEach((letter, index) => {
-
-      letter.classList.remove("wave-letter");
-
-      void letter.offsetWidth;
-
-      letter.style.animationDelay =
-        `${index * 0.14}s`;
-
-      letter.classList.add("wave-letter");
-
-    });
-
-  }, 3000);
-
-}
-
-startPulseWave();
-
-</script>
 
 </body>
 </html>
