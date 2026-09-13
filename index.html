@@ -4,21 +4,44 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>PULSE Rewards</title>
+
+  <!-- Futuristic PULSE font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap"
+    rel="stylesheet"
+  >
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
 <main class="app">
 
   <header class="brand">
 
     <div class="logo-wrap">
-      <img src="pulse-logo.png" alt="PULSE Token" class="logo">
+      <img
+        src="pulse-logo.png"
+        alt="PULSE Token"
+        class="logo"
+      >
     </div>
 
     <div class="brand-text">
-      <div class="pulse-mark" aria-label="PULSE">PULSE</div>
+
+      <div class="pulse-wave" aria-label="PULSE">
+        <span>P</span>
+        <span>U</span>
+        <span>L</span>
+        <span>S</span>
+        <span>E</span>
+      </div>
+
       <p>Complete • Earn • Get Rewarded</p>
+
     </div>
 
   </header>
@@ -27,14 +50,33 @@
   <section id="auth" class="auth-card">
 
     <h2>Welcome to PULSE</h2>
-    <p class="subtext">Complete tasks and earn rewards.</p>
 
-    <input id="email" type="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+    <p class="subtext">
+      Complete tasks and earn rewards.
+    </p>
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+    >
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+    >
 
     <div class="actions">
-      <button id="signup" class="primary">Create Account</button>
-      <button id="login" class="outline">Sign In</button>
+
+      <button id="signup" class="primary">
+        Create Account
+      </button>
+
+      <button id="login" class="outline">
+        Sign In
+      </button>
+
     </div>
 
     <p id="authMsg"></p>
@@ -44,15 +86,22 @@
 
   <section id="dashboard" hidden>
 
+
     <div class="welcome">
 
       <div>
+
         <span>YOUR PULSE BALANCE</span>
+
         <strong id="points">0</strong>
+
         <small>POINTS</small>
+
       </div>
 
-      <div class="pulse-icon">⚡</div>
+      <div class="pulse-icon">
+        ⚡
+      </div>
 
     </div>
 
@@ -70,7 +119,9 @@
 
       </div>
 
-      <div id="tasks">Loading...</div>
+      <div id="tasks">
+        Loading...
+      </div>
 
     </section>
 
@@ -78,10 +129,17 @@
     <section class="reward-card">
 
       <div>
+
         <span>REWARDS</span>
+
         <h2>Redeem Your Points</h2>
-        <p>Turn your earned points into rewards.</p>
+
+        <p>
+          Turn your earned points into rewards.
+        </p>
+
       </div>
+
 
       <input
         id="redeemAmount"
@@ -95,7 +153,11 @@
         placeholder="Optional note"
       >
 
-      <button id="redeem" class="primary full">
+
+      <button
+        id="redeem"
+        class="primary full"
+      >
         Request Reward
       </button>
 
@@ -115,12 +177,17 @@
 
       </div>
 
-      <div id="notifications">None</div>
+      <div id="notifications">
+        None
+      </div>
 
     </section>
 
 
-    <button id="logout" class="logout">
+    <button
+      id="logout"
+      class="logout"
+    >
       Sign Out
     </button>
 
@@ -130,8 +197,57 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="config.js"></script>
+
 <script src="app.js"></script>
+
+
+<script>
+
+/*
+  PULSE WAVE
+
+  The letters travel into position
+  instead of fading or shrinking.
+*/
+
+const pulseLetters =
+  document.querySelectorAll(".pulse-wave span");
+
+let pulseTimer = 0;
+
+function startPulseWave() {
+
+  pulseLetters.forEach((letter, index) => {
+
+    letter.style.animationDelay =
+      `${index * 0.14}s`;
+
+  });
+
+  pulseTimer = setInterval(() => {
+
+    pulseLetters.forEach((letter, index) => {
+
+      letter.classList.remove("wave-letter");
+
+      void letter.offsetWidth;
+
+      letter.style.animationDelay =
+        `${index * 0.14}s`;
+
+      letter.classList.add("wave-letter");
+
+    });
+
+  }, 3000);
+
+}
+
+startPulseWave();
+
+</script>
 
 </body>
 </html>
