@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Task Rewards</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="app">
+  <header><h1>Task Rewards</h1><p>Complete tasks and earn points.</p></header>
+
+  <section id="auth" class="card">
+    <h2>Sign in</h2>
+    <input id="email" type="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <div class="actions">
+      <button id="signup">Create account</button>
+      <button id="login">Sign in</button>
+    </div>
+    <p id="authMsg"></p>
+  </section>
+
+  <section id="dashboard" hidden>
+    <div class="stats">
+      <div class="card"><small>Points</small><strong id="points">0</strong></div>
+      <div class="card"><small>Account</small><strong id="userEmail">-</strong></div>
+    </div>
+
+    <div class="card">
+      <h2>Available Tasks</h2>
+      <div id="tasks">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Redeem Points</h2>
+      <input id="redeemAmount" type="number" min="1" placeholder="Points">
+      <input id="redeemNote" placeholder="Optional note">
+      <button id="redeem">Request redemption</button>
+      <p id="redeemMsg"></p>
+    </div>
+
+    <div class="card">
+      <h2>Notifications</h2>
+      <div id="notifications">None</div>
+    </div>
+
+    <button id="logout" class="secondary">Sign out</button>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
