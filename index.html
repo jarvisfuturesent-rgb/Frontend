@@ -3,28 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+
   <title>PULSE Rewards</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 
 <body>
 
 <main class="app">
 
+  <!-- BRAND -->
   <header class="brand">
+
     <div class="logo-wrap">
-      <img src="pulse-logo.png" alt="PULSE Token" class="logo">
+      <img
+        src="pulse-logo.png"
+        alt="PULSE Token"
+        class="logo"
+      >
     </div>
 
     <div class="brand-text">
       <div class="pulse-wordmark">PULSE</div>
       <p>Complete • Earn • Get Rewarded</p>
     </div>
+
   </header>
 
 
@@ -32,14 +44,33 @@
   <section id="auth" class="auth-card">
 
     <h2>Welcome to PULSE</h2>
-    <p class="subtext">Complete tasks and earn rewards.</p>
 
-    <input id="email" type="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+    <p class="subtext">
+      Complete tasks and earn rewards.
+    </p>
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+    >
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+    >
 
     <div class="actions">
-      <button id="signup" class="primary">Create Account</button>
-      <button id="login" class="outline">Sign In</button>
+
+      <button id="signup" class="primary">
+        Create Account
+      </button>
+
+      <button id="login" class="outline">
+        Sign In
+      </button>
+
     </div>
 
     <p id="authMsg" class="status"></p>
@@ -50,13 +81,18 @@
   <!-- DASHBOARD -->
   <section id="dashboard" hidden>
 
+
     <!-- BALANCE -->
     <div class="welcome">
 
       <div>
+
         <span>YOUR PULSE BALANCE</span>
+
         <strong id="points">0</strong>
+
         <small>POINTS</small>
+
       </div>
 
       <div class="pulse-icon">⚡</div>
@@ -68,12 +104,14 @@
     <section class="section">
 
       <div class="section-title">
+
         <h2>
           <span class="live-icon">⚡</span>
           Available Tasks
         </h2>
 
         <span>Earn Points</span>
+
       </div>
 
       <div id="tasks">
@@ -83,11 +121,13 @@
     </section>
 
 
-    <!-- SUBMISSION HISTORY -->
+    <!-- SUBMISSIONS -->
     <section class="section">
 
       <div class="section-title">
+
         <h2>📋 My Submissions</h2>
+
       </div>
 
       <div id="submissions">
@@ -101,7 +141,9 @@
     <section class="section">
 
       <div class="section-title">
+
         <h2>📊 Points Activity</h2>
+
       </div>
 
       <div id="activity">
@@ -115,12 +157,15 @@
     <section class="reward-card">
 
       <div>
+
         <span>REWARDS</span>
+
         <h2>Redeem Your Points</h2>
 
         <p>
           Turn your earned points into rewards.
         </p>
+
       </div>
 
       <input
@@ -135,7 +180,10 @@
         placeholder="Optional note"
       >
 
-      <button id="redeem" class="primary full">
+      <button
+        id="redeem"
+        class="primary full"
+      >
         Request Reward
       </button>
 
@@ -144,11 +192,13 @@
     </section>
 
 
-    <!-- REDEMPTIONS -->
+    <!-- MY REWARDS -->
     <section class="section">
 
       <div class="section-title">
+
         <h2>🎁 My Rewards</h2>
+
       </div>
 
       <div id="redemptions">
@@ -164,15 +214,24 @@
       <div class="section-title">
 
         <h2>
+
           <span class="bell-icon">🔔</span>
+
           Notifications
 
-          <span id="notificationCount" class="notification-count">
+          <span
+            id="notificationCount"
+            class="notification-count"
+          >
             0
           </span>
+
         </h2>
 
-        <button id="markNotificationsRead" class="small-button">
+        <button
+          id="markNotificationsRead"
+          class="small-button"
+        >
           Mark Read
         </button>
 
@@ -185,7 +244,11 @@
     </section>
 
 
-    <button id="logout" class="logout">
+    <!-- LOGOUT -->
+    <button
+      id="logout"
+      class="logout"
+    >
       Sign Out
     </button>
 
@@ -194,8 +257,13 @@
 </main>
 
 
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- CONFIG -->
 <script src="config.js"></script>
+
+<!-- APP -->
 <script src="app.js"></script>
 
 </body>
