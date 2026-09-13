@@ -2,16 +2,41 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
   font-family: system-ui, sans-serif;
   color: #fff;
+
   background:
-    radial-gradient(circle at 20% 10%, #6317a8 0, transparent 30%),
-    radial-gradient(circle at 90% 20%, #005eff 0, transparent 30%),
-    linear-gradient(145deg, #030414, #080b24 55%, #02030c);
+    radial-gradient(
+      circle at 20% 10%,
+      #6317a8 0,
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 20%,
+      #005eff 0,
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #030414,
+      #080b24 55%,
+      #02030c
+    );
+
+  overflow-x: hidden;
 }
+
+
+/* =========================
+   APP
+========================= */
 
 .app {
   width: 100%;
@@ -20,7 +45,10 @@ body {
   padding: 25px 18px 50px;
 }
 
-/* BRAND */
+
+/* =========================
+   BRAND
+========================= */
 
 .brand {
   display: flex;
@@ -30,41 +58,110 @@ body {
   margin-bottom: 30px;
 }
 
+
+/* LOGO */
+
+.logo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+.logo-wrap::before {
+  content: "";
+  position: absolute;
+
+  width: 100%;
+  height: 100%;
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 15px #8c27ff,
+    0 0 35px #0077ff,
+    0 0 60px rgba(0, 234, 255, .35);
+
+  opacity: .8;
+
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
 .logo {
+  position: relative;
+
   width: 82px;
   height: 82px;
+
   object-fit: cover;
   border-radius: 50%;
+
   box-shadow:
     0 0 15px #8c27ff,
     0 0 35px #0077ff;
+
+  animation: logoFloat 3s ease-in-out infinite;
 }
 
-.brand h1 {
+
+/* PULSE WORD */
+
+.brand-text {
+  position: relative;
+}
+
+.pulse-title {
   margin: 0;
+
   font-size: 38px;
   letter-spacing: 5px;
+
+  text-shadow:
+    0 0 5px rgba(255,255,255,.6),
+    0 0 15px #8c27ff,
+    0 0 30px #0077ff;
+
+  animation: pulseText 2.8s ease-in-out infinite;
 }
 
 .brand p {
   margin: 3px 0 0;
+
   color: #9edfff;
   font-size: 14px;
 }
 
-/* CARDS */
+
+/* =========================
+   CARDS
+========================= */
 
 .auth-card,
 .section,
 .reward-card {
+
   background: rgba(10, 15, 42, .82);
-  border: 1px solid rgba(95, 117, 255, .35);
+
+  border:
+    1px solid rgba(95, 117, 255, .35);
+
   border-radius: 20px;
+
   padding: 22px;
   margin: 18px 0;
-  box-shadow: 0 10px 35px rgba(0,0,0,.35);
+
+  box-shadow:
+    0 10px 35px rgba(0,0,0,.35);
+
   backdrop-filter: blur(12px);
 }
+
+
+/* =========================
+   AUTH
+========================= */
 
 .auth-card {
   text-align: center;
@@ -78,93 +175,214 @@ body {
   color: #aeb9d8;
 }
 
+
+/* =========================
+   INPUTS
+========================= */
+
 input {
   display: block;
+
   width: 100%;
+
   padding: 14px;
   margin: 10px 0;
-  border: 1px solid #33468b;
+
+  border:
+    1px solid #33468b;
+
   border-radius: 12px;
+
   background: #070b20;
+
   color: white;
+
   font-size: 16px;
+
+  outline: none;
+
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+input:focus {
+  border-color: #00eaff;
+
+  box-shadow:
+    0 0 12px rgba(0,234,255,.2);
 }
 
 input::placeholder {
   color: #7e8aad;
 }
 
+
+/* =========================
+   BUTTONS
+========================= */
+
 button {
+
   border: 0;
   border-radius: 12px;
+
   padding: 13px 18px;
+
   margin: 6px 4px 6px 0;
+
   cursor: pointer;
+
   font-weight: 700;
   font-size: 15px;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: scale(.97);
 }
 
 .primary {
+
   color: white;
-  background: linear-gradient(90deg, #9b20ff, #176cff);
-  box-shadow: 0 0 18px rgba(70,80,255,.35);
+
+  background:
+    linear-gradient(
+      90deg,
+      #9b20ff,
+      #176cff
+    );
+
+  box-shadow:
+    0 0 18px rgba(70,80,255,.35);
+}
+
+.primary:hover {
+  box-shadow:
+    0 0 25px rgba(70,80,255,.65);
 }
 
 .outline {
+
   color: #b9dfff;
+
   background: transparent;
-  border: 1px solid #4166c9;
+
+  border:
+    1px solid #4166c9;
 }
 
 .full {
   width: 100%;
 }
 
-/* BALANCE */
+
+/* =========================
+   BALANCE
+========================= */
 
 .welcome {
+
   display: flex;
+
   justify-content: space-between;
   align-items: center;
+
   padding: 25px;
+
   border-radius: 22px;
+
   margin-bottom: 20px;
+
   background:
-    linear-gradient(135deg, rgba(126,24,220,.7), rgba(0,91,255,.65)),
+    linear-gradient(
+      135deg,
+      rgba(126,24,220,.7),
+      rgba(0,91,255,.65)
+    ),
     #101631;
-  border: 1px solid #7088ff;
+
+  border:
+    1px solid #7088ff;
+
   box-shadow:
     0 0 25px rgba(76,70,255,.3),
     inset 0 0 30px rgba(255,255,255,.04);
 }
 
 .welcome span {
+
   display: block;
+
   color: #d5dfff;
+
   font-size: 12px;
+
   letter-spacing: 2px;
 }
 
 .welcome strong {
+
   display: block;
+
   font-size: 48px;
+
   line-height: 1.05;
+
   margin-top: 5px;
+
+  text-shadow:
+    0 0 12px rgba(255,255,255,.25);
 }
 
 .welcome small {
   color: #9eeaff;
 }
 
+
+/* =========================
+   LIGHTNING
+========================= */
+
 .pulse-icon {
+
   font-size: 45px;
-  filter: drop-shadow(0 0 12px #00eaff);
+
+  filter:
+    drop-shadow(0 0 8px #00eaff)
+    drop-shadow(0 0 20px #0077ff);
+
+  animation:
+    lightningPulse 2.5s ease-in-out infinite;
 }
 
-/* SECTIONS */
+.live-icon {
+
+  display: inline-block;
+
+  filter:
+    drop-shadow(0 0 5px #00eaff);
+
+  animation:
+    smallPulse 2.8s ease-in-out infinite;
+}
+
+
+/* =========================
+   SECTION TITLES
+========================= */
 
 .section-title {
+
   display: flex;
+
   justify-content: space-between;
   align-items: center;
 }
@@ -173,20 +391,31 @@ button {
   margin: 0 0 12px;
 }
 
-.section-title span {
+.section-title > span {
   color: #00eaff;
   font-size: 13px;
 }
 
-/* TASKS */
+
+/* =========================
+   TASKS
+========================= */
 
 .task {
+
   display: grid;
-  grid-template-columns: 1fr auto;
+
+  grid-template-columns:
+    1fr auto;
+
   gap: 12px;
+
   align-items: center;
+
   padding: 17px 0;
-  border-top: 1px solid #202b55;
+
+  border-top:
+    1px solid #202b55;
 }
 
 .task h3 {
@@ -194,34 +423,55 @@ button {
 }
 
 .task p {
+
   margin: 0;
+
   color: #98a6c9;
 }
 
 .task strong {
+
   color: #00eaff;
+
   white-space: nowrap;
 }
 
 .task button {
+
   grid-column: 1 / -1;
+
   width: 100%;
+
   background: #121d46;
+
   color: #bcefff;
-  border: 1px solid #3159c8;
+
+  border:
+    1px solid #3159c8;
 }
 
-/* REWARDS */
+
+/* =========================
+   REWARDS
+========================= */
 
 .reward-card {
+
   background:
-    radial-gradient(circle at 100% 0, rgba(0,234,255,.15), transparent 35%),
+    radial-gradient(
+      circle at 100% 0,
+      rgba(0,234,255,.15),
+      transparent 35%
+    ),
     rgba(10,15,42,.9);
 }
 
-.reward-card > span {
+.reward-card > div > span {
+
   color: #00eaff;
+
   font-size: 12px;
+
   letter-spacing: 2px;
 }
 
@@ -233,11 +483,29 @@ button {
   color: #99a8cc;
 }
 
-/* NOTIFICATIONS */
+
+/* =========================
+   NOTIFICATIONS
+========================= */
+
+.bell-icon {
+
+  display: inline-block;
+
+  animation:
+    bellPulse 3.5s ease-in-out infinite;
+
+  filter:
+    drop-shadow(0 0 6px #00eaff);
+}
 
 .notice {
+
   padding: 13px 4px;
-  border-bottom: 1px solid #202b55;
+
+  border-bottom:
+    1px solid #202b55;
+
   color: #dbe5ff;
 }
 
@@ -245,21 +513,158 @@ button {
   color: #00eaff;
 }
 
-/* LOGOUT */
+
+/* =========================
+   LOGOUT
+========================= */
 
 .logout {
+
   width: 100%;
+
   background: #11172e;
+
   color: #9aa8c8;
-  border: 1px solid #29365f;
+
+  border:
+    1px solid #29365f;
 }
 
-/* MOBILE */
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+/* Main PULSE word */
+
+@keyframes pulseText {
+
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+
+    text-shadow:
+      0 0 5px rgba(255,255,255,.5),
+      0 0 15px #8c27ff,
+      0 0 30px #0077ff;
+  }
+
+  50% {
+    transform: scale(1.035);
+    opacity: .92;
+
+    text-shadow:
+      0 0 8px rgba(255,255,255,.8),
+      0 0 22px #8c27ff,
+      0 0 42px #0077ff;
+  }
+}
+
+
+/* Logo movement */
+
+@keyframes logoFloat {
+
+  0%, 100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+
+/* Logo glow */
+
+@keyframes logoPulse {
+
+  0%, 100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes glowPulse {
+
+  0%, 100% {
+    opacity: .55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+
+/* Lightning */
+
+@keyframes lightningPulse {
+
+  0%, 100% {
+    transform: scale(1);
+    opacity: .9;
+  }
+
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+
+/* Small lightning */
+
+@keyframes smallPulse {
+
+  0%, 100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+
+/* Bell */
+
+@keyframes bellPulse {
+
+  0%, 85%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  88% {
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  91% {
+    transform: rotate(8deg) scale(1.08);
+  }
+
+  94% {
+    transform: rotate(-4deg) scale(1.04);
+  }
+
+  97% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+
+/* =========================
+   MOBILE
+========================= */
 
 @media(max-width:600px) {
 
   .app {
-    padding: 18px 12px 40px;
+    padding:
+      18px 12px 40px;
   }
 
   .brand {
@@ -271,7 +676,8 @@ button {
     height: 65px;
   }
 
-  .brand h1 {
+  .brand h1,
+  .pulse-title {
     font-size: 30px;
   }
 
@@ -279,9 +685,32 @@ button {
     font-size: 40px;
   }
 
+  .pulse-icon {
+    font-size: 40px;
+  }
+
   .auth-card,
   .section,
   .reward-card {
     padding: 17px;
+  }
+}
+
+
+/* =========================
+   REDUCE MOTION
+========================= */
+
+@media(prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+
+    animation:
+      none !important;
+
+    scroll-behavior:
+      auto !important;
   }
 }
