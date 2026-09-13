@@ -3,54 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Task Rewards</title>
+  <title>PULSE Rewards</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 <main class="app">
-  <header><h1>Task Rewards</h1><p>Complete tasks and earn points.</p></header>
 
-  <section id="auth" class="card">
-    <h2>Sign in</h2>
+  <header class="brand">
+    <img src="pulse-logo.png" alt="PULSE Token" class="logo">
+    <div>
+      <h1>PULSE</h1>
+      <p>Earn • Complete • Get Rewarded</p>
+    </div>
+  </header>
+
+  <section id="auth" class="auth-card">
+    <h2>Welcome to PULSE</h2>
+    <p class="subtext">Complete tasks and earn rewards.</p>
+
     <input id="email" type="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
+
     <div class="actions">
-      <button id="signup">Create account</button>
-      <button id="login">Sign in</button>
+      <button id="signup" class="primary">Create Account</button>
+      <button id="login" class="outline">Sign In</button>
     </div>
+
     <p id="authMsg"></p>
   </section>
 
   <section id="dashboard" hidden>
-    <div class="stats">
-      <div class="card"><small>Points</small><strong id="points">0</strong></div>
-      <div class="card"><small>Account</small><strong id="userEmail">-</strong></div>
+
+    <div class="welcome">
+      <div>
+        <span>YOUR PULSE BALANCE</span>
+        <strong id="points">0</strong>
+        <small>POINTS</small>
+      </div>
+      <div class="pulse-icon">⚡</div>
     </div>
 
-    <div class="card">
-      <h2>Available Tasks</h2>
+    <section class="section">
+      <div class="section-title">
+        <h2>⚡ Available Tasks</h2>
+        <span>Earn Points</span>
+      </div>
       <div id="tasks">Loading...</div>
-    </div>
+    </section>
 
-    <div class="card">
-      <h2>Redeem Points</h2>
-      <input id="redeemAmount" type="number" min="1" placeholder="Points">
+    <section class="reward-card">
+      <div>
+        <span>REWARDS</span>
+        <h2>Redeem Your Points</h2>
+        <p>Turn your earned points into rewards.</p>
+      </div>
+
+      <input id="redeemAmount" type="number" min="1" placeholder="Points to redeem">
       <input id="redeemNote" placeholder="Optional note">
-      <button id="redeem">Request redemption</button>
+
+      <button id="redeem" class="primary full">Request Reward</button>
       <p id="redeemMsg"></p>
-    </div>
+    </section>
 
-    <div class="card">
-      <h2>Notifications</h2>
+    <section class="section">
+      <div class="section-title">
+        <h2>🔔 Notifications</h2>
+      </div>
       <div id="notifications">None</div>
-    </div>
+    </section>
 
-    <button id="logout" class="secondary">Sign out</button>
+    <button id="logout" class="logout">Sign Out</button>
+
   </section>
+
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
+
 </body>
 </html>
