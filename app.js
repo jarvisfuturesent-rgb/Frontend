@@ -665,11 +665,35 @@ function setupSignup() {
         password
       });
 
+    if (error) {
+
+      const errorMessage =
+        error.message.toLowerCase();
+
+      if (
+        errorMessage.includes("already registered") ||
+        errorMessage.includes("already exists")
+      ) {
+
+        msg(
+          $("authMsg"),
+          "An account with this email already exists. Please use Log In."
+        );
+
+      } else {
+
+        msg(
+          $("authMsg"),
+          error.message
+        );
+      }
+
+      return;
+    }
+
     msg(
       $("authMsg"),
-      error
-        ? error.message
-        : "Account created. Check your email if confirmation is enabled."
+      "If this email can be registered, check your email for a confirmation link."
     );
   };
 }
