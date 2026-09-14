@@ -29,3 +29,10 @@ body {
   margin: 0 auto 15px auto !important;
   object-fit: contain !important;
 }
+.pulse-logo {
+  width: 90%;
+  max-width: 500px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
