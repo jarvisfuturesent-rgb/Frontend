@@ -402,10 +402,16 @@ async function loadAdminSubmissions() {
         points
       )
     `)
-    .eq("status", "pending")
-    .order("submitted_at", {
-      ascending: false
-    });
+    .eq(
+      "status",
+      "pending"
+    )
+    .order(
+      "submitted_at",
+      {
+        ascending: false
+      }
+    );
 
   if (error) {
 
@@ -688,9 +694,12 @@ async function loadAdminBusinesses() {
       status,
       created_at
     `)
-    .order("id", {
-      ascending: false
-    });
+    .order(
+      "id",
+      {
+        ascending: false
+      }
+    );
 
   if (error) {
 
@@ -899,7 +908,8 @@ async function loadAdminBusinesses() {
         const business =
           businesses.find(
             item =>
-              Number(item.id) === businessId
+              Number(item.id) ===
+              businessId
           );
 
         if (!business) return;
@@ -972,11 +982,11 @@ async function loadAdminBusinesses() {
    REWARD MANAGEMENT
 ========================= */
 
-async function loadAdminRewards() {
+async function loadAdminRedemptions() {
 
   const box =
     document.getElementById(
-      "adminRewards"
+      "adminRedemptions"
     );
 
   if (!box) return;
@@ -1162,7 +1172,7 @@ async function loadAdminRewards() {
             requestId
           );
 
-        await loadAdminRewards();
+        await loadAdminRedemptions();
 
         if (
           typeof refresh ===
@@ -1239,7 +1249,7 @@ async function loadAdminRewards() {
           return;
         }
 
-        await loadAdminRewards();
+        await loadAdminRedemptions();
 
       }
     );
@@ -1602,10 +1612,9 @@ async function loadAdminRequirementTasks() {
     error
   } = await db
     .from("tasks")
-    .select(`
-      id,
-      title
-    `)
+    .select(
+      "id, title"
+    )
     .order(
       "id",
       {
@@ -1619,6 +1628,12 @@ async function loadAdminRequirementTasks() {
       "Unable to load requirement tasks:",
       error
     );
+
+    select.innerHTML = `
+      <option value="">
+        Unable to load tasks
+      </option>
+    `;
 
     return;
   }
@@ -1648,7 +1663,7 @@ async function loadAdminRequirements(taskId) {
 
     box.innerHTML = `
       <div class="empty-card">
-        Select a task to view requirements.
+        Select a task to manage its requirements.
       </div>
     `;
 
@@ -1660,19 +1675,21 @@ async function loadAdminRequirements(taskId) {
     error
   } = await db
     .from("task_requirements")
-    .select(`
-      id,
-      task_id,
-      requirement,
-      sort_order,
-      created_at
-    `)
+    .select(
+      "id, task_id, requirement, sort_order, created_at"
+    )
     .eq(
       "task_id",
       Number(taskId)
     )
     .order(
       "sort_order",
+      {
+        ascending: true
+      }
+    )
+    .order(
+      "id",
       {
         ascending: true
       }
@@ -1788,20 +1805,20 @@ async function loadAdminRequirements(taskId) {
           return;
         }
 
-        const sortOrderText =
+        const orderText =
           prompt(
-            "Sort order:",
-            item.sort_order
+            "Order number (0 or greater):",
+            item.sort_order ?? 0
           );
 
         if (
-          sortOrderText === null
+          orderText === null
         ) {
           return;
         }
 
         const sortOrder =
-          Number(sortOrderText);
+          Number(orderText);
 
         if (
           !requirement.trim()
@@ -1822,7 +1839,7 @@ async function loadAdminRequirements(taskId) {
         ) {
 
           alert(
-            "Sort order must be a whole number 0 or greater."
+            "Order must be a whole number of 0 or greater."
           );
 
           return;
@@ -1931,8 +1948,7 @@ async function createAdminRequirement() {
   if (
     !taskSelect ||
     !requirementInput ||
-    !orderInput ||
-    !message
+    !orderInput
   ) {
     return;
   }
@@ -1952,29 +1968,33 @@ async function createAdminRequirement() {
     taskId <= 0
   ) {
 
-    message.textContent =
-      "Select a task.";
+    if (message) {
+      message.textContent =
+        "Select a task first.";
+    }
 
     return;
   }
 
   if (!requirement) {
 
-    message.textContent =
-      "Enter a requirement.";
+    if (message) {
+      message.textContent =
+        "Enter a requirement.";
+    }
 
     return;
   }
 
   if (
-    !Number.isInteger(
-      sortOrder
-    ) ||
+    !Number.isInteger(sortOrder) ||
     sortOrder < 0
   ) {
 
-    message.textContent =
-      "Sort order must be a whole number 0 or greater.";
+    if (message) {
+      message.textContent =
+        "Order must be a whole number of 0 or greater.";
+    }
 
     return;
   }
@@ -1991,17 +2011,21 @@ async function createAdminRequirement() {
 
   if (error) {
 
-    message.textContent =
-      error.message;
+    if (message) {
+      message.textContent =
+        error.message;
+    }
 
     return;
   }
 
   requirementInput.value = "";
-  orderInput.value = "";
+  orderInput.value = "0";
 
-  message.textContent =
-    "Requirement added successfully.";
+  if (message) {
+    message.textContent =
+      "Requirement created.";
+  }
 
   await loadAdminRequirements(
     taskId
@@ -2010,394 +2034,412 @@ async function createAdminRequirement() {
 }
 
 /* =========================
-   ADMIN PANEL UI
+   ADMIN PANEL
 ========================= */
 
-function renderAdminPanel() {
+async function loadAdminPanel() {
 
-  const panel =
+  const admin =
+    await isCurrentUserAdmin();
+
+  if (!admin) {
+    return;
+  }
+
+  let panel =
     document.getElementById(
       "adminPanel"
     );
 
-  if (!panel) return;
+  if (!panel) {
 
-  panel.innerHTML = `
+    panel =
+      document.createElement(
+        "section"
+      );
 
-    <div class="admin-panel">
+    panel.id =
+      "adminPanel";
 
-      <h2>
-        ⚡ PULSE Admin
-      </h2>
+    panel.className =
+      "panel";
 
-      <!-- TASKS -->
+    panel.innerHTML = `
 
-      <section>
+      <div class="panel-heading">
+
+        <h2>
+          ⚙ Admin Panel
+        </h2>
+
+      </div>
+
+
+      <!-- TASK MANAGEMENT -->
+
+      <div class="reward-box">
 
         <h3>
           📋 Task Management
         </h3>
 
-        <div class="admin-card">
+        <input
+          id="adminTaskTitle"
+          type="text"
+          placeholder="Task title"
+        >
 
-          <input
-            id="adminTaskTitle"
-            class="text-input"
-            type="text"
-            placeholder="Task title">
+        <textarea
+          id="adminTaskDescription"
+          rows="3"
+          placeholder="Task description"
+        ></textarea>
 
-          <textarea
-            id="adminTaskDescription"
-            class="text-input"
-            placeholder="Task description"></textarea>
+        <input
+          id="adminTaskPoints"
+          type="number"
+          min="1"
+          step="1"
+          placeholder="Points"
+        >
 
-          <input
-            id="adminTaskPoints"
-            class="text-input"
-            type="number"
-            min="1"
-            step="1"
-            placeholder="Points">
+        <select
+          id="adminTaskStatus">
 
-          <select
-            id="adminTaskStatus"
-            class="text-input">
+          <option value="draft">
+            Draft
+          </option>
 
-            <option value="draft">
-              Draft
-            </option>
+          <option value="active">
+            Active
+          </option>
 
-            <option value="active">
-              Active
-            </option>
+          <option value="paused">
+            Paused
+          </option>
 
-            <option value="paused">
-              Paused
-            </option>
+          <option value="completed">
+            Completed
+          </option>
 
-            <option value="completed">
-              Completed
-            </option>
+        </select>
 
-          </select>
+        <button
+          id="adminCreateTask"
+          class="gradient-button"
+          type="button">
 
-          <button
-            id="adminCreateTask"
-            class="gradient-button"
-            type="button">
-            Create Task
-          </button>
+          Create Task
 
-          <div
-            id="adminTaskMsg"
-            class="admin-message">
-          </div>
+        </button>
 
-        </div>
+        <p
+          id="adminTaskMsg"
+          class="status">
+        </p>
 
-        <div id="adminTasks">
+      </div>
+
+      <div id="adminTasks">
+
+        <div class="loading-box">
           Loading tasks...
         </div>
 
-      </section>
+      </div>
 
-      <!-- CATEGORIES -->
 
-      <section>
+      <!-- CATEGORY MANAGEMENT -->
 
-        <h3>
-          🗂️ Categories
-        </h3>
+      <div
+        class="panel-heading"
+        style="margin-top:24px">
 
-        <div class="admin-card">
+        <h2>
+          📂 Category Management
+        </h2>
 
-          <input
-            id="adminCategoryName"
-            class="text-input"
-            type="text"
-            placeholder="Category name">
+      </div>
 
-          <textarea
-            id="adminCategoryDescription"
-            class="text-input"
-            placeholder="Category description"></textarea>
+      <div class="reward-box">
 
-          <button
-            id="adminCreateCategory"
-            class="gradient-button"
-            type="button">
-            Create Category
-          </button>
+        <input
+          id="adminCategoryName"
+          type="text"
+          placeholder="Category name"
+        >
 
-          <div
-            id="adminCategoryMsg"
-            class="admin-message">
-          </div>
+        <textarea
+          id="adminCategoryDescription"
+          rows="2"
+          placeholder="Category description"
+        ></textarea>
 
-        </div>
+        <button
+          id="adminCreateCategory"
+          class="gradient-button"
+          type="button">
 
-        <div id="adminCategories">
+          Create Category
+
+        </button>
+
+        <p
+          id="adminCategoryMsg"
+          class="status">
+        </p>
+
+      </div>
+
+      <div id="adminCategories">
+
+        <div class="loading-box">
           Loading categories...
         </div>
 
-      </section>
+      </div>
+
 
       <!-- TASK REQUIREMENTS -->
 
-      <section>
+      <div
+        class="panel-heading"
+        style="margin-top:24px">
 
-        <h3>
+        <h2>
           📝 Task Requirements
-        </h3>
+        </h2>
 
-        <div class="admin-card">
+      </div>
 
-          <select
-            id="adminRequirementTask"
-            class="text-input">
+      <div class="reward-box">
 
-            <option value="">
-              Select a task
-            </option>
+        <select
+          id="adminRequirementTask">
 
-          </select>
+          <option value="">
+            Loading tasks...
+          </option>
 
-          <input
-            id="adminRequirementText"
-            class="text-input"
-            type="text"
-            placeholder="Requirement">
+        </select>
 
-          <input
-            id="adminRequirementOrder"
-            class="text-input"
-            type="number"
-            min="0"
-            step="1"
-            value="0"
-            placeholder="Sort order">
+        <input
+          id="adminRequirementText"
+          type="text"
+          placeholder="Requirement"
+        >
 
-          <button
-            id="adminCreateRequirement"
-            class="gradient-button"
-            type="button">
-            Add Requirement
-          </button>
+        <input
+          id="adminRequirementOrder"
+          type="number"
+          min="0"
+          step="1"
+          value="0"
+          placeholder="Order"
+        >
 
-          <div
-            id="adminRequirementMsg"
-            class="admin-message">
-          </div>
+        <button
+          id="adminCreateRequirement"
+          class="gradient-button"
+          type="button">
 
+          Add Requirement
+
+        </button>
+
+        <p
+          id="adminRequirementMsg"
+          class="status">
+        </p>
+
+      </div>
+
+      <div id="adminRequirements">
+
+        <div class="empty-card">
+          Select a task to manage its requirements.
         </div>
 
-        <div id="adminRequirements">
-          Select a task to view requirements.
-        </div>
+      </div>
 
-      </section>
 
-      <!-- SUBMISSIONS -->
+      <!-- SUBMISSION MANAGEMENT -->
 
-      <section>
+      <div
+        class="panel-heading"
+        style="margin-top:24px">
 
-        <h3>
-          📥 Pending Submissions
-        </h3>
+        <h2>
+          📋 Task Submissions
+        </h2>
 
-        <div id="adminSubmissions">
+      </div>
+
+      <div id="adminSubmissions">
+
+        <div class="loading-box">
           Loading submissions...
         </div>
 
-      </section>
+      </div>
 
-      <!-- BUSINESSES -->
 
-      <section>
+      <!-- BUSINESS MANAGEMENT -->
 
-        <h3>
-          🏢 Businesses
-        </h3>
+      <div
+        class="panel-heading"
+        style="margin-top:24px">
 
-        <div id="adminBusinesses">
+        <h2>
+          🏢 Business Management
+        </h2>
+
+      </div>
+
+      <div id="adminBusinesses">
+
+        <div class="loading-box">
           Loading businesses...
         </div>
 
-      </section>
+      </div>
 
-      <!-- REWARDS -->
 
-      <section>
+      <!-- REWARD MANAGEMENT -->
 
-        <h3>
+      <div
+        class="panel-heading"
+        style="margin-top:24px">
+
+        <h2>
           🎁 Pending Rewards
-        </h3>
+        </h2>
 
-        <div id="adminRewards">
-          Loading rewards...
+      </div>
+
+      <div id="adminRedemptions">
+
+        <div class="loading-box">
+          Loading pending rewards...
         </div>
 
-      </section>
+      </div>
 
-    </div>
+    `;
 
-  `;
+    const dashboard =
+      document.getElementById(
+        "dashboard"
+      );
+
+    if (dashboard) {
+      dashboard.prepend(panel);
+    }
+
+    const createButton =
+      document.getElementById(
+        "adminCreateTask"
+      );
+
+    if (createButton) {
+
+      createButton.addEventListener(
+        "click",
+        createAdminTask
+      );
+
+    }
+
+    const createCategoryButton =
+      document.getElementById(
+        "adminCreateCategory"
+      );
+
+    if (createCategoryButton) {
+
+      createCategoryButton.addEventListener(
+        "click",
+        createAdminCategory
+      );
+
+    }
+
+    const requirementTaskSelect =
+      document.getElementById(
+        "adminRequirementTask"
+      );
+
+    if (requirementTaskSelect) {
+
+      requirementTaskSelect.addEventListener(
+        "change",
+        () =>
+          loadAdminRequirements(
+            requirementTaskSelect.value
+          )
+      );
+
+    }
+
+    const createRequirementButton =
+      document.getElementById(
+        "adminCreateRequirement"
+      );
+
+    if (createRequirementButton) {
+
+      createRequirementButton.addEventListener(
+        "click",
+        createAdminRequirement
+      );
+
+    }
+
+  }
+
+  await loadAdminTasks();
+
+  await loadAdminCategories();
+
+  await loadAdminSubmissions();
+
+  await loadAdminBusinesses();
+
+  await loadAdminRedemptions();
+
+  await loadAdminRequirementTasks();
 
 }
 
 /* =========================
-   EVENT LISTENERS
+   START ADMIN
 ========================= */
 
-function bindAdminEvents() {
-
-  const createTaskButton =
-    document.getElementById(
-      "adminCreateTask"
-    );
-
-  if (createTaskButton) {
-
-    createTaskButton.addEventListener(
-      "click",
-      createAdminTask
-    );
-
-  }
-
-  const createCategoryButton =
-    document.getElementById(
-      "adminCreateCategory"
-    );
-
-  if (createCategoryButton) {
-
-    createCategoryButton.addEventListener(
-      "click",
-      createAdminCategory
-    );
-
-  }
-
-  const requirementTask =
-    document.getElementById(
-      "adminRequirementTask"
-    );
-
-  if (requirementTask) {
-
-    requirementTask.addEventListener(
-      "change",
-      () => {
-
-        loadAdminRequirements(
-          requirementTask.value
-        );
-
-      }
-    );
-
-  }
-
-  const createRequirementButton =
-    document.getElementById(
-      "adminCreateRequirement"
-    );
-
-  if (createRequirementButton) {
-
-    createRequirementButton.addEventListener(
-      "click",
-      createAdminRequirement
-    );
-
-  }
-
-}
-
-/* =========================
-   LOAD ADMIN PANEL
-========================= */
-
-async function loadAdminPanel() {
-
-  const panel =
-    document.getElementById(
-      "adminPanel"
-    );
-
-  if (!panel) return;
-
-  const isAdmin =
-    await isCurrentUserAdmin();
-
-  if (!isAdmin) {
-
-    panel.innerHTML = "";
-
-    return;
-  }
-
-  renderAdminPanel();
-
-  bindAdminEvents();
-
-  await Promise.all([
-    loadAdminTasks(),
-    loadAdminSubmissions(),
-    loadAdminBusinesses(),
-    loadAdminRewards(),
-    loadAdminCategories(),
-    loadAdminRequirementTasks()
-  ]);
-
-  const requirementTask =
-    document.getElementById(
-      "adminRequirementTask"
-    );
-
-  if (
-    requirementTask &&
-    requirementTask.value
-  ) {
-
-    await loadAdminRequirements(
-      requirementTask.value
-    );
-
-  }
-
-}
-
-/* =========================
-   AUTH STARTUP
-========================= */
-
-if (typeof db !== "undefined") {
-
-  db.auth.onAuthStateChange(() => {
+window.addEventListener(
+  "load",
+  () => {
 
     setTimeout(
       loadAdminPanel,
-      300
+      500
     );
 
-  });
-
-}
+  }
+);
 
 if (
-  document.readyState ===
-  "loading"
+  typeof db !== "undefined"
 ) {
 
-  document.addEventListener(
-    "DOMContentLoaded",
-    loadAdminPanel
+  db.auth.onAuthStateChange(
+    () => {
+
+      setTimeout(
+        loadAdminPanel,
+        300
+      );
+
+    }
   );
-
-} else {
-
-  loadAdminPanel();
 
 }
