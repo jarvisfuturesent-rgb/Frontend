@@ -79,89 +79,97 @@
 
 
   function escapeHtml(value) {
-
     return String(value ?? "")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
-
   }
 
 
   function findSurvey(title) {
+    const cleanTitle = String(title || "").trim();
 
     return Object.keys(SURVEYS).find(
-      key => title.startsWith(key)
+      key => cleanTitle.startsWith(key)
     );
-
   }
 
 
   function renderQuestion(question, index) {
 
-    const text = escapeHtml(question[0]);
+    const questionText = escapeHtml(question[0]);
+    const number = index + 1;
 
     if (question[1] === "yesno") {
 
       return `
-        <label class="survey-question">
-          ${index + 1}. ${text}
-        </label>
+        <div class="survey-question-block">
 
-        <select
-          name="q${index}"
-          required
-          class="survey-input"
-        >
-          <option value="">Choose...</option>
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>
-        </select>
+          <div class="survey-question-text">
+            ${number}. ${questionText}
+          </div>
+
+          <select
+            name="q${index}"
+            class="survey-input"
+            required
+          >
+            <option value="">Choose...</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+
+        </div>
       `;
-
     }
 
 
     if (question[1] === "rating") {
 
       return `
-        <label class="survey-question">
-          ${index + 1}. ${text}
-        </label>
+        <div class="survey-question-block">
 
-        <select
-          name="q${index}"
-          required
-          class="survey-input"
-        >
-          <option value="">Choose a rating...</option>
-          <option value="1">1 - Very poor</option>
-          <option value="2">2 - Poor</option>
-          <option value="3">3 - Okay</option>
-          <option value="4">4 - Good</option>
-          <option value="5">5 - Excellent</option>
-        </select>
+          <div class="survey-question-text">
+            ${number}. ${questionText}
+          </div>
+
+          <select
+            name="q${index}"
+            class="survey-input"
+            required
+          >
+            <option value="">Choose a rating...</option>
+            <option value="1">1 - Very poor</option>
+            <option value="2">2 - Poor</option>
+            <option value="3">3 - Okay</option>
+            <option value="4">4 - Good</option>
+            <option value="5">5 - Excellent</option>
+          </select>
+
+        </div>
       `;
-
     }
 
 
     return `
-      <label class="survey-question">
-        ${index + 1}. ${text}
-      </label>
+      <div class="survey-question-block">
 
-      <textarea
-        name="q${index}"
-        required
-        rows="3"
-        class="survey-input"
-        placeholder="Your feedback"
-      ></textarea>
+        <div class="survey-question-text">
+          ${number}. ${questionText}
+        </div>
+
+        <textarea
+          name="q${index}"
+          class="survey-input"
+          rows="4"
+          required
+          placeholder="Your feedback"
+        ></textarea>
+
+      </div>
     `;
-
   }
 
 
@@ -169,47 +177,40 @@
 
     const surveyName = findSurvey(title);
 
-    if (!surveyName) return;
-
-    let modal =
-      document.getElementById("pulseSurveyModal");
-
-
-    if (!modal) {
-
-      modal = document.createElement("div");
-
-      modal.id = "pulseSurveyModal";
-
-      document.body.appendChild(modal);
-
+    if (!surveyName) {
+      alert("This survey could not be found.");
+      return;
     }
 
+    let modal = document.getElementById("pulseSurveyModal");
+
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "pulseSurveyModal";
+      document.body.appendChild(modal);
+    }
 
     const questions = SURVEYS[surveyName];
-
 
     modal.innerHTML = `
 
       <div class="survey-modal-box">
 
-        <h2>
-          ${escapeHtml(title)}
-        </h2>
+        <h2>${escapeHtml(title)}</h2>
 
         <p class="survey-intro">
-          Complete all questions.
-          Reward: +${Number(points) || 0} points
+          Please answer every question below.
+          <br><br>
+          Reward:
+          <strong>+${Number(points) || 25} points</strong>
           after admin approval.
         </p>
 
-
         <form id="pulseSurveyForm">
 
-          ${questions
-            .map(renderQuestion)
-            .join("")}
-
+          <div class="survey-questions">
+            ${questions.map(renderQuestion).join("")}
+          </div>
 
           <div class="survey-actions">
 
@@ -230,7 +231,6 @@
 
           </div>
 
-
           <p
             id="pulseSurveyMsg"
             class="status"
@@ -239,169 +239,135 @@
         </form>
 
       </div>
-
     `;
-
 
     modal.hidden = false;
 
 
-    document
-      .getElementById("closePulseSurvey")
-      .onclick = () => {
+    const closeButton =
+      document.getElementById("closePulseSurvey");
 
+    if (closeButton) {
+      closeButton.onclick = () => {
         modal.remove();
-
       };
+    }
 
 
-    document
-      .getElementById("pulseSurveyForm")
-      .onsubmit = async function (event) {
+    const form =
+      document.getElementById("pulseSurveyForm");
 
-        event.preventDefault();
-
-
-        const form = event.currentTarget;
+    if (!form) return;
 
 
-        const answers = {};
+    form.onsubmit = async function (event) {
 
+      event.preventDefault();
 
-        for (
-          let i = 0;
-          i < questions.length;
-          i++
-        ) {
+      const answers = {};
 
-          const field =
-            form.querySelector(
-              `[name="q${i}"]`
-            );
+      for (let i = 0; i < questions.length; i++) {
 
+        const field =
+          form.querySelector(`[name="q${i}"]`);
 
-          const value =
-            field?.value?.trim();
+        const value =
+          field?.value?.trim();
 
-
-          if (!value) {
-
-            const message =
-              document.getElementById(
-                "pulseSurveyMsg"
-              );
-
-            if (message) {
-
-              message.textContent =
-                `Please answer question ${i + 1}.`;
-
-            }
-
-            field?.focus();
-
-            return;
-
-          }
-
-
-          answers[i + 1] = value;
-
-        }
-
-
-        const {
-          data: { user }
-        } = await db.auth.getUser();
-
-
-        if (!user) {
-
-          alert(
-            "Please sign in before taking a survey."
-          );
-
-          return;
-
-        }
-
-
-        const button =
-          form.querySelector(
-            'button[type="submit"]'
-          );
-
-
-        button.disabled = true;
-
-        button.textContent =
-          "Submitting...";
-
-
-        const { error } =
-          await db
-            .from("task_submissions")
-            .insert({
-
-              task_id: Number(taskId),
-
-              user_id: user.id,
-
-              proof: JSON.stringify({
-
-                survey: title,
-
-                answers: answers
-
-              })
-
-            });
-
-
-        if (error) {
-
-          button.disabled = false;
-
-          button.textContent =
-            "Submit Survey";
-
+        if (!value) {
 
           const message =
-            document.getElementById(
-              "pulseSurveyMsg"
-            );
-
+            document.getElementById("pulseSurveyMsg");
 
           if (message) {
-
             message.textContent =
-              error.message;
-
+              `Please answer question ${i + 1}.`;
           }
 
-          return;
+          field?.focus();
 
+          return;
         }
 
+        answers[i + 1] = value;
+      }
 
-        modal.remove();
 
+      const {
+        data: { user }
+      } = await db.auth.getUser();
+
+
+      if (!user) {
 
         alert(
-          "Survey submitted. Your submission is now pending review."
+          "Please sign in before taking a survey."
+        );
+
+        return;
+      }
+
+
+      const button =
+        form.querySelector(
+          'button[type="submit"]'
         );
 
 
-        if (
-          typeof refresh === "function"
-        ) {
+      if (button) {
 
-          await refresh();
+        button.disabled = true;
+        button.textContent = "Submitting...";
+      }
 
+
+      const { error } =
+        await db
+          .from("task_submissions")
+          .insert({
+
+            task_id: Number(taskId),
+
+            user_id: user.id,
+
+            proof: JSON.stringify({
+              survey: title,
+              answers: answers
+            })
+
+          });
+
+
+      if (error) {
+
+        if (button) {
+          button.disabled = false;
+          button.textContent = "Submit Survey";
         }
 
-      };
+        const message =
+          document.getElementById("pulseSurveyMsg");
 
+        if (message) {
+          message.textContent = error.message;
+        }
+
+        return;
+      }
+
+
+      modal.remove();
+
+      alert(
+        "Survey submitted. Your submission is now pending review."
+      );
+
+
+      if (typeof refresh === "function") {
+        await refresh();
+      }
+
+    };
   }
 
 
@@ -409,7 +375,6 @@
 
     const box =
       document.getElementById("tasks");
-
 
     if (!box) return;
 
@@ -427,9 +392,7 @@
 
         const title =
           card
-            .querySelector(
-              ".task-info strong"
-            )
+            .querySelector(".task-info strong")
             ?.textContent
             ?.trim() || "";
 
@@ -437,15 +400,11 @@
         const surveyName =
           findSurvey(title);
 
-
         if (!surveyName) return;
 
 
         const button =
-          card.querySelector(
-            ".task-submit"
-          );
-
+          card.querySelector(".task-submit");
 
         if (!button) return;
 
@@ -456,15 +415,12 @@
 
         const pointsText =
           card
-            .querySelector(
-              ".task-points"
-            )
+            .querySelector(".task-points")
             ?.textContent || "";
 
 
         const points =
-          pointsText
-            .replace(/[^0-9]/g, "") || "25";
+          pointsText.replace(/[^0-9]/g, "") || "25";
 
 
         button.textContent =
@@ -482,43 +438,198 @@
         };
 
 
-        card.dataset.surveyEnhanced =
-          "1";
+        card.dataset.surveyEnhanced = "1";
 
       });
+  }
 
+
+  function addSurveyStyles() {
+
+    if (
+      document.getElementById(
+        "pulseSurveyStyles"
+      )
+    ) {
+      return;
+    }
+
+
+    const style =
+      document.createElement("style");
+
+
+    style.id =
+      "pulseSurveyStyles";
+
+
+    style.textContent = `
+
+      #pulseSurveyModal {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        overflow-y: auto;
+        box-sizing: border-box;
+        padding: 20px;
+        background: rgba(3, 6, 20, 0.94);
+      }
+
+      .survey-modal-box {
+        width: 100%;
+        max-width: 680px;
+        box-sizing: border-box;
+        margin: 20px auto;
+        padding: 22px;
+        border-radius: 18px;
+        border: 1px solid rgba(80, 170, 255, 0.60);
+        background: rgba(9, 15, 36, 0.98);
+        color: #ffffff;
+      }
+
+      .survey-modal-box h2 {
+        margin: 0 0 10px;
+        line-height: 1.3;
+      }
+
+      .survey-intro {
+        margin: 0 0 22px;
+        line-height: 1.5;
+      }
+
+      .survey-question-block {
+        margin-bottom: 18px;
+        padding: 15px;
+        box-sizing: border-box;
+        border-radius: 12px;
+        border: 1px solid rgba(100, 150, 255, 0.28);
+        background: rgba(18, 27, 58, 0.72);
+      }
+
+      .survey-question-text {
+        display: block;
+        margin-bottom: 11px;
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.5;
+      }
+
+      .survey-input {
+        display: block;
+        width: 100%;
+        min-height: 46px;
+        box-sizing: border-box;
+        padding: 10px 12px;
+        border-radius: 9px;
+        border: 1px solid rgba(100, 180, 255, 0.48);
+        background: rgba(4, 9, 25, 0.98);
+        color: #ffffff;
+        font-size: 16px;
+      }
+
+      textarea.survey-input {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      .survey-input option {
+        color: #000000;
+        background: #ffffff;
+      }
+
+      .survey-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+      }
+
+      .survey-actions button {
+        min-height: 46px;
+      }
+
+      @media (max-width: 520px) {
+
+        #pulseSurveyModal {
+          padding: 10px;
+        }
+
+        .survey-modal-box {
+          margin: 5px auto;
+          padding: 16px;
+          border-radius: 14px;
+        }
+
+        .survey-question-block {
+          padding: 13px;
+        }
+
+        .survey-question-text {
+          font-size: 15px;
+        }
+
+      }
+
+    `;
+
+    document.head.appendChild(style);
+  }
+
+
+  function startSurveySystem() {
+
+    addSurveyStyles();
+    enhanceTasks();
+
+
+    const box =
+      document.getElementById("tasks");
+
+
+    if (
+      !box ||
+      box.dataset.surveyObserver === "1"
+    ) {
+      return;
+    }
+
+
+    const observer =
+      new MutationObserver(() => {
+        enhanceTasks();
+      });
+
+
+    observer.observe(box, {
+      childList: true,
+      subtree: true
+    });
+
+
+    box.dataset.surveyObserver = "1";
   }
 
 
   window.addEventListener(
     "load",
-    () => {
-
-      enhanceTasks();
-
-
-      const box =
-        document.getElementById("tasks");
+    startSurveySystem
+  );
 
 
-      if (!box) return;
+  setTimeout(
+    startSurveySystem,
+    500
+  );
 
+  setTimeout(
+    startSurveySystem,
+    1500
+  );
 
-      const observer =
-        new MutationObserver(
-          enhanceTasks
-        );
-
-
-      observer.observe(
-        box,
-        {
-          childList: true,
-          subtree: true
-        }
-      );
-
-    }
+  setTimeout(
+    startSurveySystem,
+    3000
   );
 
 })();
