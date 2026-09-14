@@ -2,27 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PULSE Token</title>
 
-  <link rel="stylesheet" href="style.css">
+  <!-- Cache-bust the current neon stylesheet -->
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 
 <body>
 
   <main class="app-shell">
 
-    <!-- =========================
-         PULSE HEADER
-    ========================== -->
-
+    <!-- PULSE HEADER -->
     <header class="hero">
-
       <img
         src="pulse-logo.png"
         alt="PULSE Token"
@@ -31,21 +23,12 @@
 
       <h1>Welcome to PULSE</h1>
 
-      <p>
-        Complete • Earn • Get Rewarded
-      </p>
-
+      <p>Complete • Earn • Get Rewarded</p>
     </header>
 
 
-    <!-- =========================
-         AUTH
-    ========================== -->
-
-    <section
-      id="auth"
-      class="panel"
-    >
+    <!-- AUTH -->
+    <section id="auth" class="panel">
 
       <div class="panel-heading">
         <h2>
@@ -54,7 +37,6 @@
         </h2>
       </div>
 
-
       <input
         id="email"
         type="email"
@@ -62,14 +44,12 @@
         autocomplete="email"
       >
 
-
       <input
         id="password"
         type="password"
         placeholder="Password"
         autocomplete="current-password"
       >
-
 
       <div class="auth-buttons">
 
@@ -91,7 +71,6 @@
 
       </div>
 
-
       <button
         id="forgotPassword"
         class="forgot-password"
@@ -100,19 +79,12 @@
         Forgot Password?
       </button>
 
-
-      <p
-        id="authMsg"
-        class="status"
-      ></p>
+      <p id="authMsg" class="status"></p>
 
     </section>
 
 
-    <!-- =========================
-         PASSWORD RESET
-    ========================== -->
-
+    <!-- PASSWORD RESET -->
     <section
       id="resetPasswordPanel"
       class="panel"
@@ -126,7 +98,6 @@
         </h2>
       </div>
 
-
       <input
         id="newPassword"
         type="password"
@@ -134,14 +105,12 @@
         autocomplete="new-password"
       >
 
-
       <input
         id="confirmPassword"
         type="password"
         placeholder="Confirm new password"
         autocomplete="new-password"
       >
-
 
       <button
         id="resetPassword"
@@ -151,40 +120,24 @@
         Update Password
       </button>
 
-
-      <p
-        id="resetMsg"
-        class="status"
-      ></p>
+      <p id="resetMsg" class="status"></p>
 
     </section>
 
 
-    <!-- =========================
-         DASHBOARD
-    ========================== -->
-
-    <section
-      id="dashboard"
-      hidden
-    >
+    <!-- DASHBOARD -->
+    <section id="dashboard" hidden>
 
 
-      <!-- =========================
-           PROFILE / BALANCE
-      ========================== -->
-
+      <!-- BALANCE -->
       <section class="panel">
 
         <div class="panel-heading">
-
           <h2>
             <span class="blue-icon">⚡</span>
             Your PULSE Balance
           </h2>
-
         </div>
-
 
         <div class="balance-card">
 
@@ -201,7 +154,6 @@
 
         </div>
 
-
         <div class="profile-row">
 
           <span>
@@ -214,7 +166,6 @@
 
         </div>
 
-
         <button
           id="logout"
           class="outline-button"
@@ -226,21 +177,15 @@
       </section>
 
 
-      <!-- =========================
-           AVAILABLE TASKS
-      ========================== -->
-
+      <!-- AVAILABLE TASKS -->
       <section class="panel">
 
         <div class="panel-heading">
-
           <h2>
             <span class="blue-icon">📋</span>
             Available Tasks
           </h2>
-
         </div>
-
 
         <div id="tasks">
 
@@ -253,21 +198,15 @@
       </section>
 
 
-      <!-- =========================
-           MY SUBMISSIONS
-      ========================== -->
-
+      <!-- MY SUBMISSIONS -->
       <section class="panel">
 
         <div class="panel-heading">
-
           <h2>
             <span class="blue-icon">📊</span>
             My Submissions
           </h2>
-
         </div>
-
 
         <div id="submissions">
 
@@ -280,21 +219,15 @@
       </section>
 
 
-      <!-- =========================
-           POINTS ACTIVITY
-      ========================== -->
-
+      <!-- POINTS ACTIVITY -->
       <section class="panel">
 
         <div class="panel-heading">
-
           <h2>
             <span class="blue-icon">⚡</span>
             Points Activity
           </h2>
-
         </div>
-
 
         <div id="activity">
 
@@ -307,21 +240,15 @@
       </section>
 
 
-      <!-- =========================
-           REWARDS
-      ========================== -->
-
+      <!-- REWARDS -->
       <section class="panel">
 
         <div class="panel-heading">
-
           <h2>
             <span class="blue-icon">🎁</span>
             Rewards
           </h2>
-
         </div>
-
 
         <div class="reward-box">
 
@@ -329,14 +256,12 @@
             Redeem Your Points
           </h3>
 
-
           <input
             id="redeemPoints"
             type="number"
             min="1"
             placeholder="Points to redeem"
           >
-
 
           <select id="rewardType">
 
@@ -346,13 +271,11 @@
 
           </select>
 
-
           <textarea
             id="rewardNote"
             rows="3"
             placeholder="Optional note"
           ></textarea>
-
 
           <button
             id="requestReward"
@@ -361,7 +284,6 @@
           >
             Request Reward
           </button>
-
 
           <p
             id="rewardMsg"
@@ -373,21 +295,15 @@
       </section>
 
 
-      <!-- =========================
-           MY REWARDS
-      ========================== -->
-
+      <!-- MY REWARDS -->
       <section class="panel">
 
         <div class="panel-heading">
-
           <h2>
             <span class="blue-icon">🎁</span>
             My Rewards
           </h2>
-
         </div>
-
 
         <div id="redemptions">
 
@@ -400,10 +316,7 @@
       </section>
 
 
-      <!-- =========================
-           NOTIFICATIONS
-      ========================== -->
-
+      <!-- NOTIFICATIONS -->
       <section class="panel">
 
         <div class="panel-heading">
@@ -423,7 +336,6 @@
 
         </div>
 
-
         <div id="notifications">
 
           <div class="loading-box">
@@ -431,7 +343,6 @@
           </div>
 
         </div>
-
 
         <button
           id="markNotificationsRead"
@@ -446,24 +357,18 @@
 
     </section>
 
-
   </main>
 
 
-  <!-- =========================
-       SUPABASE
-  ========================== -->
-
+  <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script src="config.js"></script>
 
   <script src="app.js"></script>
 
-  <!-- Survey system -->
   <script src="survey.js"></script>
 
-  <!-- Admin system -->
   <script src="admin.js"></script>
 
 </body>
