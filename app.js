@@ -1,3 +1,7 @@
+/* =========================
+   PULSE APP
+========================= */
+
 const { createClient } = supabase;
 
 const db = createClient(
@@ -5,23 +9,61 @@ const db = createClient(
   window.SUPABASE_ANON_KEY
 );
 
-const $ = (id) => document.getElementById(id);
 
-function msg(el, text) {
-  if (el) el.textContent = text;
+/* =========================
+   HELPERS
+========================= */
+
+function $(id) {
+  return document.getElementById(id);
 }
 
 function escapeHtml(value) {
-  return String(value).replace(
-    /[&<>"']/g,
-    c => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    }[c])
-  );
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function msg(element, text) {
+  if (element) {
+    element.textContent = text;
+  }
+}
+
+
+/* =========================
+   AUTH DISPLAY
+========================= */
+
+async function updateAuthState() {
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  if (user) {
+
+    if ($("auth")) {
+      $("auth").hidden = true;
+    }
+
+    if ($("dashboard")) {
+      $("dashboard").hidden = false;
+    }
+
+  } else {
+
+    if ($("auth")) {
+      $("auth").hidden = false;
+    }
+
+    if ($("dashboard")) {
+      $("dashboard").hidden = true;
+    }
+  }
 }
 
 
@@ -29,19 +71,28 @@ function escapeHtml(value) {
    PROFILE
 ========================= */
 
-async function loadProfile(user) {
+async function loadProfile() {
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  if (!user) return;
 
   const { data, error } = await db
     .from("profiles")
-    .select("name,points,role")
+    .select("points,name,role")
     .eq("id", user.id)
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error(error);
+    return;
+  }
 
-  $("points").textContent = data?.points ?? 0;
-
-  return data;
+  if ($("points")) {
+    $("points").textContent = data?.points ?? 0;
+  }
 }
 
 
@@ -53,17 +104,15 @@ async function loadTasks() {
 
   const box = $("tasks");
 
-  box.innerHTML = `
-    <div class="loading">
-      Loading tasks...
-    </div>
-  `;
+  if (!box) return;
 
   const { data, error } = await db
     .from("tasks")
     .select("id,title,description,points,status")
     .eq("status", "active")
-    .order("created_at", { ascending: false });
+    .order("created_at", {
+      ascending: false
+    });
 
   if (error) {
 
@@ -81,8 +130,8 @@ async function loadTasks() {
 
     box.innerHTML = `
       <div class="empty-card">
-        <strong>No active tasks yet.</strong>
-        <small>New opportunities will appear here.</small>
+        <strong>No tasks available.</strong>
+        <small>Check back later.</small>
       </div>
     `;
 
@@ -91,36 +140,52 @@ async function loadTasks() {
 
   box.innerHTML = data.map(task => `
 
-    <article class="task">
+    <div class="task-card">
 
-      <div class="task-main">
+      <div class="task-icon">
+        ⚡
+      </div>
 
-        <div class="task-title-row">
+      <div class="task-info">
 
-          <h3>${escapeHtml(task.title)}</h3>
+        <strong>
+          ${escapeHtml(task.title)}
+        </strong>
 
-          <span class="points-badge">
-            +${task.points} pts
-          </span>
+        <small>
+          ${escapeHtml(task.description || "")}
+        </small>
 
-        </div>
-
-        <p>
-          ${escapeHtml(task.description || "Complete this task to earn points.")}
-        </p>
+        <span class="task-points">
+          +${task.points} pts
+        </span>
 
       </div>
 
       <button
-        class="task-button"
-        onclick="submitTask(${task.id})"
+        class="gradient-button task-submit"
+        data-id="${task.id}"
+        type="button"
       >
-        Submit Task
+        Submit
       </button>
 
-    </article>
+    </div>
 
   `).join("");
+
+  box.querySelectorAll(".task-submit")
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        submitTask(
+          Number(button.dataset.id)
+        );
+
+      };
+
+    });
 }
 
 
@@ -128,19 +193,16 @@ async function loadTasks() {
    SUBMIT TASK
 ========================= */
 
-window.submitTask = async (taskId) => {
+window.submitTask = async function(taskId) {
 
   const {
     data: { user }
   } = await db.auth.getUser();
 
-  if (!user) {
-    alert("Please sign in first.");
-    return;
-  }
+  if (!user) return;
 
   const proof = prompt(
-    "Enter proof or a short note for this task:"
+    "Enter your proof or note for this task:"
   );
 
   if (proof === null) return;
@@ -154,15 +216,17 @@ window.submitTask = async (taskId) => {
     });
 
   if (error) {
+
     alert(error.message);
+
     return;
   }
 
-  alert("Task submitted for review.");
+  alert(
+    "Task submitted. Your submission is now pending review."
+  );
 
-  await loadTasks();
-  await loadSubmissions(user);
-  await loadNotifications(user);
+  await refresh();
 };
 
 
@@ -170,14 +234,23 @@ window.submitTask = async (taskId) => {
    SUBMISSIONS
 ========================= */
 
-async function loadSubmissions(user) {
+async function loadSubmissions() {
 
   const box = $("submissions");
+
+  if (!box) return;
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  if (!user) return;
 
   const { data, error } = await db
     .from("task_submissions")
     .select(`
       id,
+      task_id,
       proof,
       status,
       submitted_at,
@@ -188,18 +261,19 @@ async function loadSubmissions(user) {
       )
     `)
     .eq("user_id", user.id)
-    .order("submitted_at", { ascending: false })
-    .limit(10);
+    .order("submitted_at", {
+      ascending: false
+    });
 
   if (error) {
 
     box.innerHTML = `
       <div class="empty-card">
         Unable to load submissions.
+        <small>${escapeHtml(error.message)}</small>
       </div>
     `;
 
-    console.error(error);
     return;
   }
 
@@ -207,140 +281,7 @@ async function loadSubmissions(user) {
 
     box.innerHTML = `
       <div class="empty-card">
-        <strong>No submissions yet.</strong>
-        <small>Complete a task and your submission will appear here.</small>
-      </div>
-    `;
-
-    return;
-  }
-
-  box.innerHTML = data.map(item => {
-
-    const status = item.status || "pending";
-
-    return `
-      <div class="history-row">
-
-        <div>
-          <strong>
-            ${escapeHtml(item.tasks?.title || "Task")}
-          </strong>
-
-          <small>
-            ${item.tasks?.points ?? 0} points
-          </small>
-        </div>
-
-        <span class="status-pill ${status}">
-          ${status}
-        </span>
-
-      </div>
-    `;
-
-  }).join("");
-}
-
-
-/* =========================
-   POINT ACTIVITY
-========================= */
-
-async function loadActivity(user) {
-
-  const box = $("activity");
-
-  const { data, error } = await db
-    .from("points_ledger")
-    .select("amount,reason,created_at")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(15);
-
-  if (error) {
-
-    box.innerHTML = `
-      <div class="empty-card">
-        Unable to load activity.
-      </div>
-    `;
-
-    console.error(error);
-    return;
-  }
-
-  if (!data?.length) {
-
-    box.innerHTML = `
-      <div class="empty-card">
-        <strong>No point activity yet.</strong>
-      </div>
-    `;
-
-    return;
-  }
-
-  box.innerHTML = data.map(item => {
-
-    const positive = Number(item.amount) > 0;
-
-    return `
-      <div class="history-row">
-
-        <div>
-          <strong>
-            ${escapeHtml(item.reason || "Points")}
-          </strong>
-
-          <small>
-            ${new Date(item.created_at).toLocaleString()}
-          </small>
-        </div>
-
-        <strong class="${positive ? "amount-positive" : "amount-negative"}">
-          ${positive ? "+" : ""}${item.amount}
-        </strong>
-
-      </div>
-    `;
-
-  }).join("");
-}
-
-
-/* =========================
-   REDEMPTIONS
-========================= */
-
-async function loadRedemptions(user) {
-
-  const box = $("redemptions");
-
-  const { data, error } = await db
-    .from("redemption_requests")
-    .select("id,points_requested,reward_type,status,created_at")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(10);
-
-  if (error) {
-
-    box.innerHTML = `
-      <div class="empty-card">
-        Unable to load rewards.
-      </div>
-    `;
-
-    console.error(error);
-    return;
-  }
-
-  if (!data?.length) {
-
-    box.innerHTML = `
-      <div class="empty-card">
-        <strong>No reward requests yet.</strong>
+        No submissions yet.
       </div>
     `;
 
@@ -352,16 +293,195 @@ async function loadRedemptions(user) {
     <div class="history-row">
 
       <div>
+
+        <strong>
+          ${escapeHtml(
+            item.tasks?.title || "Task"
+          )}
+        </strong>
+
+        <small>
+          ${item.tasks?.points ?? 0} points
+        </small>
+
+        <small>
+          ${escapeHtml(item.status)}
+        </small>
+
+      </div>
+
+      <span class="status-pill">
+        ${escapeHtml(item.status)}
+      </span>
+
+    </div>
+
+  `).join("");
+}
+
+
+/* =========================
+   POINTS ACTIVITY
+========================= */
+
+async function loadActivity() {
+
+  const box = $("activity");
+
+  if (!box) return;
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  if (!user) return;
+
+  const { data, error } = await db
+    .from("points_ledger")
+    .select(`
+      id,
+      amount,
+      reason,
+      created_at,
+      submission_id
+    `)
+    .eq("user_id", user.id)
+    .order("created_at", {
+      ascending: false
+    });
+
+  if (error) {
+
+    box.innerHTML = `
+      <div class="empty-card">
+        Unable to load activity.
+        <small>${escapeHtml(error.message)}</small>
+      </div>
+    `;
+
+    return;
+  }
+
+  if (!data?.length) {
+
+    box.innerHTML = `
+      <div class="empty-card">
+        No points activity yet.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML = data.map(item => `
+
+    <div class="history-row">
+
+      <div>
+
+        <strong>
+          ${escapeHtml(item.reason)}
+        </strong>
+
+        <small>
+          ${new Date(
+            item.created_at
+          ).toLocaleString()}
+        </small>
+
+      </div>
+
+      <strong>
+        ${item.amount > 0 ? "+" : ""}
+        ${item.amount}
+      </strong>
+
+    </div>
+
+  `).join("");
+}
+
+
+/* =========================
+   REDEMPTIONS
+========================= */
+
+async function loadRedemptions() {
+
+  const box = $("redemptions");
+
+  if (!box) return;
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  if (!user) return;
+
+  const { data, error } = await db
+    .from("redemption_requests")
+    .select(`
+      id,
+      points_requested,
+      reward_type,
+      status,
+      user_note,
+      admin_note,
+      created_at,
+      reviewed_at,
+      paid_at
+    `)
+    .eq("user_id", user.id)
+    .order("created_at", {
+      ascending: false
+    });
+
+  if (error) {
+
+    box.innerHTML = `
+      <div class="empty-card">
+        Unable to load rewards.
+        <small>${escapeHtml(error.message)}</small>
+      </div>
+    `;
+
+    return;
+  }
+
+  if (!data?.length) {
+
+    box.innerHTML = `
+      <div class="empty-card">
+        No rewards requested yet.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML = data.map(item => `
+
+    <div class="history-row">
+
+      <div>
+
         <strong>
           ${item.points_requested} points
         </strong>
 
         <small>
-          ${new Date(item.created_at).toLocaleString()}
+          Request #${item.id}
         </small>
+
+        <small>
+          ${escapeHtml(
+            item.reward_type || "manual_reward"
+          )}
+        </small>
+
       </div>
 
-      <span class="status-pill ${item.status}">
+      <span class="status-pill">
         ${escapeHtml(item.status)}
       </span>
 
@@ -375,58 +495,90 @@ async function loadRedemptions(user) {
    NOTIFICATIONS
 ========================= */
 
-async function loadNotifications(user) {
+async function loadNotifications() {
 
   const box = $("notifications");
 
+  if (!box) return;
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  if (!user) return;
+
   const { data, error } = await db
     .from("notifications")
-    .select("id,title,message,read,created_at")
+    .select(`
+      id,
+      title,
+      message,
+      type,
+      read,
+      created_at
+    `)
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(10);
+    .order("created_at", {
+      ascending: false
+    });
 
   if (error) {
 
-    box.textContent = "Unable to load notifications.";
-
-    console.error(error);
-    return;
-  }
-
-  const unread = data?.filter(n => !n.read).length || 0;
-
-  $("notificationCount").textContent = unread;
-
-  $("notificationCount").hidden = unread === 0;
-
-  if (!data?.length) {
     box.innerHTML = `
       <div class="empty-card">
-        <strong>You're all caught up.</strong>
-        <small>No notifications yet.</small>
+        Unable to load notifications.
       </div>
     `;
+
     return;
   }
 
-  box.innerHTML = data.map(n => `
+  const unread =
+    (data || []).filter(
+      item => !item.read
+    ).length;
 
-    <div class="notice ${n.read ? "read" : "unread"}">
+  if ($("notificationCount")) {
+
+    $("notificationCount").textContent =
+      unread;
+
+    $("notificationCount").hidden =
+      unread === 0;
+  }
+
+  if (!data?.length) {
+
+    box.innerHTML = `
+      <div class="empty-card">
+        No notifications.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML = data.map(item => `
+
+    <div class="notification-row">
 
       <div>
 
-        <b>${escapeHtml(n.title)}</b>
-
-        <p>
-          ${escapeHtml(n.message)}
-        </p>
+        <strong>
+          ${escapeHtml(item.title)}
+        </strong>
 
         <small>
-          ${new Date(n.created_at).toLocaleString()}
+          ${escapeHtml(item.message)}
         </small>
 
       </div>
+
+      ${
+        item.read
+          ? ""
+          : `<span class="unread-dot"></span>`
+      }
 
     </div>
 
@@ -440,27 +592,32 @@ async function loadNotifications(user) {
 
 if ($("markNotificationsRead")) {
 
-  $("markNotificationsRead").onclick = async () => {
+  $("markNotificationsRead").onclick =
+    async () => {
 
-    const {
-      data: { user }
-    } = await db.auth.getUser();
+      const {
+        data: { user }
+      } = await db.auth.getUser();
 
-    if (!user) return;
+      if (!user) return;
 
-    const { error } = await db
-      .from("notifications")
-      .update({ read: true })
-      .eq("user_id", user.id)
-      .eq("read", false);
+      const { error } = await db
+        .from("notifications")
+        .update({
+          read: true
+        })
+        .eq("user_id", user.id)
+        .eq("read", false);
 
-    if (error) {
-      console.error(error);
-      return;
-    }
+      if (error) {
 
-    await loadNotifications(user);
-  };
+        alert(error.message);
+
+        return;
+      }
+
+      await loadNotifications();
+    };
 }
 
 
@@ -472,8 +629,11 @@ if ($("signup")) {
 
   $("signup").onclick = async () => {
 
-    const email = $("email").value.trim();
-    const password = $("password").value;
+    const email =
+      $("email").value.trim();
+
+    const password =
+      $("password").value;
 
     if (!email || !password) {
 
@@ -485,12 +645,16 @@ if ($("signup")) {
       return;
     }
 
-    msg($("authMsg"), "Creating account...");
+    msg(
+      $("authMsg"),
+      "Creating account..."
+    );
 
-    const { error } = await db.auth.signUp({
-      email,
-      password
-    });
+    const { error } =
+      await db.auth.signUp({
+        email,
+        password
+      });
 
     msg(
       $("authMsg"),
@@ -510,8 +674,11 @@ if ($("login")) {
 
   $("login").onclick = async () => {
 
-    const email = $("email").value.trim();
-    const password = $("password").value;
+    const email =
+      $("email").value.trim();
+
+    const password =
+      $("password").value;
 
     if (!email || !password) {
 
@@ -523,62 +690,202 @@ if ($("login")) {
       return;
     }
 
-    msg($("authMsg"), "Signing in...");
+    msg(
+      $("authMsg"),
+      "Signing in..."
+    );
 
-    const { error } = await db.auth.signInWithPassword({
-      email,
-      password
-    });
+    const { error } =
+      await db.auth.signInWithPassword({
+        email,
+        password
+      });
 
     msg(
       $("authMsg"),
-      error ? error.message : "Signed in."
+      error
+        ? error.message
+        : "Signed in."
     );
+
+    if (!error) {
+      await refresh();
+    }
   };
 }
 
 
 /* =========================
-   LOGOUT
+   FORGOT PASSWORD
 ========================= */
 
-if ($("logout")) {
+if ($("forgotPassword")) {
 
-  $("logout").onclick = async () => {
-    await db.auth.signOut();
-  };
+  $("forgotPassword").onclick =
+    async () => {
+
+      const email =
+        $("email").value.trim();
+
+      if (!email) {
+
+        msg(
+          $("authMsg"),
+          "Enter your email first."
+        );
+
+        return;
+      }
+
+      msg(
+        $("authMsg"),
+        "Sending password reset link..."
+      );
+
+      const { error } =
+        await db.auth.resetPasswordForEmail(
+          email,
+          {
+            redirectTo:
+              window.location.origin +
+              window.location.pathname
+          }
+        );
+
+      msg(
+        $("authMsg"),
+        error
+          ? error.message
+          : "Password reset link sent. Check your email."
+      );
+    };
 }
 
 
 /* =========================
-   REDEMPTION
+   PASSWORD RECOVERY SCREEN
+========================= */
+
+function showPasswordReset() {
+
+  if ($("auth")) {
+    $("auth").hidden = true;
+  }
+
+  if ($("dashboard")) {
+    $("dashboard").hidden = true;
+  }
+
+  if ($("resetPasswordPanel")) {
+    $("resetPasswordPanel").hidden = false;
+  }
+}
+
+
+/* =========================
+   UPDATE PASSWORD
+========================= */
+
+if ($("resetPassword")) {
+
+  $("resetPassword").onclick =
+    async () => {
+
+      const newPassword =
+        $("newPassword").value;
+
+      const confirmPassword =
+        $("confirmPassword").value;
+
+      if (!newPassword || !confirmPassword) {
+
+        msg(
+          $("resetMsg"),
+          "Enter and confirm your new password."
+        );
+
+        return;
+      }
+
+      if (newPassword.length < 6) {
+
+        msg(
+          $("resetMsg"),
+          "Password must be at least 6 characters."
+        );
+
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+
+        msg(
+          $("resetMsg"),
+          "Passwords do not match."
+        );
+
+        return;
+      }
+
+      msg(
+        $("resetMsg"),
+        "Updating password..."
+      );
+
+      const { error } =
+        await db.auth.updateUser({
+          password: newPassword
+        });
+
+      if (error) {
+
+        msg(
+          $("resetMsg"),
+          error.message
+        );
+
+        return;
+      }
+
+      msg(
+        $("resetMsg"),
+        "Password updated successfully."
+      );
+
+      $("newPassword").value = "";
+      $("confirmPassword").value = "";
+
+      setTimeout(async () => {
+
+        if ($("resetPasswordPanel")) {
+          $("resetPasswordPanel").hidden = true;
+        }
+
+        await refresh();
+
+      }, 1200);
+    };
+}
+
+
+/* =========================
+   REDEEM
 ========================= */
 
 if ($("redeem")) {
 
   $("redeem").onclick = async () => {
 
-    const {
-      data: { user }
-    } = await db.auth.getUser();
+    const amount =
+      Number($("redeemAmount").value);
 
-    if (!user) {
+    const note =
+      $("redeemNote").value.trim();
 
-      msg(
-        $("redeemMsg"),
-        "Please sign in first."
-      );
-
-      return;
-    }
-
-    const amount = Number(
-      $("redeemAmount").value
-    );
-
-    const note = $("redeemNote").value.trim();
-
-    if (!Number.isInteger(amount) || amount <= 0) {
+    if (
+      !Number.isInteger(amount) ||
+      amount <= 0
+    ) {
 
       msg(
         $("redeemMsg"),
@@ -590,21 +897,22 @@ if ($("redeem")) {
 
     msg(
       $("redeemMsg"),
-      "Checking your points..."
+      "Submitting reward request..."
     );
 
-    const { error } = await db.rpc(
-      "create_redemption_request",
-      {
-        p_points: amount,
-        p_reward_type: "manual_reward",
-        p_user_note: note || null
-      }
-    );
+    const { error } =
+      await db.rpc(
+        "create_redemption_request",
+        {
+          p_points: amount,
+          p_reward_type:
+            "manual_reward",
+          p_user_note:
+            note || null
+        }
+      );
 
     if (error) {
-
-      console.error(error);
 
       msg(
         $("redeemMsg"),
@@ -614,18 +922,16 @@ if ($("redeem")) {
       return;
     }
 
-    msg(
-      $("redeemMsg"),
-      "Reward request submitted for review."
-    );
-
     $("redeemAmount").value = "";
     $("redeemNote").value = "";
 
-    await loadProfile(user);
-    await loadRedemptions(user);
-    await loadActivity(user);
-    await loadNotifications(user);
+    msg(
+      $("redeemMsg"),
+      "Reward request submitted."
+    );
+
+    await loadRedemptions();
+    await loadNotifications();
   };
 }
 
@@ -637,54 +943,21 @@ if ($("redeem")) {
 async function refresh() {
 
   const {
-    data: { user },
-    error
+    data: { user }
   } = await db.auth.getUser();
 
-  if (error) {
-    console.error(error);
-  }
-
-  $("auth").hidden = !!user;
-  $("dashboard").hidden = !user;
+  await updateAuthState();
 
   if (!user) return;
 
-  try {
-    await loadProfile(user);
-  } catch (e) {
-    console.error("Profile:", e);
-  }
-
-  try {
-    await loadTasks();
-  } catch (e) {
-    console.error("Tasks:", e);
-  }
-
-  try {
-    await loadSubmissions(user);
-  } catch (e) {
-    console.error("Submissions:", e);
-  }
-
-  try {
-    await loadActivity(user);
-  } catch (e) {
-    console.error("Activity:", e);
-  }
-
-  try {
-    await loadRedemptions(user);
-  } catch (e) {
-    console.error("Redemptions:", e);
-  }
-
-  try {
-    await loadNotifications(user);
-  } catch (e) {
-    console.error("Notifications:", e);
-  }
+  await Promise.all([
+    loadProfile(),
+    loadTasks(),
+    loadSubmissions(),
+    loadActivity(),
+    loadRedemptions(),
+    loadNotifications()
+  ]);
 }
 
 
@@ -692,13 +965,36 @@ async function refresh() {
    AUTH STATE
 ========================= */
 
-db.auth.onAuthStateChange(() => {
-  setTimeout(refresh, 0);
-});
+db.auth.onAuthStateChange(
+  async (event, session) => {
+
+    if (
+      event === "PASSWORD_RECOVERY"
+    ) {
+
+      showPasswordReset();
+
+      return;
+    }
+
+    await updateAuthState();
+
+    if (session) {
+      await refresh();
+    }
+  }
+);
 
 
 /* =========================
    START
 ========================= */
 
-refresh();
+window.addEventListener(
+  "load",
+  async () => {
+
+    await refresh();
+
+  }
+);
