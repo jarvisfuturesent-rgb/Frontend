@@ -90,8 +90,10 @@ async function loadProfile() {
     return;
   }
 
-  if ($("points")) {
-    $("points").textContent = data?.points ?? 0;
+  const balance = $("balance") || $("points");
+
+  if (balance) {
+    balance.textContent = data?.points ?? 0;
   }
 }
 
@@ -590,34 +592,37 @@ async function loadNotifications() {
    MARK NOTIFICATIONS READ
 ========================= */
 
-if ($("markNotificationsRead")) {
+function setupNotificationButton() {
 
-  $("markNotificationsRead").onclick =
-    async () => {
+  const button = $("markNotificationsRead");
 
-      const {
-        data: { user }
-      } = await db.auth.getUser();
+  if (!button) return;
 
-      if (!user) return;
+  button.onclick = async () => {
 
-      const { error } = await db
-        .from("notifications")
-        .update({
-          read: true
-        })
-        .eq("user_id", user.id)
-        .eq("read", false);
+    const {
+      data: { user }
+    } = await db.auth.getUser();
 
-      if (error) {
+    if (!user) return;
 
-        alert(error.message);
+    const { error } = await db
+      .from("notifications")
+      .update({
+        read: true
+      })
+      .eq("user_id", user.id)
+      .eq("read", false);
 
-        return;
-      }
+    if (error) {
 
-      await loadNotifications();
-    };
+      alert(error.message);
+
+      return;
+    }
+
+    await loadNotifications();
+  };
 }
 
 
@@ -625,9 +630,13 @@ if ($("markNotificationsRead")) {
    SIGN UP
 ========================= */
 
-if ($("signup")) {
+function setupSignup() {
 
-  $("signup").onclick = async () => {
+  const button = $("signup");
+
+  if (!button) return;
+
+  button.onclick = async () => {
 
     const email =
       $("email").value.trim();
@@ -670,9 +679,13 @@ if ($("signup")) {
    LOGIN
 ========================= */
 
-if ($("login")) {
+function setupLogin() {
 
-  $("login").onclick = async () => {
+  const button = $("login");
+
+  if (!button) return;
+
+  button.onclick = async () => {
 
     const email =
       $("email").value.trim();
@@ -716,12 +729,70 @@ if ($("login")) {
 
 
 /* =========================
+   SIGN OUT
+========================= */
+
+function setupSignOut() {
+
+  const button = $("logout");
+
+  if (!button) {
+    console.warn(
+      "PULSE: Sign Out button #logout was not found."
+    );
+    return;
+  }
+
+  button.onclick = async () => {
+
+    button.disabled = true;
+
+    try {
+
+      const { error } =
+        await db.auth.signOut();
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          "Unable to sign out: " +
+          error.message
+        );
+
+        button.disabled = false;
+
+        return;
+      }
+
+      await updateAuthState();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Unable to sign out."
+      );
+
+      button.disabled = false;
+    }
+  };
+}
+
+
+/* =========================
    FORGOT PASSWORD
 ========================= */
 
-if ($("forgotPassword")) {
+function setupForgotPassword() {
 
-  $("forgotPassword").onclick =
+  const button = $("forgotPassword");
+
+  if (!button) return;
+
+  button.onclick =
     async () => {
 
       const email =
@@ -786,9 +857,13 @@ function showPasswordReset() {
    UPDATE PASSWORD
 ========================= */
 
-if ($("resetPassword")) {
+function setupPasswordReset() {
 
-  $("resetPassword").onclick =
+  const button = $("resetPassword");
+
+  if (!button) return;
+
+  button.onclick =
     async () => {
 
       const newPassword =
@@ -872,9 +947,13 @@ if ($("resetPassword")) {
    REDEEM
 ========================= */
 
-if ($("redeem")) {
+function setupRedeem() {
 
-  $("redeem").onclick = async () => {
+  const button = $("redeem");
+
+  if (!button) return;
+
+  button.onclick = async () => {
 
     const amount =
       Number($("redeemAmount").value);
@@ -962,6 +1041,22 @@ async function refresh() {
 
 
 /* =========================
+   SETUP FRONTEND EVENTS
+========================= */
+
+function setupAppEvents() {
+
+  setupSignup();
+  setupLogin();
+  setupSignOut();
+  setupForgotPassword();
+  setupPasswordReset();
+  setupRedeem();
+  setupNotificationButton();
+}
+
+
+/* =========================
    AUTH STATE
 ========================= */
 
@@ -993,6 +1088,8 @@ db.auth.onAuthStateChange(
 window.addEventListener(
   "load",
   async () => {
+
+    setupAppEvents();
 
     await refresh();
 
