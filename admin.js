@@ -1,6 +1,6 @@
 /* =========================
    PULSE ADMIN PANEL
-   Task + Reward Management
+   Tasks + Submissions + Rewards
 ========================= */
 
 function adminEscape(value) {
@@ -14,7 +14,7 @@ function adminEscape(value) {
 
 
 /* =========================
-   CHECK ADMIN
+   ADMIN CHECK
 ========================= */
 
 async function isCurrentUserAdmin() {
@@ -35,7 +35,7 @@ async function isCurrentUserAdmin() {
 
 
 /* =========================
-   LOAD TASKS
+   TASK MANAGEMENT
 ========================= */
 
 async function loadAdminTasks() {
@@ -67,7 +67,7 @@ async function loadAdminTasks() {
     return;
   }
 
-  if (!tasks || tasks.length === 0) {
+  if (!tasks?.length) {
     box.innerHTML = `
       <div class="empty-card">
         No tasks found.
@@ -156,12 +156,7 @@ async function loadAdminTasks() {
   `).join("");
 
 
-  /* =========================
-     STATUS BUTTONS
-  ========================= */
-
-  box
-    .querySelectorAll(".admin-task-status")
+  box.querySelectorAll(".admin-task-status")
     .forEach(button => {
 
       button.addEventListener("click", async () => {
@@ -179,11 +174,8 @@ async function loadAdminTasks() {
           .eq("id", taskId);
 
         if (error) {
-
           alert(error.message);
-
           button.disabled = false;
-
           return;
         }
 
@@ -192,18 +184,12 @@ async function loadAdminTasks() {
         if (typeof refresh === "function") {
           await refresh();
         }
-
       });
 
     });
 
 
-  /* =========================
-     EDIT BUTTONS
-  ========================= */
-
-  box
-    .querySelectorAll(".admin-task-edit")
+  box.querySelectorAll(".admin-task-edit")
     .forEach(button => {
 
       button.addEventListener("click", async () => {
@@ -216,14 +202,12 @@ async function loadAdminTasks() {
 
         if (!task) return;
 
-
         const title = prompt(
           "Task title:",
           task.title
         );
 
         if (title === null) return;
-
 
         const description = prompt(
           "Task description:",
@@ -232,7 +216,6 @@ async function loadAdminTasks() {
 
         if (description === null) return;
 
-
         const pointsText = prompt(
           "Task points:",
           task.points
@@ -240,31 +223,22 @@ async function loadAdminTasks() {
 
         if (pointsText === null) return;
 
-
         const points = Number(pointsText);
 
         if (
           !Number.isInteger(points) ||
           points <= 0
         ) {
-
           alert(
             "Points must be a whole number greater than 0."
           );
-
           return;
         }
-
 
         if (!title.trim()) {
-
-          alert(
-            "Task title cannot be empty."
-          );
-
+          alert("Task title cannot be empty.");
           return;
         }
-
 
         const { error } = await db
           .from("tasks")
@@ -275,21 +249,15 @@ async function loadAdminTasks() {
           })
           .eq("id", taskId);
 
-
         if (error) {
-
           alert(error.message);
-
           return;
         }
 
-
         await loadAdminTasks();
-
       });
 
     });
-
 }
 
 
@@ -314,15 +282,9 @@ async function createAdminTask() {
   const message =
     document.getElementById("adminTaskMsg");
 
-
-  if (
-    !titleInput ||
-    !pointsInput ||
-    !message
-  ) {
+  if (!titleInput || !pointsInput || !message) {
     return;
   }
-
 
   const title =
     titleInput.value.trim();
@@ -336,27 +298,20 @@ async function createAdminTask() {
   const status =
     statusInput?.value || "draft";
 
-
   if (!title) {
-
     message.textContent =
       "Enter a task title.";
-
     return;
   }
-
 
   if (
     !Number.isInteger(points) ||
     points <= 0
   ) {
-
     message.textContent =
       "Points must be a whole number greater than 0.";
-
     return;
   }
-
 
   const { error } = await db
     .from("tasks")
@@ -367,15 +322,11 @@ async function createAdminTask() {
       status
     });
 
-
   if (error) {
-
     message.textContent =
       error.message;
-
     return;
   }
-
 
   titleInput.value = "";
 
@@ -388,8 +339,303 @@ async function createAdminTask() {
   message.textContent =
     "Task created successfully.";
 
-
   await loadAdminTasks();
+}
+
+
+/* =========================
+   SUBMISSION MANAGEMENT
+========================= */
+
+async function loadAdminSubmissions() {
+
+  const box =
+    document.getElementById("adminSubmissions");
+
+  if (!box) return;
+
+
+  const { data: submissions, error } = await db
+    .from("task_submissions")
+    .select(`
+      id,
+      task_id,
+      user_id,
+      proof,
+      status,
+      reviewer_note,
+      submitted_at,
+      reviewed_at,
+      tasks (
+        title,
+        points
+      )
+    `)
+    .eq("status", "pending")
+    .order("submitted_at", {
+      ascending: false
+    });
+
+
+  if (error) {
+
+    box.innerHTML = `
+      <div class="empty-card">
+        Unable to load submissions.
+
+        <small>
+          ${adminEscape(error.message)}
+        </small>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  if (!submissions?.length) {
+
+    box.innerHTML = `
+      <div class="empty-card">
+        No pending submissions.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  box.innerHTML = submissions.map(submission => {
+
+    const taskTitle =
+      submission.tasks?.title ||
+      `Task #${submission.task_id}`;
+
+    const taskPoints =
+      submission.tasks?.points ?? 0;
+
+    return `
+
+      <div class="history-row">
+
+        <div style="min-width:0">
+
+          <strong>
+            ${adminEscape(taskTitle)}
+          </strong>
+
+          <small>
+            User: ${adminEscape(submission.user_id)}
+          </small>
+
+          <small>
+            ${taskPoints} task points
+          </small>
+
+          <small>
+            Submission #${submission.id}
+          </small>
+
+          ${
+            submission.proof
+              ? `
+                <div style="
+                  margin-top:8px;
+                  padding:10px;
+                  border:1px solid rgba(0,200,255,.25);
+                  border-radius:10px;
+                  word-break:break-word;
+                ">
+                  <strong>Proof:</strong>
+                  <div>
+                    ${adminEscape(submission.proof)}
+                  </div>
+                </div>
+              `
+              : `
+                <small>
+                  No proof provided.
+                </small>
+              `
+          }
+
+        </div>
+
+
+        <div style="
+          display:flex;
+          flex-direction:column;
+          gap:8px;
+          min-width:120px;
+        ">
+
+          <button
+            class="gradient-button admin-submission-approve"
+            data-id="${submission.id}"
+            type="button">
+            Approve
+          </button>
+
+          <button
+            class="outline-button admin-submission-reject"
+            data-id="${submission.id}"
+            type="button">
+            Reject
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }).join("");
+
+
+  /* =========================
+     APPROVE SUBMISSION
+  ========================= */
+
+  box.querySelectorAll(
+    ".admin-submission-approve"
+  ).forEach(button => {
+
+    button.addEventListener(
+      "click",
+      async () => {
+
+        const submissionId =
+          Number(button.dataset.id);
+
+        const note =
+          prompt(
+            "Admin note (optional):",
+            "Submission approved."
+          );
+
+        if (note === null) return;
+
+
+        button.disabled = true;
+
+        button.textContent =
+          "Approving...";
+
+
+        const { error } = await db
+          .from("task_submissions")
+          .update({
+            status: "approved",
+            reviewer_note: note.trim(),
+            reviewed_at: new Date().toISOString()
+          })
+          .eq("id", submissionId)
+          .eq("status", "pending");
+
+
+        if (error) {
+
+          alert(error.message);
+
+          button.disabled = false;
+
+          button.textContent =
+            "Approve";
+
+          return;
+        }
+
+
+        /*
+          IMPORTANT:
+          This ONLY approves the submission.
+
+          It does NOT add points.
+
+          Points are added later when the
+          reward request is approved.
+        */
+
+
+        await loadAdminSubmissions();
+
+      }
+    );
+
+  });
+
+
+  /* =========================
+     REJECT SUBMISSION
+  ========================= */
+
+  box.querySelectorAll(
+    ".admin-submission-reject"
+  ).forEach(button => {
+
+    button.addEventListener(
+      "click",
+      async () => {
+
+        const submissionId =
+          Number(button.dataset.id);
+
+
+        const note =
+          prompt(
+            "Reason for rejection:",
+            ""
+          );
+
+        if (note === null) return;
+
+
+        if (!note.trim()) {
+
+          alert(
+            "Please enter a rejection reason."
+          );
+
+          return;
+        }
+
+
+        button.disabled = true;
+
+        button.textContent =
+          "Rejecting...";
+
+
+        const { error } = await db
+          .from("task_submissions")
+          .update({
+            status: "rejected",
+            reviewer_note: note.trim(),
+            reviewed_at: new Date().toISOString()
+          })
+          .eq("id", submissionId)
+          .eq("status", "pending");
+
+
+        if (error) {
+
+          alert(error.message);
+
+          button.disabled = false;
+
+          button.textContent =
+            "Reject";
+
+          return;
+        }
+
+
+        await loadAdminSubmissions();
+
+      }
+    );
+
+  });
 
 }
 
@@ -438,13 +684,11 @@ async function loadAdminRedemptions() {
   }
 
 
-  if (!data || data.length === 0) {
+  if (!data?.length) {
 
     box.innerHTML = `
       <div class="empty-card">
-        <strong>
-          No pending rewards.
-        </strong>
+        No pending rewards.
       </div>
     `;
 
@@ -470,6 +714,10 @@ async function loadAdminRedemptions() {
           User: ${adminEscape(request.user_id)}
         </small>
 
+        <small>
+          Reward: ${adminEscape(request.reward_type)}
+        </small>
+
       </div>
 
 
@@ -487,8 +735,7 @@ async function loadAdminRedemptions() {
   `).join("");
 
 
-  box
-    .querySelectorAll(".admin-approve")
+  box.querySelectorAll(".admin-approve")
     .forEach(button => {
 
       button.addEventListener(
@@ -497,7 +744,6 @@ async function loadAdminRedemptions() {
 
           const requestId =
             Number(button.dataset.id);
-
 
           button.disabled = true;
 
@@ -516,28 +762,20 @@ async function loadAdminRedemptions() {
 
           if (error) {
 
+            alert(error.message);
+
             button.disabled = false;
 
             button.textContent =
               "Approve";
 
-            alert(error.message);
-
             return;
           }
 
 
-          alert(
-            `Reward request #${requestId} approved.`
-          );
-
-
           await loadAdminRedemptions();
 
-
-          if (
-            typeof refresh === "function"
-          ) {
+          if (typeof refresh === "function") {
             await refresh();
           }
 
@@ -582,17 +820,13 @@ async function loadAdminPanel() {
       <div class="panel-heading">
 
         <h2>
-
-          <span class="blue-icon">
-            ⚙
-          </span>
-
-          Admin Panel
-
+          ⚙ Admin Panel
         </h2>
 
       </div>
 
+
+      <!-- TASK MANAGEMENT -->
 
       <div class="reward-box">
 
@@ -672,18 +906,34 @@ async function loadAdminPanel() {
       </div>
 
 
-      <div
-        class="panel-heading"
-        style="margin-top:20px">
+      <!-- SUBMISSION MANAGEMENT -->
+
+      <div class="panel-heading"
+           style="margin-top:24px">
 
         <h2>
+          📋 Task Submissions
+        </h2>
 
-          <span class="blue-icon">
-            🎁
-          </span>
+      </div>
 
-          Pending Rewards
 
+      <div id="adminSubmissions">
+
+        <div class="loading-box">
+          Loading submissions...
+        </div>
+
+      </div>
+
+
+      <!-- REWARD MANAGEMENT -->
+
+      <div class="panel-heading"
+           style="margin-top:24px">
+
+        <h2>
+          🎁 Pending Rewards
         </h2>
 
       </div>
@@ -701,15 +951,11 @@ async function loadAdminPanel() {
 
 
     const dashboard =
-      document.getElementById(
-        "dashboard"
-      );
+      document.getElementById("dashboard");
 
 
     if (dashboard) {
-
       dashboard.prepend(panel);
-
     }
 
 
@@ -733,13 +979,15 @@ async function loadAdminPanel() {
 
   await loadAdminTasks();
 
+  await loadAdminSubmissions();
+
   await loadAdminRedemptions();
 
 }
 
 
 /* =========================
-   START ADMIN
+   START
 ========================= */
 
 window.addEventListener(
@@ -757,15 +1005,13 @@ window.addEventListener(
 
 if (typeof db !== "undefined") {
 
-  db.auth.onAuthStateChange(
-    () => {
+  db.auth.onAuthStateChange(() => {
 
-      setTimeout(
-        loadAdminPanel,
-        300
-      );
+    setTimeout(
+      loadAdminPanel,
+      300
+    );
 
-    }
-  );
+  });
 
 }
