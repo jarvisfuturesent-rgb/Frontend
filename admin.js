@@ -1,6 +1,6 @@
 /* =========================
    PULSE ADMIN PANEL
-   Tasks + Submissions + Businesses + Rewards
+   Tasks + Submissions + Businesses + Rewards + Categories
 ========================= */
 
 function adminEscape(value) {
@@ -11,7 +11,6 @@ function adminEscape(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
 
 /* =========================
    ADMIN CHECK
@@ -38,14 +37,12 @@ async function isCurrentUserAdmin() {
   return profile?.role === "admin";
 }
 
-
 /* =========================
    TASK MANAGEMENT
 ========================= */
 
 async function loadAdminTasks() {
   const box = document.getElementById("adminTasks");
-
   if (!box) return;
 
   const { data: tasks, error } = await db
@@ -164,135 +161,123 @@ async function loadAdminTasks() {
     </div>
   `).join("");
 
+  /* STATUS BUTTONS */
 
-  box.querySelectorAll(".admin-task-status")
-    .forEach(button => {
+  box.querySelectorAll(
+    ".admin-task-status"
+  ).forEach(button => {
 
-      button.addEventListener("click", async () => {
+    button.addEventListener("click", async () => {
 
-        const taskId =
-          Number(button.dataset.id);
+      const taskId =
+        Number(button.dataset.id);
 
-        const newStatus =
-          button.dataset.status;
+      const newStatus =
+        button.dataset.status;
 
-        button.disabled = true;
+      button.disabled = true;
 
-        const { error } = await db
-          .from("tasks")
-          .update({
-            status: newStatus
-          })
-          .eq("id", taskId);
+      const { error } = await db
+        .from("tasks")
+        .update({
+          status: newStatus
+        })
+        .eq("id", taskId);
 
-        if (error) {
-          alert(error.message);
-          button.disabled = false;
-          return;
-        }
+      if (error) {
+        alert(error.message);
+        button.disabled = false;
+        return;
+      }
 
-        await loadAdminTasks();
+      await loadAdminTasks();
 
-        if (typeof refresh === "function") {
-          await refresh();
-        }
+      if (typeof refresh === "function") {
+        await refresh();
+      }
 
-      });
+    });
+
+  });
+
+  /* EDIT BUTTONS */
+
+  box.querySelectorAll(
+    ".admin-task-edit"
+  ).forEach(button => {
+
+    button.addEventListener("click", async () => {
+
+      const taskId =
+        Number(button.dataset.id);
+
+      const task =
+        tasks.find(
+          item => Number(item.id) === taskId
+        );
+
+      if (!task) return;
+
+      const title = prompt(
+        "Task title:",
+        task.title || ""
+      );
+
+      if (title === null) return;
+
+      const description = prompt(
+        "Task description:",
+        task.description || ""
+      );
+
+      if (description === null) return;
+
+      const pointsText = prompt(
+        "Task points:",
+        task.points
+      );
+
+      if (pointsText === null) return;
+
+      const points =
+        Number(pointsText);
+
+      if (!title.trim()) {
+        alert("Task title cannot be empty.");
+        return;
+      }
+
+      if (
+        !Number.isInteger(points) ||
+        points <= 0
+      ) {
+        alert(
+          "Points must be a whole number greater than 0."
+        );
+        return;
+      }
+
+      const { error } = await db
+        .from("tasks")
+        .update({
+          title: title.trim(),
+          description: description.trim(),
+          points
+        })
+        .eq("id", taskId);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      await loadAdminTasks();
 
     });
 
-
-  box.querySelectorAll(".admin-task-edit")
-    .forEach(button => {
-
-      button.addEventListener("click", async () => {
-
-        const taskId =
-          Number(button.dataset.id);
-
-        const task =
-          tasks.find(
-            item => Number(item.id) === taskId
-          );
-
-        if (!task) return;
-
-
-        const title =
-          prompt(
-            "Task title:",
-            task.title || ""
-          );
-
-        if (title === null) return;
-
-
-        const description =
-          prompt(
-            "Task description:",
-            task.description || ""
-          );
-
-        if (description === null) return;
-
-
-        const pointsText =
-          prompt(
-            "Task points:",
-            task.points
-          );
-
-        if (pointsText === null) return;
-
-
-        const points =
-          Number(pointsText);
-
-
-        if (!title.trim()) {
-          alert(
-            "Task title cannot be empty."
-          );
-          return;
-        }
-
-
-        if (
-          !Number.isInteger(points) ||
-          points <= 0
-        ) {
-          alert(
-            "Points must be a whole number greater than 0."
-          );
-          return;
-        }
-
-
-        const { error } =
-          await db
-            .from("tasks")
-            .update({
-              title: title.trim(),
-              description: description.trim(),
-              points
-            })
-            .eq("id", taskId);
-
-
-        if (error) {
-          alert(error.message);
-          return;
-        }
-
-
-        await loadAdminTasks();
-
-      });
-
-    });
+  });
 
 }
-
 
 /* =========================
    CREATE TASK
@@ -325,7 +310,6 @@ async function createAdminTask() {
       "adminTaskMsg"
     );
 
-
   if (
     !titleInput ||
     !pointsInput ||
@@ -333,7 +317,6 @@ async function createAdminTask() {
   ) {
     return;
   }
-
 
   const title =
     titleInput.value.trim();
@@ -347,13 +330,11 @@ async function createAdminTask() {
   const status =
     statusInput?.value || "draft";
 
-
   if (!title) {
     message.textContent =
       "Enter a task title.";
     return;
   }
-
 
   if (
     !Number.isInteger(points) ||
@@ -364,24 +345,20 @@ async function createAdminTask() {
     return;
   }
 
-
-  const { error } =
-    await db
-      .from("tasks")
-      .insert({
-        title,
-        description,
-        points,
-        status
-      });
-
+  const { error } = await db
+    .from("tasks")
+    .insert({
+      title,
+      description,
+      points,
+      status
+    });
 
   if (error) {
     message.textContent =
       error.message;
     return;
   }
-
 
   titleInput.value = "";
 
@@ -395,9 +372,7 @@ async function createAdminTask() {
     "Task created successfully.";
 
   await loadAdminTasks();
-
 }
-
 
 /* =========================
    SUBMISSION MANAGEMENT
@@ -411,7 +386,6 @@ async function loadAdminSubmissions() {
     );
 
   if (!box) return;
-
 
   const {
     data: submissions,
@@ -437,13 +411,11 @@ async function loadAdminSubmissions() {
       ascending: false
     });
 
-
   if (error) {
 
     box.innerHTML = `
       <div class="empty-card">
         Unable to load submissions.
-
         <small>
           ${adminEscape(error.message)}
         </small>
@@ -452,7 +424,6 @@ async function loadAdminSubmissions() {
 
     return;
   }
-
 
   if (!submissions?.length) {
 
@@ -465,120 +436,104 @@ async function loadAdminSubmissions() {
     return;
   }
 
-
   box.innerHTML =
-    submissions.map(
-      submission => {
+    submissions.map(submission => {
 
-        const taskTitle =
-          submission.tasks?.title ||
-          `Task #${submission.task_id}`;
+      const taskTitle =
+        submission.tasks?.title ||
+        `Task #${submission.task_id}`;
 
-        const taskPoints =
-          submission.tasks?.points ?? 0;
+      const taskPoints =
+        submission.tasks?.points ?? 0;
 
+      return `
 
-        return `
+        <div class="history-row">
 
-          <div class="history-row">
+          <div style="min-width:0">
 
-            <div style="min-width:0">
+            <strong>
+              ${adminEscape(taskTitle)}
+            </strong>
 
-              <strong>
-                ${adminEscape(taskTitle)}
-              </strong>
+            <small>
+              User:
+              ${adminEscape(
+                submission.user_id
+              )}
+            </small>
 
-              <small>
-                User:
-                ${adminEscape(
-                  submission.user_id
-                )}
-              </small>
+            <small>
+              ${taskPoints} task points
+            </small>
 
-              <small>
-                ${taskPoints} task points
-              </small>
+            <small>
+              Submission #${submission.id}
+            </small>
 
-              <small>
-                Submission #${submission.id}
-              </small>
+            ${
+              submission.proof
+                ? `
+                  <div style="
+                    margin-top:8px;
+                    padding:10px;
+                    border:1px solid
+                      rgba(0,200,255,.25);
+                    border-radius:10px;
+                    word-break:break-word;
+                  ">
 
-              ${
-                submission.proof
-                  ? `
-                    <div style="
-                      margin-top:8px;
-                      padding:10px;
-                      border:
-                        1px solid
-                        rgba(0,200,255,.25);
-                      border-radius:10px;
-                      word-break:break-word;
-                    ">
+                    <strong>
+                      Proof:
+                    </strong>
 
-                      <strong>
-                        Proof:
-                      </strong>
-
-                      <div>
-                        ${adminEscape(
-                          submission.proof
-                        )}
-                      </div>
-
+                    <div>
+                      ${adminEscape(
+                        submission.proof
+                      )}
                     </div>
-                  `
-                  : `
-                    <small>
-                      No proof provided.
-                    </small>
-                  `
-              }
 
-            </div>
-
-
-            <div style="
-              display:flex;
-              flex-direction:column;
-              gap:8px;
-              min-width:120px;
-            ">
-
-              <button
-                class="
-                  gradient-button
-                  admin-submission-approve
-                "
-                data-id="${submission.id}"
-                type="button">
-
-                Approve
-
-              </button>
-
-
-              <button
-                class="
-                  outline-button
-                  admin-submission-reject
-                "
-                data-id="${submission.id}"
-                type="button">
-
-                Reject
-
-              </button>
-
-            </div>
+                  </div>
+                `
+                : `
+                  <small>
+                    No proof provided.
+                  </small>
+                `
+            }
 
           </div>
 
-        `;
+          <div style="
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            min-width:120px;
+          ">
 
-      }
-    ).join("");
+            <button
+              class="gradient-button
+                admin-submission-approve"
+              data-id="${submission.id}"
+              type="button">
+              Approve
+            </button>
 
+            <button
+              class="outline-button
+                admin-submission-reject"
+              data-id="${submission.id}"
+              type="button">
+              Reject
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
 
   /* APPROVE */
 
@@ -593,22 +548,17 @@ async function loadAdminSubmissions() {
         const submissionId =
           Number(button.dataset.id);
 
-
         const note =
           prompt(
             "Admin note (optional):",
             "Submission approved."
           );
 
-
         if (note === null) return;
 
-
         button.disabled = true;
-
         button.textContent =
           "Approving...";
-
 
         const { error } =
           await db
@@ -620,33 +570,25 @@ async function loadAdminSubmissions() {
               reviewed_at:
                 new Date().toISOString()
             })
-            .eq("id", submissionId)
-            .eq("status", "pending");
-
+            .eq(
+              "id",
+              submissionId
+            )
+            .eq(
+              "status",
+              "pending"
+            );
 
         if (error) {
 
           alert(error.message);
 
           button.disabled = false;
-
           button.textContent =
             "Approve";
 
           return;
         }
-
-
-        /*
-          IMPORTANT:
-
-          Approving a task submission
-          DOES NOT add points.
-
-          Points are added later when
-          the reward request is approved.
-        */
-
 
         await loadAdminSubmissions();
 
@@ -654,7 +596,6 @@ async function loadAdminSubmissions() {
     );
 
   });
-
 
   /* REJECT */
 
@@ -669,16 +610,13 @@ async function loadAdminSubmissions() {
         const submissionId =
           Number(button.dataset.id);
 
-
         const note =
           prompt(
             "Reason for rejection:",
             ""
           );
 
-
         if (note === null) return;
-
 
         if (!note.trim()) {
 
@@ -689,12 +627,9 @@ async function loadAdminSubmissions() {
           return;
         }
 
-
         button.disabled = true;
-
         button.textContent =
           "Rejecting...";
-
 
         const { error } =
           await db
@@ -706,22 +641,25 @@ async function loadAdminSubmissions() {
               reviewed_at:
                 new Date().toISOString()
             })
-            .eq("id", submissionId)
-            .eq("status", "pending");
-
+            .eq(
+              "id",
+              submissionId
+            )
+            .eq(
+              "status",
+              "pending"
+            );
 
         if (error) {
 
           alert(error.message);
 
           button.disabled = false;
-
           button.textContent =
             "Reject";
 
           return;
         }
-
 
         await loadAdminSubmissions();
 
@@ -731,7 +669,6 @@ async function loadAdminSubmissions() {
   });
 
 }
-
 
 /* =========================
    BUSINESS MANAGEMENT
@@ -745,7 +682,6 @@ async function loadAdminBusinesses() {
     );
 
   if (!box) return;
-
 
   const {
     data: businesses,
@@ -764,24 +700,19 @@ async function loadAdminBusinesses() {
       ascending: false
     });
 
-
   if (error) {
 
     box.innerHTML = `
       <div class="empty-card">
-
         Unable to load businesses.
-
         <small>
           ${adminEscape(error.message)}
         </small>
-
       </div>
     `;
 
     return;
   }
-
 
   if (!businesses?.length) {
 
@@ -794,165 +725,130 @@ async function loadAdminBusinesses() {
     return;
   }
 
-
   box.innerHTML =
-    businesses.map(
-      business => `
+    businesses.map(business => `
 
-        <div class="history-row">
+      <div class="history-row">
 
-          <div style="min-width:0">
+        <div style="min-width:0">
 
-            <strong>
-              ${adminEscape(
-                business.name
-              )}
-            </strong>
+          <strong>
+            ${adminEscape(
+              business.name
+            )}
+          </strong>
 
-            <small>
-              Status:
-              ${adminEscape(
-                business.status
-              )}
-            </small>
+          <small>
+            Status:
+            ${adminEscape(
+              business.status
+            )}
+          </small>
 
-            ${
-              business.description
-                ? `
-                  <small>
-                    ${adminEscape(
-                      business.description
-                    )}
-                  </small>
-                `
-                : ""
-            }
+          ${
+            business.description
+              ? `
+                <small>
+                  ${adminEscape(
+                    business.description
+                  )}
+                </small>
+              `
+              : ""
+          }
 
-            ${
-              business.website
-                ? `
-                  <small>
-                    ${adminEscape(
-                      business.website
-                    )}
-                  </small>
-                `
-                : ""
-            }
+          ${
+            business.website
+              ? `
+                <small>
+                  ${adminEscape(
+                    business.website
+                  )}
+                </small>
+              `
+              : ""
+          }
 
-            <small>
-              Business ID:
-              ${business.id}
-            </small>
-
-          </div>
-
-
-          <div style="
-            display:flex;
-            gap:8px;
-            flex-wrap:wrap;
-          ">
-
-            <button
-              class="
-                outline-button
-                admin-business-edit
-              "
-              data-id="${business.id}"
-              type="button">
-
-              Edit
-
-            </button>
-
-
-            ${
-              business.status === "pending"
-                ? `
-
-                  <button
-                    class="
-                      gradient-button
-                      admin-business-status
-                    "
-                    data-id="${business.id}"
-                    data-status="approved"
-                    type="button">
-
-                    Approve
-
-                  </button>
-
-
-                  <button
-                    class="
-                      outline-button
-                      admin-business-status
-                    "
-                    data-id="${business.id}"
-                    data-status="rejected"
-                    type="button">
-
-                    Reject
-
-                  </button>
-
-                `
-                : ""
-            }
-
-
-            ${
-              business.status === "approved"
-                ? `
-
-                  <button
-                    class="
-                      outline-button
-                      admin-business-status
-                    "
-                    data-id="${business.id}"
-                    data-status="inactive"
-                    type="button">
-
-                    Deactivate
-
-                  </button>
-
-                `
-                : ""
-            }
-
-
-            ${
-              business.status === "inactive"
-                ? `
-
-                  <button
-                    class="
-                      gradient-button
-                      admin-business-status
-                    "
-                    data-id="${business.id}"
-                    data-status="approved"
-                    type="button">
-
-                    Reactivate
-
-                  </button>
-
-                `
-                : ""
-            }
-
-          </div>
+          <small>
+            Business ID:
+            ${business.id}
+          </small>
 
         </div>
 
-      `
-    ).join("");
+        <div style="
+          display:flex;
+          gap:8px;
+          flex-wrap:wrap;
+        ">
 
+          <button
+            class="outline-button
+              admin-business-edit"
+            data-id="${business.id}"
+            type="button">
+            Edit
+          </button>
+
+          ${
+            business.status === "pending"
+              ? `
+                <button
+                  class="gradient-button
+                    admin-business-status"
+                  data-id="${business.id}"
+                  data-status="approved"
+                  type="button">
+                  Approve
+                </button>
+
+                <button
+                  class="outline-button
+                    admin-business-status"
+                  data-id="${business.id}"
+                  data-status="rejected"
+                  type="button">
+                  Reject
+                </button>
+              `
+              : ""
+          }
+
+          ${
+            business.status === "approved"
+              ? `
+                <button
+                  class="outline-button
+                    admin-business-status"
+                  data-id="${business.id}"
+                  data-status="inactive"
+                  type="button">
+                  Deactivate
+                </button>
+              `
+              : ""
+          }
+
+          ${
+            business.status === "inactive"
+              ? `
+                <button
+                  class="gradient-button
+                    admin-business-status"
+                  data-id="${business.id}"
+                  data-status="approved"
+                  type="button">
+                  Reactivate
+                </button>
+              `
+              : ""
+          }
+
+        </div>
+
+      </div>
+
+    `).join("");
 
   /* BUSINESS STATUS */
 
@@ -970,18 +866,16 @@ async function loadAdminBusinesses() {
         const status =
           button.dataset.status;
 
-
         button.disabled = true;
-
 
         const { error } =
           await db
             .from("businesses")
-            .update({
-              status
-            })
-            .eq("id", businessId);
-
+            .update({ status })
+            .eq(
+              "id",
+              businessId
+            );
 
         if (error) {
 
@@ -992,14 +886,12 @@ async function loadAdminBusinesses() {
           return;
         }
 
-
         await loadAdminBusinesses();
 
       }
     );
 
   });
-
 
   /* BUSINESS EDIT */
 
@@ -1014,7 +906,6 @@ async function loadAdminBusinesses() {
         const businessId =
           Number(button.dataset.id);
 
-
         const business =
           businesses.find(
             item =>
@@ -1022,9 +913,7 @@ async function loadAdminBusinesses() {
               businessId
           );
 
-
         if (!business) return;
-
 
         const name =
           prompt(
@@ -1032,9 +921,7 @@ async function loadAdminBusinesses() {
             business.name || ""
           );
 
-
         if (name === null) return;
-
 
         const description =
           prompt(
@@ -1042,9 +929,7 @@ async function loadAdminBusinesses() {
             business.description || ""
           );
 
-
         if (description === null) return;
-
 
         const website =
           prompt(
@@ -1052,9 +937,7 @@ async function loadAdminBusinesses() {
             business.website || ""
           );
 
-
         if (website === null) return;
-
 
         if (!name.trim()) {
 
@@ -1064,7 +947,6 @@ async function loadAdminBusinesses() {
 
           return;
         }
-
 
         const { error } =
           await db
@@ -1076,8 +958,10 @@ async function loadAdminBusinesses() {
               website:
                 website.trim()
             })
-            .eq("id", businessId);
-
+            .eq(
+              "id",
+              businessId
+            );
 
         if (error) {
 
@@ -1085,7 +969,6 @@ async function loadAdminBusinesses() {
 
           return;
         }
-
 
         await loadAdminBusinesses();
 
@@ -1095,7 +978,6 @@ async function loadAdminBusinesses() {
   });
 
 }
-
 
 /* =========================
    REWARD MANAGEMENT
@@ -1109,7 +991,6 @@ async function loadAdminRedemptions() {
     );
 
   if (!box) return;
-
 
   const {
     data,
@@ -1129,24 +1010,21 @@ async function loadAdminRedemptions() {
       ascending: false
     });
 
-
   if (error) {
 
     box.innerHTML = `
       <div class="empty-card">
-
         Unable to load pending rewards.
-
         <small>
-          ${adminEscape(error.message)}
+          ${adminEscape(
+            error.message
+          )}
         </small>
-
       </div>
     `;
 
     return;
   }
-
 
   if (!data?.length) {
 
@@ -1159,58 +1037,49 @@ async function loadAdminRedemptions() {
     return;
   }
 
-
   box.innerHTML =
-    data.map(
-      request => `
+    data.map(request => `
 
-        <div class="history-row">
+      <div class="history-row">
 
-          <div style="min-width:0">
+        <div style="min-width:0">
 
-            <strong>
-              ${request.points_requested}
-              points
-            </strong>
+          <strong>
+            ${request.points_requested}
+            points
+          </strong>
 
-            <small>
-              Request #${request.id}
-            </small>
+          <small>
+            Request #${request.id}
+          </small>
 
-            <small>
-              User:
-              ${adminEscape(
-                request.user_id
-              )}
-            </small>
+          <small>
+            User:
+            ${adminEscape(
+              request.user_id
+            )}
+          </small>
 
-            <small>
-              Reward:
-              ${adminEscape(
-                request.reward_type
-              )}
-            </small>
-
-          </div>
-
-
-          <button
-            class="
-              gradient-button
-              admin-approve
-            "
-            data-id="${request.id}"
-            type="button">
-
-            Approve
-
-          </button>
+          <small>
+            Reward:
+            ${adminEscape(
+              request.reward_type
+            )}
+          </small>
 
         </div>
 
-      `
-    ).join("");
+        <button
+          class="gradient-button
+            admin-approve"
+          data-id="${request.id}"
+          type="button">
+          Approve
+        </button>
 
+      </div>
+
+    `).join("");
 
   box.querySelectorAll(
     ".admin-approve"
@@ -1223,12 +1092,9 @@ async function loadAdminRedemptions() {
         const requestId =
           Number(button.dataset.id);
 
-
         button.disabled = true;
-
         button.textContent =
           "Approving...";
-
 
         const { error } =
           await db.rpc(
@@ -1239,22 +1105,18 @@ async function loadAdminRedemptions() {
             }
           );
 
-
         if (error) {
 
           alert(error.message);
 
           button.disabled = false;
-
           button.textContent =
             "Approve";
 
           return;
         }
 
-
         await loadAdminRedemptions();
-
 
         if (typeof refresh === "function") {
           await refresh();
@@ -1267,6 +1129,359 @@ async function loadAdminRedemptions() {
 
 }
 
+/* =========================
+   CATEGORY MANAGEMENT
+========================= */
+
+async function loadAdminCategories() {
+
+  const box =
+    document.getElementById(
+      "adminCategories"
+    );
+
+  if (!box) return;
+
+  const {
+    data: categories,
+    error
+  } = await db
+    .from("task_categories")
+    .select(`
+      id,
+      name,
+      description,
+      created_at
+    `)
+    .order("name", {
+      ascending: true
+    });
+
+  if (error) {
+
+    box.innerHTML = `
+      <div class="empty-card">
+        Unable to load categories.
+        <small>
+          ${adminEscape(
+            error.message
+          )}
+        </small>
+      </div>
+    `;
+
+    return;
+  }
+
+  if (!categories?.length) {
+
+    box.innerHTML = `
+      <div class="empty-card">
+        No categories found.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML =
+    categories.map(category => `
+
+      <div class="history-row">
+
+        <div style="min-width:0">
+
+          <strong>
+            ${adminEscape(
+              category.name
+            )}
+          </strong>
+
+          <small>
+            ${adminEscape(
+              category.description ||
+              "No description"
+            )}
+          </small>
+
+          <small>
+            Category ID:
+            ${category.id}
+          </small>
+
+        </div>
+
+        <div style="
+          display:flex;
+          gap:8px;
+          flex-wrap:wrap;
+        ">
+
+          <button
+            class="outline-button
+              admin-category-edit"
+            data-id="${category.id}"
+            type="button">
+            Edit
+          </button>
+
+          <button
+            class="outline-button
+              admin-category-delete"
+            data-id="${category.id}"
+            type="button">
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+  /* EDIT CATEGORY */
+
+  box.querySelectorAll(
+    ".admin-category-edit"
+  ).forEach(button => {
+
+    button.addEventListener(
+      "click",
+      async () => {
+
+        const categoryId =
+          Number(button.dataset.id);
+
+        const category =
+          categories.find(
+            item =>
+              Number(item.id) ===
+              categoryId
+          );
+
+        if (!category) return;
+
+        const name =
+          prompt(
+            "Category name:",
+            category.name || ""
+          );
+
+        if (name === null) return;
+
+        const description =
+          prompt(
+            "Category description:",
+            category.description || ""
+          );
+
+        if (description === null) return;
+
+        if (!name.trim()) {
+
+          alert(
+            "Category name cannot be empty."
+          );
+
+          return;
+        }
+
+        const { error } =
+          await db
+            .from("task_categories")
+            .update({
+              name: name.trim(),
+              description:
+                description.trim()
+            })
+            .eq(
+              "id",
+              categoryId
+            );
+
+        if (error) {
+
+          alert(error.message);
+
+          return;
+        }
+
+        await loadAdminCategories();
+        await loadAdminTasks();
+
+      }
+    );
+
+  });
+
+  /* DELETE CATEGORY */
+
+  box.querySelectorAll(
+    ".admin-category-delete"
+  ).forEach(button => {
+
+    button.addEventListener(
+      "click",
+      async () => {
+
+        const categoryId =
+          Number(button.dataset.id);
+
+        const category =
+          categories.find(
+            item =>
+              Number(item.id) ===
+              categoryId
+          );
+
+        const categoryName =
+          category?.name ||
+          "this category";
+
+        const confirmed =
+          confirm(
+            `Delete category "${categoryName}"?`
+          );
+
+        if (!confirmed) return;
+
+        /*
+          Check whether tasks are using
+          this category first.
+        */
+
+        const {
+          count,
+          error: taskCheckError
+        } = await db
+          .from("tasks")
+          .select(
+            "id",
+            {
+              count: "exact",
+              head: true
+            }
+          )
+          .eq(
+            "category_id",
+            categoryId
+          );
+
+        if (taskCheckError) {
+
+          alert(
+            taskCheckError.message
+          );
+
+          return;
+        }
+
+        if ((count || 0) > 0) {
+
+          alert(
+            "This category is being used by one or more tasks. Reassign those tasks first."
+          );
+
+          return;
+        }
+
+        const { error } =
+          await db
+            .from("task_categories")
+            .delete()
+            .eq(
+              "id",
+              categoryId
+            );
+
+        if (error) {
+
+          alert(error.message);
+
+          return;
+        }
+
+        await loadAdminCategories();
+
+      }
+    );
+
+  });
+
+}
+
+/* =========================
+   CREATE CATEGORY
+========================= */
+
+async function createAdminCategory() {
+
+  const nameInput =
+    document.getElementById(
+      "adminCategoryName"
+    );
+
+  const descriptionInput =
+    document.getElementById(
+      "adminCategoryDescription"
+    );
+
+  const message =
+    document.getElementById(
+      "adminCategoryMsg"
+    );
+
+  if (!nameInput) return;
+
+  const name =
+    nameInput.value.trim();
+
+  const description =
+    descriptionInput
+      ? descriptionInput.value.trim()
+      : "";
+
+  if (!name) {
+
+    if (message) {
+      message.textContent =
+        "Category name is required.";
+    }
+
+    return;
+  }
+
+  const { error } =
+    await db
+      .from("task_categories")
+      .insert({
+        name,
+        description
+      });
+
+  if (error) {
+
+    if (message) {
+      message.textContent =
+        error.message;
+    }
+
+    return;
+  }
+
+  nameInput.value = "";
+
+  if (descriptionInput) {
+    descriptionInput.value = "";
+  }
+
+  if (message) {
+    message.textContent =
+      "Category created.";
+  }
+
+  await loadAdminCategories();
+}
 
 /* =========================
    BUILD ADMIN PANEL
@@ -1277,15 +1492,12 @@ async function loadAdminPanel() {
   const admin =
     await isCurrentUserAdmin();
 
-
   if (!admin) return;
-
 
   let panel =
     document.getElementById(
       "adminPanel"
     );
-
 
   if (!panel) {
 
@@ -1300,15 +1512,10 @@ async function loadAdminPanel() {
     panel.className =
       "panel";
 
-
     panel.innerHTML = `
 
       <div class="panel-heading">
-
-        <h2>
-          ⚙ Admin Panel
-        </h2>
-
+        <h2>⚙ Admin Panel</h2>
       </div>
 
 
@@ -1320,13 +1527,11 @@ async function loadAdminPanel() {
           Task Management
         </h3>
 
-
         <input
           id="adminTaskTitle"
           type="text"
           placeholder="Task title"
         >
-
 
         <textarea
           id="adminTaskDescription"
@@ -1334,14 +1539,12 @@ async function loadAdminPanel() {
           placeholder="Task description"
         ></textarea>
 
-
         <input
           id="adminTaskPoints"
           type="number"
           min="1"
           placeholder="Points"
         >
-
 
         <select
           id="adminTaskStatus">
@@ -1364,16 +1567,12 @@ async function loadAdminPanel() {
 
         </select>
 
-
         <button
           id="adminCreateTask"
           class="gradient-button"
           type="button">
-
           Create Task
-
         </button>
-
 
         <p
           id="adminTaskMsg"
@@ -1392,7 +1591,57 @@ async function loadAdminPanel() {
       </div>
 
 
-      <!-- SUBMISSIONS -->
+      <!-- CATEGORY MANAGEMENT -->
+
+      <div
+        class="panel-heading"
+        style="margin-top:24px">
+
+        <h2>
+          📂 Category Management
+        </h2>
+
+      </div>
+
+      <div class="reward-box">
+
+        <input
+          id="adminCategoryName"
+          type="text"
+          placeholder="Category name"
+        >
+
+        <textarea
+          id="adminCategoryDescription"
+          rows="2"
+          placeholder="Category description"
+        ></textarea>
+
+        <button
+          id="adminCreateCategory"
+          class="gradient-button"
+          type="button">
+          Create Category
+        </button>
+
+        <p
+          id="adminCategoryMsg"
+          class="status">
+        </p>
+
+      </div>
+
+
+      <div id="adminCategories">
+
+        <div class="loading-box">
+          Loading categories...
+        </div>
+
+      </div>
+
+
+      <!-- SUBMISSION MANAGEMENT -->
 
       <div
         class="panel-heading"
@@ -1404,7 +1653,6 @@ async function loadAdminPanel() {
 
       </div>
 
-
       <div id="adminSubmissions">
 
         <div class="loading-box">
@@ -1414,7 +1662,7 @@ async function loadAdminPanel() {
       </div>
 
 
-      <!-- BUSINESSES -->
+      <!-- BUSINESS MANAGEMENT -->
 
       <div
         class="panel-heading"
@@ -1426,7 +1674,6 @@ async function loadAdminPanel() {
 
       </div>
 
-
       <div id="adminBusinesses">
 
         <div class="loading-box">
@@ -1436,7 +1683,7 @@ async function loadAdminPanel() {
       </div>
 
 
-      <!-- REWARDS -->
+      <!-- REWARD MANAGEMENT -->
 
       <div
         class="panel-heading"
@@ -1448,7 +1695,6 @@ async function loadAdminPanel() {
 
       </div>
 
-
       <div id="adminRedemptions">
 
         <div class="loading-box">
@@ -1459,46 +1705,55 @@ async function loadAdminPanel() {
 
     `;
 
-
     const dashboard =
       document.getElementById(
         "dashboard"
       );
 
-
     if (dashboard) {
       dashboard.prepend(panel);
     }
 
-
-    const createButton =
+    const createTaskButton =
       document.getElementById(
         "adminCreateTask"
       );
 
+    if (createTaskButton) {
 
-    if (createButton) {
-
-      createButton.addEventListener(
+      createTaskButton.addEventListener(
         "click",
         createAdminTask
       );
 
     }
 
+    const createCategoryButton =
+      document.getElementById(
+        "adminCreateCategory"
+      );
+
+    if (createCategoryButton) {
+
+      createCategoryButton.addEventListener(
+        "click",
+        createAdminCategory
+      );
+
+    }
+
   }
 
-
   await loadAdminTasks();
+
+  await loadAdminCategories();
 
   await loadAdminSubmissions();
 
   await loadAdminBusinesses();
 
   await loadAdminRedemptions();
-
 }
-
 
 /* =========================
    START ADMIN
@@ -1515,7 +1770,6 @@ window.addEventListener(
 
   }
 );
-
 
 if (typeof db !== "undefined") {
 
