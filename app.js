@@ -72,7 +72,7 @@ async function updateAuthState() {
 
 
 /* =========================
-   PROFILE
+   PROFILE + BALANCE
 ========================= */
 
 async function loadProfile() {
@@ -91,25 +91,169 @@ async function loadProfile() {
 
   if (error) {
 
-    console.error("PULSE profile error:", error);
+    console.error(
+      "PULSE profile error:",
+      error
+    );
 
     return;
   }
 
-  const balance = $("balance") || $("points");
+  const balance = Number(data?.points ?? 0);
 
-  if (balance) {
-    balance.textContent = data?.points ?? 0;
+  if ($("balance")) {
+    $("balance").textContent = balance;
   }
 
-  const profileName = $("profileName");
+  if ($("profileName")) {
 
-  if (profileName) {
-
-    profileName.textContent =
+    $("profileName").textContent =
       data?.name ||
       user.email?.split("@")[0] ||
       "User";
+  }
+
+  /*
+    The profile points value is the user's
+    current available PLS/point balance.
+  */
+
+  if ($("availableBalance")) {
+    $("availableBalance").textContent =
+      balance + " PLS";
+  }
+
+  if ($("withdrawAvailable")) {
+    $("withdrawAvailable").textContent =
+      balance + " PLS";
+  }
+
+  await loadEarningsSummary();
+}
+
+
+/* =========================
+   EARNINGS SUMMARY
+========================= */
+
+async function loadEarningsSummary() {
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  if (!user) return;
+
+  /*
+    Total task rewards ever credited.
+  */
+
+  const { data: rewards, error: rewardError } =
+    await db
+      .from("points_ledger")
+      .select("amount,reason")
+      .eq("user_id", user.id)
+      .eq("reason", "Task reward");
+
+  if (rewardError) {
+
+    console.error(
+      "PULSE earnings error:",
+      rewardError
+    );
+
+    return;
+  }
+
+  const totalEarned =
+    (rewards || []).reduce(
+      (total, row) =>
+        total + Number(row.amount || 0),
+      0
+    );
+
+
+  /*
+    Pending withdrawal requests.
+  */
+
+  const {
+    data: pendingRequests,
+    error: pendingError
+  } = await db
+    .from("redemption_requests")
+    .select("points_requested")
+    .eq("user_id", user.id)
+    .eq("status", "pending");
+
+  if (pendingError) {
+
+    console.error(
+      "PULSE pending withdrawal error:",
+      pendingError
+    );
+
+    return;
+  }
+
+  const pendingWithdrawal =
+    (pendingRequests || []).reduce(
+      (total, row) =>
+        total + Number(row.points_requested || 0),
+      0
+    );
+
+
+  /*
+    Current profile balance is the amount
+    that remains available.
+  */
+
+  const {
+    data: profile,
+    error: profileError
+  } = await db
+    .from("profiles")
+    .select("points")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profileError) {
+
+    console.error(
+      "PULSE balance summary error:",
+      profileError
+    );
+
+    return;
+  }
+
+  const available =
+    Number(profile?.points ?? 0);
+
+
+  if ($("totalEarned")) {
+
+    $("totalEarned").textContent =
+      totalEarned + " PLS";
+  }
+
+  if ($("pendingWithdrawal")) {
+
+    $("pendingWithdrawal").textContent =
+      pendingWithdrawal + " PLS";
+  }
+
+  if ($("availableBalance")) {
+
+    $("availableBalance").textContent =
+      available + " PLS";
+  }
+
+  if ($("withdrawAvailable")) {
+
+    $("withdrawAvailable").textContent =
+      available + " PLS";
   }
 }
 
@@ -145,7 +289,10 @@ async function loadTasks() {
 
   if (error) {
 
-    console.error("PULSE tasks error:", error);
+    console.error(
+      "PULSE tasks error:",
+      error
+    );
 
     box.innerHTML = `
       <div class="empty-card">
@@ -552,7 +699,7 @@ async function loadRedemptions() {
 
     box.innerHTML = `
       <div class="empty-card">
-        No rewards requested yet.
+        No withdrawals requested yet.
       </div>
     `;
 
@@ -566,7 +713,7 @@ async function loadRedemptions() {
       <div>
 
         <strong>
-          ${item.points_requested} points
+          ${item.points_requested} PLS
         </strong>
 
         <small>
@@ -1079,7 +1226,7 @@ function setupPasswordReset() {
 
 
 /* =========================
-   REDEEM
+   REDEEM / WITHDRAWAL
 ========================= */
 
 function setupRedeem() {
@@ -1107,7 +1254,7 @@ function setupRedeem() {
 
       msg(
         $("redeemMsg"),
-        "Enter a valid point amount."
+        "Enter a valid PLS amount."
       );
 
       return;
@@ -1117,10 +1264,15 @@ function setupRedeem() {
 
     msg(
       $("redeemMsg"),
-      "Submitting reward request..."
+      "Submitting withdrawal request..."
     );
 
     try {
+
+      /*
+        The database performs the real
+        available-balance check.
+      */
 
       const { error } =
         await db.rpc(
@@ -1136,7 +1288,7 @@ function setupRedeem() {
       if (error) {
 
         console.error(
-          "PULSE reward request error:",
+          "PULSE withdrawal request error:",
           error
         );
 
@@ -1153,13 +1305,14 @@ function setupRedeem() {
 
       msg(
         $("redeemMsg"),
-        "Reward request submitted."
+        "Withdrawal request submitted for admin approval."
       );
 
       await Promise.all([
         loadRedemptions(),
         loadNotifications(),
-        loadProfile()
+        loadProfile(),
+        loadEarningsSummary()
       ]);
 
     } finally {
