@@ -466,7 +466,8 @@ async function loadAdminSubmissions() {
             </small>
 
             <small>
-              ${taskPoints} task points
+              Reward:
+              ${taskPoints} points
             </small>
 
             <small>
@@ -591,6 +592,10 @@ async function loadAdminSubmissions() {
         }
 
         await loadAdminSubmissions();
+
+        if (typeof refresh === "function") {
+          await refresh();
+        }
 
       }
     );
@@ -979,7 +984,7 @@ async function loadAdminBusinesses() {
 }
 
 /* =========================
-   REWARD MANAGEMENT
+   REWARD / PLS WITHDRAWAL MANAGEMENT
 ========================= */
 
 async function loadAdminRedemptions() {
@@ -1023,7 +1028,7 @@ async function loadAdminRedemptions() {
 
     box.innerHTML = `
       <div class="empty-card">
-        Unable to load rewards.
+        Unable to load PLS withdrawal requests.
         <small>
           ${adminEscape(error.message)}
         </small>
@@ -1037,7 +1042,7 @@ async function loadAdminRedemptions() {
 
     box.innerHTML = `
       <div class="empty-card">
-        No pending reward requests.
+        No pending PLS withdrawal requests.
       </div>
     `;
 
@@ -1045,77 +1050,103 @@ async function loadAdminRedemptions() {
   }
 
   box.innerHTML =
-    rewards.map(reward => `
+    rewards.map(reward => {
 
-      <div class="history-row">
+      const requestedAmount =
+        Number(reward.points_requested) || 0;
 
-        <div style="min-width:0">
+      return `
 
-          <strong>
-            ${adminEscape(
-              reward.reward_type
-            )}
-          </strong>
+        <div class="history-row">
 
-          <small>
-            User:
-            ${adminEscape(
-              reward.user_id
-            )}
-          </small>
+          <div style="min-width:0">
 
-          <small>
-            Points:
-            ${reward.points_requested}
-          </small>
+            <strong>
+              PLS Withdrawal Request
+            </strong>
 
-          <small>
-            Request #${reward.id}
-          </small>
+            <small>
+              User:
+              ${adminEscape(
+                reward.user_id
+              )}
+            </small>
 
-          ${
-            reward.user_note
-              ? `
-                <small>
-                  Note:
-                  ${adminEscape(
-                    reward.user_note
-                  )}
-                </small>
-              `
-              : ""
-          }
+            <small>
+              Amount:
+              ${requestedAmount} PLS
+            </small>
+
+            <small>
+              Reward type:
+              ${adminEscape(
+                reward.reward_type || "manual_reward"
+              )}
+            </small>
+
+            <small>
+              Status:
+              ${adminEscape(
+                reward.status
+              )}
+            </small>
+
+            <small>
+              Request #${reward.id}
+            </small>
+
+            ${
+              reward.user_note
+                ? `
+                  <small>
+                    User note:
+                    ${adminEscape(
+                      reward.user_note
+                    )}
+                  </small>
+                `
+                : ""
+            }
+
+            <small style="
+              margin-top:6px;
+              color:#b6c9e8;
+            ">
+              Approval only. PLS is sent manually after approval.
+            </small>
+
+          </div>
+
+          <div style="
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            min-width:140px;
+          ">
+
+            <button
+              class="gradient-button
+                admin-reward-approve"
+              data-id="${reward.id}"
+              type="button">
+              Approve ${requestedAmount} PLS
+            </button>
+
+            <button
+              class="outline-button
+                admin-reward-reject"
+              data-id="${reward.id}"
+              type="button">
+              Reject
+            </button>
+
+          </div>
 
         </div>
 
-        <div style="
-          display:flex;
-          flex-direction:column;
-          gap:8px;
-          min-width:120px;
-        ">
+      `;
 
-          <button
-            class="gradient-button
-              admin-reward-approve"
-            data-id="${reward.id}"
-            type="button">
-            Give Reward
-          </button>
-
-          <button
-            class="outline-button
-              admin-reward-reject"
-            data-id="${reward.id}"
-            type="button">
-            Reject
-          </button>
-
-        </div>
-
-      </div>
-
-    `).join("");
+    }).join("");
 
   box.querySelectorAll(
     ".admin-reward-approve"
@@ -1128,17 +1159,37 @@ async function loadAdminRedemptions() {
         const requestId =
           Number(button.dataset.id);
 
+        const reward =
+          rewards.find(
+            item =>
+              Number(item.id) === requestId
+          );
+
+        if (!reward) return;
+
+        const requestedAmount =
+          Number(
+            reward.points_requested
+          ) || 0;
+
         const note =
           prompt(
-            "Admin note (optional):",
-            "Reward approved."
+            `Admin note for ${requestedAmount} PLS withdrawal (optional):`,
+            "Withdrawal approved. PLS will be sent manually."
           );
 
         if (note === null) return;
 
+        const confirmed =
+          confirm(
+            `Approve ${requestedAmount} PLS for this user?\n\nThis only approves the withdrawal request. It does NOT send PLS automatically.`
+          );
+
+        if (!confirmed) return;
+
         button.disabled = true;
         button.textContent =
-          "Giving Reward...";
+          "Approving...";
 
         const {
           error
@@ -1156,12 +1207,14 @@ async function loadAdminRedemptions() {
 
           button.disabled = false;
           button.textContent =
-            "Give Reward";
+            `Approve ${requestedAmount} PLS`;
 
           return;
         }
 
-        await db
+        const {
+          error: noteError
+        } = await db
           .from("redemption_requests")
           .update({
             admin_note:
@@ -1171,6 +1224,17 @@ async function loadAdminRedemptions() {
             "id",
             requestId
           );
+
+        if (noteError) {
+          console.error(
+            "Admin note update failed:",
+            noteError
+          );
+        }
+
+        alert(
+          `${requestedAmount} PLS withdrawal approved.\n\nRemember: the PLS transfer is still manual.`
+        );
 
         await loadAdminRedemptions();
 
@@ -1197,9 +1261,20 @@ async function loadAdminRedemptions() {
         const requestId =
           Number(button.dataset.id);
 
+        const reward =
+          rewards.find(
+            item =>
+              Number(item.id) === requestId
+          );
+
+        const requestedAmount =
+          Number(
+            reward?.points_requested
+          ) || 0;
+
         const note =
           prompt(
-            "Reason for rejection:",
+            `Reason for rejecting the ${requestedAmount} PLS withdrawal:`,
             ""
           );
 
@@ -2305,22 +2380,34 @@ async function loadAdminPanel() {
       </div>
 
 
-      <!-- REWARD MANAGEMENT -->
+      <!-- PLS WITHDRAWAL MANAGEMENT -->
 
       <div
         class="panel-heading"
         style="margin-top:24px">
 
         <h2>
-          🎁 Pending Rewards
+          💰 PLS Withdrawal Requests
         </h2>
+
+      </div>
+
+      <div class="reward-box">
+
+        <p style="
+          margin:0;
+          color:#b6c9e8;
+        ">
+          Approve or reject user withdrawal requests.
+          Approved PLS transfers are handled manually.
+        </p>
 
       </div>
 
       <div id="adminRedemptions">
 
         <div class="loading-box">
-          Loading pending rewards...
+          Loading pending PLS withdrawals...
         </div>
 
       </div>
