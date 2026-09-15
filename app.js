@@ -11,6 +11,16 @@ const db = createClient(
 
 
 /* =========================
+   PRODUCTION AUTH REDIRECT
+========================= */
+
+// Live GitHub Pages homepage.
+// This prevents Supabase email links from returning to localhost.
+const AUTH_REDIRECT_URL =
+  "https://jarvisfuturesent-rgb.github.io/Frontend/";
+
+
+/* =========================
    HELPERS
 ========================= */
 
@@ -47,7 +57,9 @@ async function updateAuthState() {
   } else {
     if ($("auth")) $("auth").hidden = false;
     if ($("dashboard")) $("dashboard").hidden = true;
-    if ($("resetPasswordPanel")) $("resetPasswordPanel").hidden = true;
+    if ($("resetPasswordPanel")) {
+      $("resetPasswordPanel").hidden = true;
+    }
   }
 }
 
@@ -73,11 +85,15 @@ async function loadProfile() {
 
   const balance = Number(data?.points ?? 0);
 
-  if ($("balance")) $("balance").textContent = balance;
+  if ($("balance")) {
+    $("balance").textContent = balance;
+  }
 
   if ($("profileName")) {
     $("profileName").textContent =
-      data?.name || user.email?.split("@")[0] || "User";
+      data?.name ||
+      user.email?.split("@")[0] ||
+      "User";
   }
 
   await loadEarningsSummary();
@@ -104,47 +120,62 @@ async function loadEarningsSummary() {
   }
 
   const totalEarned = (rewards || []).reduce(
-    (total, row) => total + Number(row.amount || 0),
+    (total, row) =>
+      total + Number(row.amount || 0),
     0
   );
 
-  const { data: pendingRequests, error: pendingError } = await db
+  const {
+    data: pendingRequests,
+    error: pendingError
+  } = await db
     .from("redemption_requests")
     .select("points_requested")
     .eq("user_id", user.id)
     .eq("status", "pending");
 
   if (pendingError) {
-    console.error("PULSE pending withdrawal error:", pendingError);
+    console.error(
+      "PULSE pending withdrawal error:",
+      pendingError
+    );
     return;
   }
 
-  const pendingWithdrawal = (pendingRequests || []).reduce(
-    (total, row) => total + Number(row.points_requested || 0),
-    0
-  );
+  const pendingWithdrawal =
+    (pendingRequests || []).reduce(
+      (total, row) =>
+        total + Number(row.points_requested || 0),
+      0
+    );
 
-  const { data: profile, error: profileError } = await db
+  const {
+    data: profile,
+    error: profileError
+  } = await db
     .from("profiles")
     .select("points")
     .eq("id", user.id)
     .maybeSingle();
 
   if (profileError) {
-    console.error("PULSE balance summary error:", profileError);
+    console.error(
+      "PULSE balance summary error:",
+      profileError
+    );
     return;
   }
 
   const balance = Number(profile?.points ?? 0);
 
-  // Pending withdrawals reserve part of the current balance.
   const available = Math.max(
     0,
     balance - pendingWithdrawal
   );
 
   if ($("totalEarned")) {
-    $("totalEarned").textContent = totalEarned + " PLS";
+    $("totalEarned").textContent =
+      totalEarned + " PLS";
   }
 
   if ($("pendingWithdrawal")) {
@@ -187,7 +218,9 @@ async function loadTasks() {
       )
     `)
     .eq("status", "active")
-    .order("created_at", { ascending: false });
+    .order("created_at", {
+      ascending: false
+    });
 
   if (error) {
     console.error("PULSE tasks error:", error);
@@ -195,7 +228,9 @@ async function loadTasks() {
     box.innerHTML = `
       <div class="empty-card">
         Unable to load tasks.
-        <small>${escapeHtml(error.message)}</small>
+        <small>
+          ${escapeHtml(error.message)}
+        </small>
       </div>
     `;
 
@@ -214,35 +249,48 @@ async function loadTasks() {
   }
 
   box.innerHTML = data.map(task => {
-    const requirements = Array.isArray(task.task_requirements)
-      ? [...task.task_requirements].sort(
-          (a, b) =>
-            (a.sort_order ?? 0) - (b.sort_order ?? 0)
-        )
-      : [];
+    const requirements =
+      Array.isArray(task.task_requirements)
+        ? [...task.task_requirements].sort(
+            (a, b) =>
+              (a.sort_order ?? 0) -
+              (b.sort_order ?? 0)
+          )
+        : [];
 
-    const requirementsHtml = requirements.length
-      ? `
-        <div class="task-requirements">
-          <strong>Requirements:</strong>
-          <ul>
-            ${requirements.map(requirement => `
-              <li>${escapeHtml(requirement.requirement)}</li>
-            `).join("")}
-          </ul>
-        </div>
-      `
-      : "";
+    const requirementsHtml =
+      requirements.length
+        ? `
+          <div class="task-requirements">
+            <strong>Requirements:</strong>
+            <ul>
+              ${requirements.map(
+                requirement => `
+                  <li>
+                    ${escapeHtml(
+                      requirement.requirement
+                    )}
+                  </li>
+                `
+              ).join("")}
+            </ul>
+          </div>
+        `
+        : "";
 
     return `
       <div class="task-card">
         <div class="task-icon">⚡</div>
 
         <div class="task-info">
-          <strong>${escapeHtml(task.title)}</strong>
+          <strong>
+            ${escapeHtml(task.title)}
+          </strong>
 
           <small>
-            ${escapeHtml(task.description || "")}
+            ${escapeHtml(
+              task.description || ""
+            )}
           </small>
 
           ${requirementsHtml}
@@ -263,10 +311,14 @@ async function loadTasks() {
     `;
   }).join("");
 
-  box.querySelectorAll(".task-submit").forEach(button => {
-    button.onclick = () =>
-      submitTask(Number(button.dataset.id));
-  });
+  box
+    .querySelectorAll(".task-submit")
+    .forEach(button => {
+      button.onclick = () =>
+        submitTask(
+          Number(button.dataset.id)
+        );
+    });
 }
 
 
@@ -275,7 +327,8 @@ async function loadTasks() {
 ========================= */
 
 window.submitTask = async function(taskId) {
-  const { data: { user } } = await db.auth.getUser();
+  const { data: { user } } =
+    await db.auth.getUser();
 
   if (!user) {
     alert("Please log in first.");
@@ -302,7 +355,11 @@ window.submitTask = async function(taskId) {
     });
 
   if (error) {
-    console.error("PULSE submission error:", error);
+    console.error(
+      "PULSE submission error:",
+      error
+    );
+
     alert(error.message);
     return;
   }
@@ -323,7 +380,9 @@ async function loadSubmissions() {
   const box = $("submissions");
   if (!box) return;
 
-  const { data: { user } } = await db.auth.getUser();
+  const { data: { user } } =
+    await db.auth.getUser();
+
   if (!user) return;
 
   const { data, error } = await db
@@ -341,15 +400,22 @@ async function loadSubmissions() {
       )
     `)
     .eq("user_id", user.id)
-    .order("submitted_at", { ascending: false });
+    .order("submitted_at", {
+      ascending: false
+    });
 
   if (error) {
-    console.error("PULSE submissions error:", error);
+    console.error(
+      "PULSE submissions error:",
+      error
+    );
 
     box.innerHTML = `
       <div class="empty-card">
         Unable to load submissions.
-        <small>${escapeHtml(error.message)}</small>
+        <small>
+          ${escapeHtml(error.message)}
+        </small>
       </div>
     `;
 
@@ -358,7 +424,9 @@ async function loadSubmissions() {
 
   if (!data?.length) {
     box.innerHTML =
-      `<div class="empty-card">No submissions yet.</div>`;
+      `<div class="empty-card">
+        No submissions yet.
+      </div>`;
 
     return;
   }
@@ -367,7 +435,9 @@ async function loadSubmissions() {
     <div class="history-row">
       <div>
         <strong>
-          ${escapeHtml(item.tasks?.title || "Task")}
+          ${escapeHtml(
+            item.tasks?.title || "Task"
+          )}
         </strong>
 
         <small>
@@ -395,7 +465,9 @@ async function loadActivity() {
   const box = $("activity");
   if (!box) return;
 
-  const { data: { user } } = await db.auth.getUser();
+  const { data: { user } } =
+    await db.auth.getUser();
+
   if (!user) return;
 
   const { data, error } = await db
@@ -408,15 +480,22 @@ async function loadActivity() {
       submission_id
     `)
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", {
+      ascending: false
+    });
 
   if (error) {
-    console.error("PULSE activity error:", error);
+    console.error(
+      "PULSE activity error:",
+      error
+    );
 
     box.innerHTML = `
       <div class="empty-card">
         Unable to load activity.
-        <small>${escapeHtml(error.message)}</small>
+        <small>
+          ${escapeHtml(error.message)}
+        </small>
       </div>
     `;
 
@@ -425,7 +504,9 @@ async function loadActivity() {
 
   if (!data?.length) {
     box.innerHTML =
-      `<div class="empty-card">No points activity yet.</div>`;
+      `<div class="empty-card">
+        No points activity yet.
+      </div>`;
 
     return;
   }
@@ -433,15 +514,20 @@ async function loadActivity() {
   box.innerHTML = data.map(item => `
     <div class="history-row">
       <div>
-        <strong>${escapeHtml(item.reason)}</strong>
+        <strong>
+          ${escapeHtml(item.reason)}
+        </strong>
 
         <small>
-          ${new Date(item.created_at).toLocaleString()}
+          ${new Date(
+            item.created_at
+          ).toLocaleString()}
         </small>
       </div>
 
       <strong>
-        ${item.amount > 0 ? "+" : ""}${item.amount}
+        ${item.amount > 0 ? "+" : ""}
+        ${item.amount}
       </strong>
     </div>
   `).join("");
@@ -456,7 +542,9 @@ async function loadRedemptions() {
   const box = $("redemptions");
   if (!box) return;
 
-  const { data: { user } } = await db.auth.getUser();
+  const { data: { user } } =
+    await db.auth.getUser();
+
   if (!user) return;
 
   const { data, error } = await db
@@ -473,15 +561,22 @@ async function loadRedemptions() {
       paid_at
     `)
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", {
+      ascending: false
+    });
 
   if (error) {
-    console.error("PULSE redemption error:", error);
+    console.error(
+      "PULSE redemption error:",
+      error
+    );
 
     box.innerHTML = `
       <div class="empty-card">
         Unable to load rewards.
-        <small>${escapeHtml(error.message)}</small>
+        <small>
+          ${escapeHtml(error.message)}
+        </small>
       </div>
     `;
 
@@ -490,7 +585,9 @@ async function loadRedemptions() {
 
   if (!data?.length) {
     box.innerHTML =
-      `<div class="empty-card">No withdrawals requested yet.</div>`;
+      `<div class="empty-card">
+        No withdrawals requested yet.
+      </div>`;
 
     return;
   }
@@ -508,7 +605,8 @@ async function loadRedemptions() {
 
         <small>
           ${escapeHtml(
-            item.reward_type || "manual_reward"
+            item.reward_type ||
+            "manual_reward"
           )}
         </small>
       </div>
@@ -529,7 +627,9 @@ async function loadNotifications() {
   const box = $("notifications");
   if (!box) return;
 
-  const { data: { user } } = await db.auth.getUser();
+  const { data: { user } } =
+    await db.auth.getUser();
+
   if (!user) return;
 
   const { data, error } = await db
@@ -543,15 +643,22 @@ async function loadNotifications() {
       created_at
     `)
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", {
+      ascending: false
+    });
 
   if (error) {
-    console.error("PULSE notifications error:", error);
+    console.error(
+      "PULSE notifications error:",
+      error
+    );
 
     box.innerHTML = `
       <div class="empty-card">
         Unable to load notifications.
-        <small>${escapeHtml(error.message)}</small>
+        <small>
+          ${escapeHtml(error.message)}
+        </small>
       </div>
     `;
 
@@ -559,30 +666,41 @@ async function loadNotifications() {
   }
 
   const unreadCount =
-    (data || []).filter(item => !item.read).length;
+    (data || []).filter(
+      item => !item.read
+    ).length;
 
   if ($("notificationCount")) {
-    $("notificationCount").textContent = unreadCount;
+    $("notificationCount").textContent =
+      unreadCount;
   }
 
   if (!data?.length) {
     box.innerHTML =
-      `<div class="empty-card">No notifications yet.</div>`;
+      `<div class="empty-card">
+        No notifications yet.
+      </div>`;
 
     return;
   }
 
   box.innerHTML = data.map(item => `
-    <div class="history-row ${item.read ? "" : "unread"}">
+    <div class="history-row ${
+      item.read ? "" : "unread"
+    }">
       <div>
-        <strong>${escapeHtml(item.title)}</strong>
+        <strong>
+          ${escapeHtml(item.title)}
+        </strong>
 
         <small>
           ${escapeHtml(item.message)}
         </small>
 
         <small>
-          ${new Date(item.created_at).toLocaleString()}
+          ${new Date(
+            item.created_at
+          ).toLocaleString()}
         </small>
       </div>
     </div>
@@ -595,7 +713,9 @@ async function loadNotifications() {
 ========================= */
 
 async function markNotificationsRead() {
-  const { data: { user } } = await db.auth.getUser();
+  const { data: { user } } =
+    await db.auth.getUser();
+
   if (!user) return;
 
   const { error } = await db
@@ -723,6 +843,11 @@ function setupAuth() {
   const forgot = $("forgotPassword");
   const reset = $("resetPassword");
 
+
+  /* =========================
+     SIGN UP
+  ========================= */
+
   if (signup) {
     signup.onclick = async () => {
       const email =
@@ -743,7 +868,15 @@ function setupAuth() {
       const { error } =
         await db.auth.signUp({
           email,
-          password
+          password,
+
+          // FIX:
+          // Always send confirmation back
+          // to the live GitHub Pages site.
+          options: {
+            emailRedirectTo:
+              AUTH_REDIRECT_URL
+          }
         });
 
       if (error) {
@@ -757,12 +890,15 @@ function setupAuth() {
 
       msg(
         $("authMsg"),
-        "Account created. Check your email if confirmation is required."
+        "Account created. Check your email to confirm your account."
       );
-
-      await refresh();
     };
   }
+
+
+  /* =========================
+     LOGIN
+  ========================= */
 
   if (login) {
     login.onclick = async () => {
@@ -805,6 +941,11 @@ function setupAuth() {
     };
   }
 
+
+  /* =========================
+     FORGOT PASSWORD
+  ========================= */
+
   if (forgot) {
     forgot.onclick = async () => {
       const email =
@@ -819,13 +960,13 @@ function setupAuth() {
         return;
       }
 
-      const redirectTo =
-        `${window.location.origin}${window.location.pathname}`;
-
       const { error } =
         await db.auth.resetPasswordForEmail(
           email,
-          { redirectTo }
+          {
+            redirectTo:
+              AUTH_REDIRECT_URL
+          }
         );
 
       if (error) {
@@ -843,6 +984,11 @@ function setupAuth() {
       );
     };
   }
+
+
+  /* =========================
+     RESET PASSWORD
+  ========================= */
 
   if (reset) {
     reset.onclick = async () => {
@@ -963,8 +1109,10 @@ document.addEventListener(
       await updateAuthState();
     }
 
-    db.auth.onAuthStateChange(async () => {
-      await refresh();
-    });
+    db.auth.onAuthStateChange(
+      async () => {
+        await refresh();
+      }
+    );
   }
 );
