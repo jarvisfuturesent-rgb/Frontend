@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PULSE Token</title>
 
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 
 <body>
@@ -155,6 +155,28 @@
 
         </div>
 
+
+        <!-- EARNINGS / WITHDRAWAL SUMMARY -->
+        <div class="earnings-summary">
+
+          <div class="profile-row">
+            <span>Total Earned</span>
+            <strong id="totalEarned">0 PLS</strong>
+          </div>
+
+          <div class="profile-row">
+            <span>Available to Withdraw</span>
+            <strong id="availableBalance">0 PLS</strong>
+          </div>
+
+          <div class="profile-row">
+            <span>Pending Withdrawal</span>
+            <strong id="pendingWithdrawal">0 PLS</strong>
+          </div>
+
+        </div>
+
+
         <div class="profile-row">
 
           <span>
@@ -241,33 +263,38 @@
       </section>
 
 
-      <!-- REWARDS -->
+      <!-- REWARDS / WITHDRAWAL -->
       <section class="panel">
 
         <div class="panel-heading">
           <h2>
-            <span class="blue-icon">🎁</span>
-            Rewards
+            <span class="blue-icon">💰</span>
+            Withdraw PLS
           </h2>
         </div>
 
         <div class="reward-box">
 
           <h3>
-            Redeem Your Points
+            Request Withdrawal
           </h3>
+
+          <p>
+            Available:
+            <strong id="withdrawAvailable">0 PLS</strong>
+          </p>
 
           <input
             id="redeemAmount"
             type="number"
             min="1"
-            placeholder="Points to redeem"
+            placeholder="PLS amount to withdraw"
           >
 
           <select id="rewardType">
 
             <option value="manual_reward">
-              Manual Reward
+              Manual PLS Reward
             </option>
 
           </select>
@@ -283,7 +310,7 @@
             class="gradient-button"
             type="button"
           >
-            Request Reward
+            Request Withdrawal
           </button>
 
           <p
@@ -296,20 +323,20 @@
       </section>
 
 
-      <!-- MY REWARDS -->
+      <!-- MY REWARDS / WITHDRAWAL HISTORY -->
       <section class="panel">
 
         <div class="panel-heading">
           <h2>
             <span class="blue-icon">🎁</span>
-            My Rewards
+            My Withdrawals
           </h2>
         </div>
 
         <div id="redemptions">
 
           <div class="loading-box">
-            Loading rewards...
+            Loading withdrawals...
           </div>
 
         </div>
