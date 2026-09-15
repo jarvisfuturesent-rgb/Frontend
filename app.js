@@ -39,34 +39,15 @@ function msg(element, text) {
 ========================= */
 
 async function updateAuthState() {
-
-  const {
-    data: { user }
-  } = await db.auth.getUser();
+  const { data: { user } } = await db.auth.getUser();
 
   if (user) {
-
-    if ($("auth")) {
-      $("auth").hidden = true;
-    }
-
-    if ($("dashboard")) {
-      $("dashboard").hidden = false;
-    }
-
+    if ($("auth")) $("auth").hidden = true;
+    if ($("dashboard")) $("dashboard").hidden = false;
   } else {
-
-    if ($("auth")) {
-      $("auth").hidden = false;
-    }
-
-    if ($("dashboard")) {
-      $("dashboard").hidden = true;
-    }
-
-    if ($("resetPasswordPanel")) {
-      $("resetPasswordPanel").hidden = true;
-    }
+    if ($("auth")) $("auth").hidden = false;
+    if ($("dashboard")) $("dashboard").hidden = true;
+    if ($("resetPasswordPanel")) $("resetPasswordPanel").hidden = true;
   }
 }
 
@@ -76,11 +57,7 @@ async function updateAuthState() {
 ========================= */
 
 async function loadProfile() {
-
-  const {
-    data: { user }
-  } = await db.auth.getUser();
-
+  const { data: { user } } = await db.auth.getUser();
   if (!user) return;
 
   const { data, error } = await db
@@ -90,42 +67,17 @@ async function loadProfile() {
     .maybeSingle();
 
   if (error) {
-
-    console.error(
-      "PULSE profile error:",
-      error
-    );
-
+    console.error("PULSE profile error:", error);
     return;
   }
 
   const balance = Number(data?.points ?? 0);
 
-  if ($("balance")) {
-    $("balance").textContent = balance;
-  }
+  if ($("balance")) $("balance").textContent = balance;
 
   if ($("profileName")) {
-
     $("profileName").textContent =
-      data?.name ||
-      user.email?.split("@")[0] ||
-      "User";
-  }
-
-  /*
-    The profile points value is the user's
-    current available PLS/point balance.
-  */
-
-  if ($("availableBalance")) {
-    $("availableBalance").textContent =
-      balance + " PLS";
-  }
-
-  if ($("withdrawAvailable")) {
-    $("withdrawAvailable").textContent =
-      balance + " PLS";
+      data?.name || user.email?.split("@")[0] || "User";
   }
 
   await loadEarningsSummary();
@@ -137,121 +89,75 @@ async function loadProfile() {
 ========================= */
 
 async function loadEarningsSummary() {
-
-  const {
-    data: { user }
-  } = await db.auth.getUser();
-
+  const { data: { user } } = await db.auth.getUser();
   if (!user) return;
 
-  /*
-    Total task rewards ever credited.
-  */
-
-  const { data: rewards, error: rewardError } =
-    await db
-      .from("points_ledger")
-      .select("amount,reason")
-      .eq("user_id", user.id)
-      .eq("reason", "Task reward");
+  const { data: rewards, error: rewardError } = await db
+    .from("points_ledger")
+    .select("amount,reason")
+    .eq("user_id", user.id)
+    .eq("reason", "Task reward");
 
   if (rewardError) {
-
-    console.error(
-      "PULSE earnings error:",
-      rewardError
-    );
-
+    console.error("PULSE earnings error:", rewardError);
     return;
   }
 
-  const totalEarned =
-    (rewards || []).reduce(
-      (total, row) =>
-        total + Number(row.amount || 0),
-      0
-    );
+  const totalEarned = (rewards || []).reduce(
+    (total, row) => total + Number(row.amount || 0),
+    0
+  );
 
-
-  /*
-    Pending withdrawal requests.
-  */
-
-  const {
-    data: pendingRequests,
-    error: pendingError
-  } = await db
+  const { data: pendingRequests, error: pendingError } = await db
     .from("redemption_requests")
     .select("points_requested")
     .eq("user_id", user.id)
     .eq("status", "pending");
 
   if (pendingError) {
-
-    console.error(
-      "PULSE pending withdrawal error:",
-      pendingError
-    );
-
+    console.error("PULSE pending withdrawal error:", pendingError);
     return;
   }
 
-  const pendingWithdrawal =
-    (pendingRequests || []).reduce(
-      (total, row) =>
-        total + Number(row.points_requested || 0),
-      0
-    );
+  const pendingWithdrawal = (pendingRequests || []).reduce(
+    (total, row) => total + Number(row.points_requested || 0),
+    0
+  );
 
-
-  /*
-    Current profile balance is the amount
-    that remains available.
-  */
-
-  const {
-    data: profile,
-    error: profileError
-  } = await db
+  const { data: profile, error: profileError } = await db
     .from("profiles")
     .select("points")
     .eq("id", user.id)
     .maybeSingle();
 
   if (profileError) {
-
-    console.error(
-      "PULSE balance summary error:",
-      profileError
-    );
-
+    console.error("PULSE balance summary error:", profileError);
     return;
   }
 
-  const available =
-    Number(profile?.points ?? 0);
+  const balance = Number(profile?.points ?? 0);
 
+  // Pending withdrawals reserve part of the current balance.
+  const available = Math.max(
+    0,
+    balance - pendingWithdrawal
+  );
 
   if ($("totalEarned")) {
-
-    $("totalEarned").textContent =
-      totalEarned + " PLS";
+    $("totalEarned").textContent = totalEarned + " PLS";
   }
 
   if ($("pendingWithdrawal")) {
-
     $("pendingWithdrawal").textContent =
       pendingWithdrawal + " PLS";
   }
 
   if ($("availableBalance")) {
-
     $("availableBalance").textContent =
       available + " PLS";
   }
 
   if ($("withdrawAvailable")) {
-
     $("withdrawAvailable").textContent =
       available + " PLS";
   }
@@ -263,9 +169,7 @@ async function loadEarningsSummary() {
 ========================= */
 
 async function loadTasks() {
-
   const box = $("tasks");
-
   if (!box) return;
 
   const { data, error } = await db
@@ -283,16 +187,10 @@ async function loadTasks() {
       )
     `)
     .eq("status", "active")
-    .order("created_at", {
-      ascending: false
-    });
+    .order("created_at", { ascending: false });
 
   if (error) {
-
-    console.error(
-      "PULSE tasks error:",
-      error
-    );
+    console.error("PULSE tasks error:", error);
 
     box.innerHTML = `
       <div class="empty-card">
@@ -305,7 +203,6 @@ async function loadTasks() {
   }
 
   if (!data?.length) {
-
     box.innerHTML = `
       <div class="empty-card">
         <strong>No tasks available.</strong>
@@ -317,52 +214,32 @@ async function loadTasks() {
   }
 
   box.innerHTML = data.map(task => {
+    const requirements = Array.isArray(task.task_requirements)
+      ? [...task.task_requirements].sort(
+          (a, b) =>
+            (a.sort_order ?? 0) - (b.sort_order ?? 0)
+        )
+      : [];
 
-    const requirements =
-      Array.isArray(task.task_requirements)
-        ? [...task.task_requirements].sort(
-            (a, b) =>
-              (a.sort_order ?? 0) -
-              (b.sort_order ?? 0)
-          )
-        : [];
-
-    const requirementsHtml =
-      requirements.length
-        ? `
-          <div class="task-requirements">
-
-            <strong>
-              Requirements:
-            </strong>
-
-            <ul>
-              ${requirements.map(requirement => `
-                <li>
-                  ${escapeHtml(
-                    requirement.requirement
-                  )}
-                </li>
-              `).join("")}
-            </ul>
-
-          </div>
-        `
-        : "";
+    const requirementsHtml = requirements.length
+      ? `
+        <div class="task-requirements">
+          <strong>Requirements:</strong>
+          <ul>
+            ${requirements.map(requirement => `
+              <li>${escapeHtml(requirement.requirement)}</li>
+            `).join("")}
+          </ul>
+        </div>
+      `
+      : "";
 
     return `
-
       <div class="task-card">
-
-        <div class="task-icon">
-          ⚡
-        </div>
+        <div class="task-icon">⚡</div>
 
         <div class="task-info">
-
-          <strong>
-            ${escapeHtml(task.title)}
-          </strong>
+          <strong>${escapeHtml(task.title)}</strong>
 
           <small>
             ${escapeHtml(task.description || "")}
@@ -373,7 +250,6 @@ async function loadTasks() {
           <span class="task-points">
             +${escapeHtml(task.points)} pts
           </span>
-
         </div>
 
         <button
@@ -383,24 +259,14 @@ async function loadTasks() {
         >
           Submit
         </button>
-
       </div>
-
     `;
   }).join("");
 
-  box.querySelectorAll(".task-submit")
-    .forEach(button => {
-
-      button.onclick = () => {
-
-        submitTask(
-          Number(button.dataset.id)
-        );
-
-      };
-
-    });
+  box.querySelectorAll(".task-submit").forEach(button => {
+    button.onclick = () =>
+      submitTask(Number(button.dataset.id));
+  });
 }
 
 
@@ -409,22 +275,15 @@ async function loadTasks() {
 ========================= */
 
 window.submitTask = async function(taskId) {
-
-  const {
-    data: { user }
-  } = await db.auth.getUser();
+  const { data: { user } } = await db.auth.getUser();
 
   if (!user) {
-
     alert("Please log in first.");
-
     return;
   }
 
   if (!Number.isInteger(taskId)) {
-
     alert("Invalid task.");
-
     return;
   }
 
@@ -443,14 +302,8 @@ window.submitTask = async function(taskId) {
     });
 
   if (error) {
-
-    console.error(
-      "PULSE submission error:",
-      error
-    );
-
+    console.error("PULSE submission error:", error);
     alert(error.message);
-
     return;
   }
 
@@ -467,15 +320,10 @@ window.submitTask = async function(taskId) {
 ========================= */
 
 async function loadSubmissions() {
-
   const box = $("submissions");
-
   if (!box) return;
 
-  const {
-    data: { user }
-  } = await db.auth.getUser();
-
+  const { data: { user } } = await db.auth.getUser();
   if (!user) return;
 
   const { data, error } = await db
@@ -493,16 +341,10 @@ async function loadSubmissions() {
       )
     `)
     .eq("user_id", user.id)
-    .order("submitted_at", {
-      ascending: false
-    });
+    .order("submitted_at", { ascending: false });
 
   if (error) {
-
-    console.error(
-      "PULSE submissions error:",
-      error
-    );
+    console.error("PULSE submissions error:", error);
 
     box.innerHTML = `
       <div class="empty-card">
@@ -515,26 +357,17 @@ async function loadSubmissions() {
   }
 
   if (!data?.length) {
-
-    box.innerHTML = `
-      <div class="empty-card">
-        No submissions yet.
-      </div>
-    `;
+    box.innerHTML =
+      `<div class="empty-card">No submissions yet.</div>`;
 
     return;
   }
 
   box.innerHTML = data.map(item => `
-
     <div class="history-row">
-
       <div>
-
         <strong>
-          ${escapeHtml(
-            item.tasks?.title || "Task"
-          )}
+          ${escapeHtml(item.tasks?.title || "Task")}
         </strong>
 
         <small>
@@ -544,15 +377,12 @@ async function loadSubmissions() {
         <small>
           ${escapeHtml(item.status)}
         </small>
-
       </div>
 
       <span class="status-pill">
         ${escapeHtml(item.status)}
       </span>
-
     </div>
-
   `).join("");
 }
 
@@ -562,15 +392,10 @@ async function loadSubmissions() {
 ========================= */
 
 async function loadActivity() {
-
   const box = $("activity");
-
   if (!box) return;
 
-  const {
-    data: { user }
-  } = await db.auth.getUser();
-
+  const { data: { user } } = await db.auth.getUser();
   if (!user) return;
 
   const { data, error } = await db
@@ -583,16 +408,10 @@ async function loadActivity() {
       submission_id
     `)
     .eq("user_id", user.id)
-    .order("created_at", {
-      ascending: false
-    });
+    .order("created_at", { ascending: false });
 
   if (error) {
-
-    console.error(
-      "PULSE activity error:",
-      error
-    );
+    console.error("PULSE activity error:", error);
 
     box.innerHTML = `
       <div class="empty-card">
@@ -605,41 +424,26 @@ async function loadActivity() {
   }
 
   if (!data?.length) {
-
-    box.innerHTML = `
-      <div class="empty-card">
-        No points activity yet.
-      </div>
-    `;
+    box.innerHTML =
+      `<div class="empty-card">No points activity yet.</div>`;
 
     return;
   }
 
   box.innerHTML = data.map(item => `
-
     <div class="history-row">
-
       <div>
-
-        <strong>
-          ${escapeHtml(item.reason)}
-        </strong>
+        <strong>${escapeHtml(item.reason)}</strong>
 
         <small>
-          ${new Date(
-            item.created_at
-          ).toLocaleString()}
+          ${new Date(item.created_at).toLocaleString()}
         </small>
-
       </div>
 
       <strong>
-        ${item.amount > 0 ? "+" : ""}
-        ${item.amount}
+        ${item.amount > 0 ? "+" : ""}${item.amount}
       </strong>
-
     </div>
-
   `).join("");
 }
 
@@ -649,15 +453,10 @@ async function loadActivity() {
 ========================= */
 
 async function loadRedemptions() {
-
   const box = $("redemptions");
-
   if (!box) return;
 
-  const {
-    data: { user }
-  } = await db.auth.getUser();
-
+  const { data: { user } } = await db.auth.getUser();
   if (!user) return;
 
   const { data, error } = await db
@@ -674,16 +473,10 @@ async function loadRedemptions() {
       paid_at
     `)
     .eq("user_id", user.id)
-    .order("created_at", {
-      ascending: false
-    });
+    .order("created_at", { ascending: false });
 
   if (error) {
-
-    console.error(
-      "PULSE redemption error:",
-      error
-    );
+    console.error("PULSE redemption error:", error);
 
     box.innerHTML = `
       <div class="empty-card">
@@ -696,22 +489,15 @@ async function loadRedemptions() {
   }
 
   if (!data?.length) {
-
-    box.innerHTML = `
-      <div class="empty-card">
-        No withdrawals requested yet.
-      </div>
-    `;
+    box.innerHTML =
+      `<div class="empty-card">No withdrawals requested yet.</div>`;
 
     return;
   }
 
   box.innerHTML = data.map(item => `
-
     <div class="history-row">
-
       <div>
-
         <strong>
           ${item.points_requested} PLS
         </strong>
@@ -725,15 +511,12 @@ async function loadRedemptions() {
             item.reward_type || "manual_reward"
           )}
         </small>
-
       </div>
 
       <span class="status-pill">
         ${escapeHtml(item.status)}
       </span>
-
     </div>
-
   `).join("");
 }
 
@@ -743,15 +526,10 @@ async function loadRedemptions() {
 ========================= */
 
 async function loadNotifications() {
-
   const box = $("notifications");
-
   if (!box) return;
 
-  const {
-    data: { user }
-  } = await db.auth.getUser();
-
+  const { data: { user } } = await db.auth.getUser();
   if (!user) return;
 
   const { data, error } = await db
@@ -765,16 +543,10 @@ async function loadNotifications() {
       created_at
     `)
     .eq("user_id", user.id)
-    .order("created_at", {
-      ascending: false
-    });
+    .order("created_at", { ascending: false });
 
   if (error) {
-
-    console.error(
-      "PULSE notifications error:",
-      error
-    );
+    console.error("PULSE notifications error:", error);
 
     box.innerHTML = `
       <div class="empty-card">
@@ -786,55 +558,34 @@ async function loadNotifications() {
     return;
   }
 
-  const unread =
-    (data || []).filter(
-      item => !item.read
-    ).length;
+  const unreadCount =
+    (data || []).filter(item => !item.read).length;
 
   if ($("notificationCount")) {
-
-    $("notificationCount").textContent =
-      unread;
-
-    $("notificationCount").hidden =
-      unread === 0;
+    $("notificationCount").textContent = unreadCount;
   }
 
   if (!data?.length) {
-
-    box.innerHTML = `
-      <div class="empty-card">
-        No notifications.
-      </div>
-    `;
+    box.innerHTML =
+      `<div class="empty-card">No notifications yet.</div>`;
 
     return;
   }
 
   box.innerHTML = data.map(item => `
-
-    <div class="notification-row">
-
+    <div class="history-row ${item.read ? "" : "unread"}">
       <div>
-
-        <strong>
-          ${escapeHtml(item.title)}
-        </strong>
+        <strong>${escapeHtml(item.title)}</strong>
 
         <small>
           ${escapeHtml(item.message)}
         </small>
 
+        <small>
+          ${new Date(item.created_at).toLocaleString()}
+        </small>
       </div>
-
-      ${
-        item.read
-          ? ""
-          : `<span class="unread-dot"></span>`
-      }
-
     </div>
-
   `).join("");
 }
 
@@ -843,248 +594,162 @@ async function loadNotifications() {
    MARK NOTIFICATIONS READ
 ========================= */
 
-function setupNotificationButton() {
+async function markNotificationsRead() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
 
-  const button = $("markNotificationsRead");
+  const { error } = await db
+    .from("notifications")
+    .update({ read: true })
+    .eq("user_id", user.id)
+    .eq("read", false);
 
-  if (!button) return;
-
-  button.onclick = async () => {
-
-    const {
-      data: { user }
-    } = await db.auth.getUser();
-
-    if (!user) return;
-
-    const { error } = await db
-      .from("notifications")
-      .update({
-        read: true
-      })
-      .eq("user_id", user.id)
-      .eq("read", false);
-
-    if (error) {
-
-      console.error(
-        "PULSE notification update error:",
-        error
-      );
-
-      alert(error.message);
-
-      return;
-    }
-
-    await loadNotifications();
-  };
-}
-
-
-/* =========================
-   SIGN UP
-========================= */
-
-function setupSignup() {
-
-  const button = $("signup");
-
-  if (!button) return;
-
-  button.onclick = async () => {
-
-    const email =
-      $("email").value.trim();
-
-    const password =
-      $("password").value;
-
-    if (!email || !password) {
-
-      msg(
-        $("authMsg"),
-        "Enter an email and password."
-      );
-
-      return;
-    }
-
-    msg(
-      $("authMsg"),
-      "Creating account..."
-    );
-
-    const { error } =
-      await db.auth.signUp({
-        email,
-        password
-      });
-
-    if (error) {
-
-      const errorMessage =
-        error.message.toLowerCase();
-
-      if (
-        errorMessage.includes("already registered") ||
-        errorMessage.includes("already exists")
-      ) {
-
-        msg(
-          $("authMsg"),
-          "An account with this email already exists. Please use Log In."
-        );
-
-      } else {
-
-        msg(
-          $("authMsg"),
-          error.message
-        );
-      }
-
-      return;
-    }
-
-    msg(
-      $("authMsg"),
-      "If this email can be registered, check your email for a confirmation link."
-    );
-  };
-}
-
-
-/* =========================
-   LOGIN
-========================= */
-
-function setupLogin() {
-
-  const button = $("login");
-
-  if (!button) return;
-
-  button.onclick = async () => {
-
-    const email =
-      $("email").value.trim();
-
-    const password =
-      $("password").value;
-
-    if (!email || !password) {
-
-      msg(
-        $("authMsg"),
-        "Enter an email and password."
-      );
-
-      return;
-    }
-
-    msg(
-      $("authMsg"),
-      "Signing in..."
-    );
-
-    const { error } =
-      await db.auth.signInWithPassword({
-        email,
-        password
-      });
-
-    msg(
-      $("authMsg"),
+  if (error) {
+    console.error(
+      "PULSE notification update error:",
       error
-        ? error.message
-        : "Signed in."
     );
 
-    if (!error) {
-      await refresh();
-    }
-  };
-}
-
-
-/* =========================
-   SIGN OUT
-========================= */
-
-function setupSignOut() {
-
-  const button = $("logout");
-
-  if (!button) {
-
-    console.warn(
-      "PULSE: Sign Out button #logout was not found."
-    );
-
+    alert(error.message);
     return;
   }
 
+  await loadNotifications();
+}
+
+
+/* =========================
+   WITHDRAWAL REQUEST
+========================= */
+
+function setupRedeem() {
+  const button = $("redeem");
+  if (!button) return;
+
   button.onclick = async () => {
+    const amount = Number(
+      $("redeemAmount")?.value
+    );
+
+    const rewardType =
+      $("rewardType")?.value ||
+      "manual_reward";
+
+    const userNote =
+      $("redeemNote")?.value?.trim() ||
+      null;
+
+    const output = $("redeemMsg");
+
+    msg(output, "");
+
+    if (
+      !Number.isInteger(amount) ||
+      amount <= 0
+    ) {
+      msg(
+        output,
+        "Enter a valid whole-number PLS amount."
+      );
+
+      return;
+    }
+
+    const { data: { user } } =
+      await db.auth.getUser();
+
+    if (!user) {
+      msg(
+        output,
+        "Please sign in first."
+      );
+
+      return;
+    }
 
     button.disabled = true;
 
-    try {
+    msg(
+      output,
+      "Submitting withdrawal request..."
+    );
 
-      const { error } =
-        await db.auth.signOut();
-
-      if (error) {
-
-        console.error(error);
-
-        alert(
-          "Unable to sign out: " +
-          error.message
-        );
-
-        button.disabled = false;
-
-        return;
+    const { error } = await db.rpc(
+      "create_redemption_request",
+      {
+        p_points: amount,
+        p_reward_type: rewardType,
+        p_user_note: userNote
       }
+    );
 
-      await updateAuthState();
+    button.disabled = false;
 
-    } catch (error) {
-
-      console.error(error);
-
-      alert(
-        "Unable to sign out."
+    if (error) {
+      console.error(
+        "PULSE withdrawal request error:",
+        error
       );
 
-      button.disabled = false;
+      msg(output, error.message);
+      return;
     }
+
+    msg(
+      output,
+      "Withdrawal request submitted for admin approval."
+    );
+
+    if ($("redeemAmount")) {
+      $("redeemAmount").value = "";
+    }
+
+    if ($("redeemNote")) {
+      $("redeemNote").value = "";
+    }
+
+    await refresh();
   };
 }
 
 
 /* =========================
-   FORGOT PASSWORD
+   AUTH ACTIONS
 ========================= */
 
-function setupForgotPassword() {
+function setupAuth() {
+  const signup = $("signup");
+  const login = $("login");
+  const forgot = $("forgotPassword");
+  const reset = $("resetPassword");
 
-  const button = $("forgotPassword");
-
-  if (!button) return;
-
-  button.onclick =
-    async () => {
-
+  if (signup) {
+    signup.onclick = async () => {
       const email =
-        $("email").value.trim();
+        $("email")?.value?.trim();
 
-      if (!email) {
+      const password =
+        $("password")?.value || "";
 
+      if (!email || !password) {
         msg(
           $("authMsg"),
-          "Enter your email first."
+          "Enter an email and password."
+        );
+
+        return;
+      }
+
+      const { error } =
+        await db.auth.signUp({
+          email,
+          password
+        });
+
+      if (error) {
+        msg(
+          $("authMsg"),
+          error.message
         );
 
         return;
@@ -1092,70 +757,102 @@ function setupForgotPassword() {
 
       msg(
         $("authMsg"),
-        "Sending password reset link..."
+        "Account created. Check your email if confirmation is required."
       );
+
+      await refresh();
+    };
+  }
+
+  if (login) {
+    login.onclick = async () => {
+      const email =
+        $("email")?.value?.trim();
+
+      const password =
+        $("password")?.value || "";
+
+      if (!email || !password) {
+        msg(
+          $("authMsg"),
+          "Enter an email and password."
+        );
+
+        return;
+      }
+
+      const { error } =
+        await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) {
+        msg(
+          $("authMsg"),
+          error.message
+        );
+
+        return;
+      }
+
+      msg(
+        $("authMsg"),
+        "Signed in."
+      );
+
+      await refresh();
+    };
+  }
+
+  if (forgot) {
+    forgot.onclick = async () => {
+      const email =
+        $("email")?.value?.trim();
+
+      if (!email) {
+        msg(
+          $("authMsg"),
+          "Enter your email address first."
+        );
+
+        return;
+      }
+
+      const redirectTo =
+        `${window.location.origin}${window.location.pathname}`;
 
       const { error } =
         await db.auth.resetPasswordForEmail(
           email,
-          {
-            redirectTo:
-              window.location.origin +
-              window.location.pathname
-          }
+          { redirectTo }
         );
+
+      if (error) {
+        msg(
+          $("authMsg"),
+          error.message
+        );
+
+        return;
+      }
 
       msg(
         $("authMsg"),
-        error
-          ? error.message
-          : "Password reset link sent. Check your email."
+        "Password reset email sent."
       );
     };
-}
-
-
-/* =========================
-   PASSWORD RECOVERY SCREEN
-========================= */
-
-function showPasswordReset() {
-
-  if ($("auth")) {
-    $("auth").hidden = true;
   }
 
-  if ($("dashboard")) {
-    $("dashboard").hidden = true;
-  }
+  if (reset) {
+    reset.onclick = async () => {
+      const password =
+        $("newPassword")?.value || "";
 
-  if ($("resetPasswordPanel")) {
-    $("resetPasswordPanel").hidden = false;
-  }
-}
+      const confirm =
+        $("confirmPassword")?.value || "";
 
-
-/* =========================
-   UPDATE PASSWORD
-========================= */
-
-function setupPasswordReset() {
-
-  const button = $("resetPassword");
-
-  if (!button) return;
-
-  button.onclick =
-    async () => {
-
-      const newPassword =
-        $("newPassword").value;
-
-      const confirmPassword =
-        $("confirmPassword").value;
-
-      if (!newPassword || !confirmPassword) {
-
+      if (!password || !confirm) {
         msg(
           $("resetMsg"),
           "Enter and confirm your new password."
@@ -1164,18 +861,7 @@ function setupPasswordReset() {
         return;
       }
 
-      if (newPassword.length < 6) {
-
-        msg(
-          $("resetMsg"),
-          "Password must be at least 6 characters."
-        );
-
-        return;
-      }
-
-      if (newPassword !== confirmPassword) {
-
+      if (password !== confirm) {
         msg(
           $("resetMsg"),
           "Passwords do not match."
@@ -1184,18 +870,12 @@ function setupPasswordReset() {
         return;
       }
 
-      msg(
-        $("resetMsg"),
-        "Updating password..."
-      );
-
       const { error } =
         await db.auth.updateUser({
-          password: newPassword
+          password
         });
 
       if (error) {
-
         msg(
           $("resetMsg"),
           error.message
@@ -1209,116 +889,32 @@ function setupPasswordReset() {
         "Password updated successfully."
       );
 
-      $("newPassword").value = "";
-      $("confirmPassword").value = "";
-
-      setTimeout(async () => {
-
-        if ($("resetPasswordPanel")) {
-          $("resetPasswordPanel").hidden = true;
-        }
-
-        await refresh();
-
-      }, 1200);
+      if ($("resetPasswordPanel")) {
+        $("resetPasswordPanel").hidden = true;
+      }
     };
+  }
 }
 
 
 /* =========================
-   REDEEM / WITHDRAWAL
+   SIGN OUT
 ========================= */
 
-function setupRedeem() {
-
-  const button = $("redeem");
-
+function setupLogout() {
+  const button = $("logout");
   if (!button) return;
 
   button.onclick = async () => {
+    const { error } =
+      await db.auth.signOut();
 
-    const amount =
-      Number($("redeemAmount").value);
-
-    const note =
-      $("redeemNote").value.trim();
-
-    const rewardType =
-      $("rewardType")?.value ||
-      "manual_reward";
-
-    if (
-      !Number.isInteger(amount) ||
-      amount <= 0
-    ) {
-
-      msg(
-        $("redeemMsg"),
-        "Enter a valid PLS amount."
-      );
-
+    if (error) {
+      alert(error.message);
       return;
     }
 
-    button.disabled = true;
-
-    msg(
-      $("redeemMsg"),
-      "Submitting withdrawal request..."
-    );
-
-    try {
-
-      /*
-        The database performs the real
-        available-balance check.
-      */
-
-      const { error } =
-        await db.rpc(
-          "create_redemption_request",
-          {
-            p_points: amount,
-            p_reward_type: rewardType,
-            p_user_note:
-              note || null
-          }
-        );
-
-      if (error) {
-
-        console.error(
-          "PULSE withdrawal request error:",
-          error
-        );
-
-        msg(
-          $("redeemMsg"),
-          error.message
-        );
-
-        return;
-      }
-
-      $("redeemAmount").value = "";
-      $("redeemNote").value = "";
-
-      msg(
-        $("redeemMsg"),
-        "Withdrawal request submitted for admin approval."
-      );
-
-      await Promise.all([
-        loadRedemptions(),
-        loadNotifications(),
-        loadProfile(),
-        loadEarningsSummary()
-      ]);
-
-    } finally {
-
-      button.disabled = false;
-    }
+    await refresh();
   };
 }
 
@@ -1328,12 +924,10 @@ function setupRedeem() {
 ========================= */
 
 async function refresh() {
-
-  const {
-    data: { user }
-  } = await db.auth.getUser();
-
   await updateAuthState();
+
+  const { data: { user } } =
+    await db.auth.getUser();
 
   if (!user) return;
 
@@ -1349,57 +943,28 @@ async function refresh() {
 
 
 /* =========================
-   SETUP FRONTEND EVENTS
+   STARTUP
 ========================= */
 
-function setupAppEvents() {
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+    setupAuth();
+    setupLogout();
+    setupRedeem();
 
-  setupSignup();
-  setupLogin();
-  setupSignOut();
-  setupForgotPassword();
-  setupPasswordReset();
-  setupRedeem();
-  setupNotificationButton();
-}
-
-
-/* =========================
-   AUTH STATE
-========================= */
-
-db.auth.onAuthStateChange(
-  async (event, session) => {
-
-    if (
-      event === "PASSWORD_RECOVERY"
-    ) {
-
-      showPasswordReset();
-
-      return;
-    }
-
-    await updateAuthState();
+    const {
+      data: { session }
+    } = await db.auth.getSession();
 
     if (session) {
       await refresh();
+    } else {
+      await updateAuthState();
     }
-  }
-);
 
-
-/* =========================
-   START
-========================= */
-
-window.addEventListener(
-  "load",
-  async () => {
-
-    setupAppEvents();
-
-    await refresh();
-
+    db.auth.onAuthStateChange(async () => {
+      await refresh();
+    });
   }
 );
