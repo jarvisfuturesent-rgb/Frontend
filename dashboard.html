@@ -9,8 +9,10 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* Dashboard-only aesthetic refinements.
-       style.css remains unchanged. */
+    /* =========================================
+       DASHBOARD AESTHETIC
+       style.css remains unchanged
+       ========================================= */
 
     .menu {
       margin-top: 16px;
@@ -69,6 +71,208 @@
       transform: translateX(2px);
     }
 
+
+    /* =========================================
+       ALIVE PULSE BALANCE
+       ========================================= */
+
+    .pulse-balance-card {
+      position: relative;
+      overflow: hidden;
+      margin: 18px 0;
+      padding: 26px 22px;
+      border-radius: 22px;
+      text-align: center;
+
+      border: 1px solid rgba(0, 220, 255, .65);
+
+      background:
+        radial-gradient(
+          circle at 50% 35%,
+          rgba(0, 210, 255, .18),
+          rgba(5, 12, 28, .96) 68%
+        );
+
+      box-shadow:
+        0 0 14px rgba(0, 210, 255, .22),
+        0 0 35px rgba(0, 210, 255, .12),
+        inset 0 0 30px rgba(0, 210, 255, .07);
+
+      animation: pulseBalanceGlow 3s ease-in-out infinite;
+    }
+
+    .pulse-balance-card::before {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+
+      border-radius: 50%;
+
+      border: 1px solid rgba(0, 220, 255, .20);
+
+      animation: pulseRing 3s ease-out infinite;
+      pointer-events: none;
+    }
+
+    .pulse-balance-card::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      left: -100%;
+      top: 0;
+
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 220, 255, .65),
+        transparent
+      );
+
+      animation: balanceScan 4s linear infinite;
+      pointer-events: none;
+    }
+
+    .balance-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    .balance-label {
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      opacity: .8;
+      margin-bottom: 8px;
+    }
+
+    .alive-balance-number {
+      font-size: clamp(3.2rem, 15vw, 5.5rem);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -2px;
+
+      text-shadow:
+        0 0 8px rgba(0, 220, 255, .9),
+        0 0 20px rgba(0, 210, 255, .65),
+        0 0 45px rgba(0, 210, 255, .35);
+
+      animation: numberGlow 2.5s ease-in-out infinite;
+    }
+
+    .balance-unit {
+      margin-top: 10px;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 5px;
+      opacity: .9;
+    }
+
+    .balance-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 16px;
+      padding: 6px 12px;
+      border-radius: 20px;
+
+      font-size: .72rem;
+      font-weight: 700;
+
+      border: 1px solid rgba(0, 220, 255, .25);
+      background: rgba(0, 210, 255, .07);
+    }
+
+    .balance-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00dcff;
+      box-shadow:
+        0 0 6px #00dcff,
+        0 0 14px #00dcff;
+
+      animation: statusPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulseBalanceGlow {
+      0%, 100% {
+        box-shadow:
+          0 0 14px rgba(0, 210, 255, .20),
+          0 0 35px rgba(0, 210, 255, .10),
+          inset 0 0 30px rgba(0, 210, 255, .06);
+      }
+
+      50% {
+        box-shadow:
+          0 0 22px rgba(0, 210, 255, .38),
+          0 0 55px rgba(0, 210, 255, .18),
+          inset 0 0 35px rgba(0, 210, 255, .10);
+      }
+    }
+
+    @keyframes numberGlow {
+      0%, 100% {
+        opacity: .92;
+      }
+
+      50% {
+        opacity: 1;
+        text-shadow:
+          0 0 10px rgba(0, 220, 255, 1),
+          0 0 28px rgba(0, 210, 255, .75),
+          0 0 55px rgba(0, 210, 255, .4);
+      }
+    }
+
+    @keyframes pulseRing {
+      0% {
+        opacity: .5;
+        transform: translate(-50%, -50%) scale(.75);
+      }
+
+      70% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.45);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.55);
+      }
+    }
+
+    @keyframes balanceScan {
+      0% {
+        left: -100%;
+      }
+
+      100% {
+        left: 100%;
+      }
+    }
+
+    @keyframes statusPulse {
+      0%, 100% {
+        transform: scale(.8);
+        opacity: .6;
+      }
+
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+
+
+    /* =========================================
+       COLLAPSIBLE SECTIONS
+       ========================================= */
+
     .dashboard-dropdown {
       border-radius: 12px;
     }
@@ -106,6 +310,7 @@
 
   <main class="app-shell">
 
+
     <!-- HEADER -->
     <header class="hero">
 
@@ -119,6 +324,8 @@
         Complete • Earn • Get Rewarded
       </p>
 
+
+      <!-- MENU -->
       <details class="menu">
 
         <summary>
@@ -219,10 +426,10 @@
       </section>
 
 
-      <!-- MAIN BALANCE -->
-      <section class="balance-card">
+      <!-- ALIVE PULSE BALANCE -->
+      <section class="pulse-balance-card">
 
-        <div>
+        <div class="balance-inner">
 
           <div class="balance-label">
             PULSE BALANCE
@@ -230,16 +437,24 @@
 
           <div
             id="balance"
-            class="balance-number"
+            class="alive-balance-number"
           >
             0
           </div>
 
-        </div>
+          <div class="balance-unit">
+            PLS
+          </div>
 
-        <strong>
-          PLS
-        </strong>
+          <div class="balance-status">
+
+            <span class="balance-status-dot"></span>
+
+            Balance Active
+
+          </div>
+
+        </div>
 
       </section>
 
