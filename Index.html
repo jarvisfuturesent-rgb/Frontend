@@ -20,7 +20,7 @@
     <header class="hero">
 
       <img
-        src="https://raw.githubusercontent.com/jarvisfuturesent-rgb/Frontend/main/pulse-logo.png"
+        src="pulse-logo.png"
         alt="PULSE Token"
         class="pulse-logo"
       >
@@ -37,28 +37,30 @@
 
         <div class="menu-panel">
 
-          <a href="#home">Home</a>
+          <a href="index.html">
+            Home
+          </a>
 
-          <a href="#how-it-works">
+          <a href="how-it-works.html">
             How It Works
           </a>
 
-          <a href="#about">
+          <a href="about.html">
             About PULSE
           </a>
 
-          <a href="#contact">
+          <a href="contact.html">
             Contact
           </a>
 
-          <a href="https://jarvisfuturesent-rgb.github.io/Frontend/">
+          <a href="dashboard.html">
             Enter PULSE
           </a>
 
           <!-- ADMIN DASHBOARD -->
           <a
             id="admin-dashboard-link"
-            href="https://jarvisfuturesent-rgb.github.io/Frontend/"
+            href="admin.html"
             style="display:none;"
           >
             ⚙ Admin Dashboard
@@ -82,7 +84,7 @@
 
       <a
         class="gradient-button"
-        href="https://jarvisfuturesent-rgb.github.io/Frontend/"
+        href="dashboard.html"
       >
         Enter PULSE
       </a>
@@ -159,7 +161,7 @@
 
       <a
         class="gradient-button"
-        href="https://jarvisfuturesent-rgb.github.io/Frontend/"
+        href="dashboard.html"
       >
         Enter PULSE
       </a>
@@ -181,6 +183,7 @@
 
   <!-- ADMIN ACCESS CHECK -->
   <script>
+
     const SUPABASE_URL =
       "https://egeftdnvgcqjjavrpohd.supabase.co";
 
@@ -193,12 +196,14 @@
         SUPABASE_ANON_KEY
       );
 
+
     async function checkAdminAccess() {
 
       const adminLink =
         document.getElementById("admin-dashboard-link");
 
       if (!adminLink) return;
+
 
       try {
 
@@ -208,10 +213,14 @@
           }
         } = await supabaseClient.auth.getUser();
 
+
         if (!user) {
+
           adminLink.style.display = "none";
+
           return;
         }
+
 
         const {
           data: profile,
@@ -222,21 +231,33 @@
           .eq("id", user.id)
           .maybeSingle();
 
+
         if (error) {
+
           console.error(
             "Admin check failed:",
             error
           );
 
           adminLink.style.display = "none";
+
           return;
         }
 
-        if (profile && profile.role === "admin") {
+
+        if (
+          profile &&
+          profile.role === "admin"
+        ) {
+
           adminLink.style.display = "block";
+
         } else {
+
           adminLink.style.display = "none";
+
         }
+
 
       } catch (error) {
 
@@ -246,10 +267,14 @@
         );
 
         adminLink.style.display = "none";
+
       }
+
     }
 
+
     checkAdminAccess();
+
   </script>
 
 </body>
