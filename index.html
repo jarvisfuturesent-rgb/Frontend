@@ -130,6 +130,45 @@
       text-decoration: none;
     }
 
+    /* Folder-style menu */
+
+    .menu-panel > details {
+      margin: 6px 0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .menu-panel > details > summary {
+      cursor: pointer;
+      padding: 11px 12px;
+      font-weight: 700;
+      list-style: none;
+    }
+
+    .menu-panel > details > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .menu-panel > details > summary::before {
+      content: "▶ ";
+      font-size: .75rem;
+    }
+
+    .menu-panel > details[open] > summary::before {
+      content: "▼ ";
+    }
+
+    .menu-panel > details > div {
+      padding: 2px 8px 8px;
+    }
+
+    .menu-panel > details > div a {
+      display: block;
+      padding: 9px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
     @media (max-width: 420px) {
       .feature-grid {
         grid-template-columns: 1fr;
@@ -157,40 +196,79 @@
         Complete • Earn • Get Rewarded
       </p>
 
-      <!-- MENU -->
+
+      <!-- MAIN MENU -->
       <details class="menu">
 
         <summary>☰ Menu</summary>
 
         <div class="menu-panel">
 
-          <a href="index.html">🏠 Home</a>
-          <a href="how-it-works.html">⚡ How It Works</a>
-          <a href="about.html">ℹ️ About PULSE</a>
-          <a href="contact.html">✉️ Contact</a>
+          <!-- PUBLIC -->
+          <details>
+            <summary>📁 Public</summary>
 
-          <a href="terms.html">📜 Terms</a>
-          <a href="privacy.html">🔒 Privacy Policy</a>
-          <a href="disclosures.html">⚖️ Disclosures</a>
+            <div>
+              <a href="index.html">🏠 Home</a>
+              <a href="how-it-works.html">⚡ How It Works</a>
+              <a href="about.html">ℹ️ About PULSE</a>
+              <a href="contact.html">✉️ Contact</a>
+            </div>
+          </details>
 
-          <a href="auth.html">🔐 Login / Sign Up</a>
-          <a href="dashboard.html">👤 Dashboard</a>
 
-          <a href="tasks.html">⚡ Available Tasks</a>
-          <a href="surveys.html">📝 Surveys</a>
-          <a href="submissions.html">📋 My Submissions</a>
-          <a href="earnings.html">💰 Earnings & Balance</a>
-          <a href="notifications.html">🔔 Notifications</a>
-          <a href="profile.html">⚙️ Profile & Account</a>
+          <!-- LEGAL -->
+          <details>
+            <summary>📁 Legal</summary>
 
-          <a href="admin.html">⚙️ Admin Dashboard</a>
-          <a href="admin-tasks.html">📋 Task Management</a>
-          <a href="admin-businesses.html">🏢 Business Management</a>
-          <a href="admin-submissions.html">📝 Submission Review</a>
-          <a href="admin-rewards.html">💰 Reward Requests</a>
-          <a href="admin-reports.html">📊 Reports & Records</a>
+            <div>
+              <a href="terms.html">📜 Terms</a>
+              <a href="privacy.html">🔒 Privacy Policy</a>
+              <a href="disclosures.html">⚖️ Disclosures</a>
+            </div>
+          </details>
 
-          <a href="reset-password.html">🔑 Reset Password</a>
+
+          <!-- ACCOUNT -->
+          <details>
+            <summary>📁 Account</summary>
+
+            <div>
+              <a href="auth.html">🔐 Login / Sign Up</a>
+              <a href="dashboard.html">👤 Dashboard</a>
+              <a href="profile.html">⚙️ Profile & Account</a>
+              <a href="reset-password.html">🔑 Reset Password</a>
+            </div>
+          </details>
+
+
+          <!-- PULSE -->
+          <details>
+            <summary>📁 PULSE</summary>
+
+            <div>
+              <a href="tasks.html">⚡ Available Tasks</a>
+              <a href="surveys.html">📝 Surveys</a>
+              <a href="submissions.html">📋 My Submissions</a>
+              <a href="earnings.html">💰 Earnings & Balance</a>
+              <a href="notifications.html">🔔 Notifications</a>
+            </div>
+          </details>
+
+
+          <!-- ADMINISTRATION -->
+          <details>
+            <summary>📁 Administration</summary>
+
+            <div>
+              <a href="admin.html">⚙️ Admin Dashboard</a>
+              <a href="admin-tasks.html">📋 Task Management</a>
+              <a href="admin-businesses.html">🏢 Business Management</a>
+              <a href="admin-submissions.html">📝 Submission Review</a>
+              <a href="admin-rewards.html">💰 Reward Requests</a>
+              <a href="admin-reports.html">📊 Reports & Records</a>
+            </div>
+          </details>
 
         </div>
 
