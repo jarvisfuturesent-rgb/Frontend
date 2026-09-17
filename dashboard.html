@@ -34,9 +34,7 @@
 
         <div class="menu-panel">
 
-          <a href="index.html">
-            Home
-          </a>
+          <a href="index.html">Home</a>
 
           <a href="how-it-works.html">
             How It Works
@@ -68,55 +66,142 @@
     </header>
 
 
-    <!-- AUTH STATUS -->
+    <!-- AUTH AREA -->
     <section
-      id="authStatus"
+      id="auth"
       class="panel"
+      hidden
     >
-      Loading account...
+      <h2>Account</h2>
+
+      <p>
+        Please log in to access your PULSE dashboard.
+      </p>
     </section>
 
 
     <!-- USER DASHBOARD -->
     <section
-      id="dashboardContent"
-      class="panel"
-    >
-      Loading dashboard...
-    </section>
-
-
-    <!-- HIDDEN AUTH CONTAINER
-         Used by app.js -->
-    <section
-      id="auth"
-      hidden
-    >
-    </section>
-
-
-    <!-- HIDDEN DASHBOARD CONTAINER
-         Used by app.js -->
-    <section
       id="dashboard"
+      class="panel"
       hidden
     >
+
+      <h2>Your PULSE Dashboard</h2>
+
+      <!-- PROFILE -->
+      <div class="panel">
+
+        <h3>Welcome</h3>
+
+        <p>
+          <strong id="profileName">
+            Loading...
+          </strong>
+        </p>
+
+      </div>
+
+
+      <!-- BALANCE -->
+      <div class="panel">
+
+        <h3>PULSE Balance</h3>
+
+        <p>
+          <strong id="balance">
+            0
+          </strong>
+          PLS
+        </p>
+
+      </div>
+
+
+      <!-- EARNINGS -->
+      <div class="panel">
+
+        <h3>Earnings Summary</h3>
+
+        <p>
+          Total Earned:
+          <strong id="totalEarned">
+            0 PLS
+          </strong>
+        </p>
+
+        <p>
+          Pending:
+          <strong id="pendingWithdrawal">
+            0 PLS
+          </strong>
+        </p>
+
+        <p>
+          Available:
+          <strong id="availableBalance">
+            0 PLS
+          </strong>
+        </p>
+
+      </div>
+
+
+      <!-- AVAILABLE WITHDRAWAL -->
+      <div class="panel">
+
+        <h3>Available Reward Balance</h3>
+
+        <p>
+          <strong id="withdrawAvailable">
+            0 PLS
+          </strong>
+        </p>
+
+      </div>
+
+
+      <!-- TASKS -->
+      <div class="panel">
+
+        <h2>Available Tasks</h2>
+
+        <div id="tasks">
+          Loading tasks...
+        </div>
+
+      </div>
+
+
+      <!-- SUBMISSIONS -->
+      <div class="panel">
+
+        <h2>My Submissions</h2>
+
+        <div id="submissions">
+          Loading submissions...
+        </div>
+
+      </div>
+
     </section>
 
 
-    <!-- HIDDEN ADMIN CONTAINER
-         Used by app.js -->
+    <!-- ADMIN CONTAINER
+         Kept for compatibility with app.js -->
     <section
       id="adminDashboard"
+      class="panel"
       hidden
     >
     </section>
 
 
-    <!-- HIDDEN PASSWORD RESET CONTAINER
-         Used by app.js -->
+    <!-- PASSWORD RESET CONTAINER
+         Kept for compatibility with app.js -->
     <section
       id="resetPasswordPanel"
+      class="panel"
       hidden
     >
     </section>
@@ -134,38 +219,35 @@
   <script src="app.js"></script>
 
 
-  <!-- ADMIN LINK CHECK -->
+  <!-- ADMIN LINK -->
   <script>
 
-    const dashboardSupabase =
-      window.supabase.createClient(
-        window.SUPABASE_URL,
-        window.SUPABASE_ANON_KEY
-      );
+    async function checkAdminLink() {
 
-    async function checkDashboardAdmin() {
-
-      const adminLink =
+      const link =
         document.getElementById(
           "admin-dashboard-link"
         );
 
-      if (!adminLink) return;
+      if (!link) return;
 
       try {
+
+        const client =
+          window.supabase.createClient(
+            window.SUPABASE_URL,
+            window.SUPABASE_ANON_KEY
+          );
 
         const {
           data: {
             user
           }
         } =
-          await dashboardSupabase.auth.getUser();
+          await client.auth.getUser();
 
         if (!user) {
-
-          adminLink.style.display =
-            "none";
-
+          link.style.display = "none";
           return;
         }
 
@@ -173,53 +255,38 @@
           data: profile,
           error
         } =
-          await dashboardSupabase
+          await client
             .from("profiles")
             .select("role")
             .eq("id", user.id)
             .maybeSingle();
 
-        if (error) {
-
-          console.error(
-            "Admin check failed:",
-            error
-          );
-
-          adminLink.style.display =
-            "none";
-
-          return;
-        }
-
         if (
+          !error &&
           profile &&
           profile.role === "admin"
         ) {
 
-          adminLink.style.display =
-            "block";
+          link.style.display = "block";
 
         } else {
 
-          adminLink.style.display =
-            "none";
+          link.style.display = "none";
+
         }
 
       } catch (error) {
 
         console.error(
-          "Admin access check failed:",
+          "Admin link check failed:",
           error
         );
 
-        adminLink.style.display =
-          "none";
+        link.style.display = "none";
       }
     }
 
-
-    checkDashboardAdmin();
+    checkAdminLink();
 
   </script>
 
