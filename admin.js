@@ -1,35 +1,11 @@
-/* =========================================================
-   PULSE ADMIN DASHBOARD
-   Separate admin.html page
-   ========================================================= */
-
-(function () {
+(() => {
   "use strict";
 
-  /* =========================================================
-     HELPERS
-     ========================================================= */
+  // =========================================
+  // SUPABASE CONNECTION
+  // =========================================
 
-  function escapeHTML(value) {
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
-  function formatDate(value) {
-    if (!value) return "Not recorded";
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return "Not recorded";
-    }
-
-    return date.toLocaleString();
-  }
+  let db = null;
 
   function getDb() {
     if (window.db) return window.db;
@@ -40,54 +16,78 @@
 
     if (
       window.supabase &&
-      window.PULSE_SUPABASE_URL &&
-      window.PULSE_SUPABASE_KEY
+      window.SUPABASE_URL &&
+      window.SUPABASE_ANON_KEY
     ) {
       return window.supabase.createClient(
-        window.PULSE_SUPABASE_URL,
-        window.PULSE_SUPABASE_KEY
+        window.SUPABASE_URL,
+        window.SUPABASE_ANON_KEY
       );
     }
 
     return null;
   }
 
-  const db = getDb();
+  db = getDb();
 
 
-  /* =========================================================
-     ADMIN AUTHORIZATION
-     ========================================================= */
+  // =========================================
+  // HELPERS
+  // =========================================
+
+  function escapeHTML(value) {
+    if (value === null || value === undefined) return "";
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function formatDate(value) {
+    if (!value) return "";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return escapeHTML(value);
+    }
+
+    return date.toLocaleString();
+  }
+
+  function getAdminContent() {
+    return document.getElementById("adminContent");
+  }
+
+
+  // =========================================
+  // ADMIN CHECK
+  // =========================================
 
   async function getCurrentAdmin() {
-    if (!db) {
-      throw new Error("Supabase connection is not available.");
-    }
+    if (!db) return null;
 
     const {
       data: { user },
       error: userError
     } = await db.auth.getUser();
 
-    if (userError) {
-      throw userError;
-    }
-
-    if (!user) {
+    if (userError || !user) {
       return null;
     }
 
-    const {
-      data: profile,
-      error: profileError
-    } = await db
+    const { data: profile, error } = await db
       .from("profiles")
-      .select("id, name, role, points")
+      .select("id, name, role")
       .eq("id", user.id)
       .maybeSingle();
 
-    if (profileError) {
-      throw profileError;
+    if (error) {
+      console.error("Profile check failed:", error);
+      return null;
     }
 
     if (!profile || profile.role !== "admin") {
@@ -105,7 +105,20 @@
     const admin = await getCurrentAdmin();
 
     if (!admin) {
-      window.location.href = "index.html";
+      const content = getAdminContent();
+
+      if (content) {
+        content.innerHTML = `
+          <div class="panel">
+            <h3>Admin Access Required</h3>
+            <p>You must be signed in with an administrator account.</p>
+            <p>
+              <a href="dashboard.html">Return to Dashboard</a>
+            </p>
+          </div>
+        `;
+      }
+
       return null;
     }
 
@@ -113,58 +126,443 @@
   }
 
 
-  /* =========================================================
-     MAIN ADMIN PAGE
-     ========================================================= */
+  // =========================================
+  // TASKS
+  // =========================================
+
+  async function loadTasks() {
+    const { data, error } = await db
+      .from("tasks")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (error) {
+      return `<p>Unable to load tasks.</p>`;
+    }
+
+    let html = `
+      <h3>Task Management</h3>
+
+      <form id="createTaskForm">
+        <label>Task Title</label>
+        <input id="taskTitle" required>
+
+        <label>Task Description</label>
+        <textarea id="taskDescription"></textarea>
+
+        <label>Points</label>
+        <input id="taskPoints" type="number" min="0" value="25" required>
+
+        <button type="submit">Create Task</button>
+      </form>
+
+      <div id="taskMessage"></div>
+
+      <h4>Tasks</h4>
+    `;
+
+    if (!data || data.length === 0) {
+      html += "<p>No tasks found.</p>";
+      return html;
+    }
+
+    html += data.map(task => `
+      <div class="panel">
+        <strong>${escapeHTML(task.title)}</strong>
+
+        <p>${escapeHTML(task.description || "")}</p>
+
+        <p>
+          Points: ${escapeHTML(task.points)}
+          <br>
+          Status: ${escapeHTML(task.status)}
+        </p>
+
+        <button
+          class="taskStatusButton"
+          data-id="${task.id}"
+          data-status="${
+            task.status === "active" ? "paused" : "active"
+          }"
+        >
+          ${
+            task.status === "active"
+              ? "Pause"
+              : "Activate"
+          }
+        </button>
+      </div>
+    `).join("");
+
+    return html;
+  }
+
+
+  // =========================================
+  // CATEGORIES
+  // =========================================
+
+  async function loadCategories() {
+    const { data, error } = await db
+      .from("task_categories")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (error) {
+      return `
+        <h3>Category Management</h3>
+        <p>Unable to load categories.</p>
+      `;
+    }
+
+    let html = `
+      <h3>Category Management</h3>
+
+      <form id="createCategoryForm">
+
+        <label>Category Name</label>
+        <input id="categoryName" required>
+
+        <label>Description</label>
+        <textarea id="categoryDescription"></textarea>
+
+        <button type="submit">Create Category</button>
+
+      </form>
+
+      <div id="categoryMessage"></div>
+    `;
+
+    if (!data || data.length === 0) {
+      html += "<p>No categories found.</p>";
+      return html;
+    }
+
+    html += data.map(category => `
+      <div class="panel">
+        <strong>${escapeHTML(category.name)}</strong>
+        <p>${escapeHTML(category.description || "")}</p>
+      </div>
+    `).join("");
+
+    return html;
+  }
+
+
+  // =========================================
+  // BUSINESSES
+  // =========================================
+
+  async function loadBusinesses() {
+    const { data, error } = await db
+      .from("businesses")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (error) {
+      return `
+        <h3>Businesses</h3>
+        <p>Unable to load businesses.</p>
+      `;
+    }
+
+    let html = `
+      <h3>Businesses</h3>
+    `;
+
+    if (!data || data.length === 0) {
+      html += "<p>No businesses found.</p>";
+      return html;
+    }
+
+    html += data.map(business => `
+      <div class="panel">
+        <strong>
+          ${escapeHTML(
+            business.name ||
+            business.business_name ||
+            "Business"
+          )}
+        </strong>
+
+        <p>
+          ${escapeHTML(
+            business.description || ""
+          )}
+        </p>
+      </div>
+    `).join("");
+
+    return html;
+  }
+
+
+  // =========================================
+  // SURVEY ANSWERS
+  // =========================================
+
+  function renderSurveyAnswers(answers) {
+    if (!answers) {
+      return "<p>No survey answers recorded.</p>";
+    }
+
+    if (typeof answers === "string") {
+      try {
+        answers = JSON.parse(answers);
+      } catch {
+        return `<p>${escapeHTML(answers)}</p>`;
+      }
+    }
+
+    if (Array.isArray(answers)) {
+      return answers.map((item, index) => `
+        <div class="panel">
+          <strong>
+            ${index + 1}. ${escapeHTML(item.question || "")}
+          </strong>
+
+          <p>
+            ${escapeHTML(item.answer || "")}
+          </p>
+        </div>
+      `).join("");
+    }
+
+    if (typeof answers === "object") {
+      return Object.entries(answers).map(
+        ([key, value]) => `
+          <div class="panel">
+            <strong>${escapeHTML(key)}</strong>
+            <p>${escapeHTML(
+              typeof value === "object"
+                ? JSON.stringify(value)
+                : value
+            )}</p>
+          </div>
+        `
+      ).join("");
+    }
+
+    return "<p>No survey answers recorded.</p>";
+  }
+
+
+  // =========================================
+  // SUBMISSIONS
+  // =========================================
+
+  async function loadSubmissions() {
+    const { data, error } = await db
+      .from("task_submissions")
+      .select(`
+        *,
+        tasks (
+          title,
+          points
+        )
+      `)
+      .order("submitted_at", { ascending: false });
+
+    if (error) {
+      console.error(error);
+
+      return `
+        <h3>Submissions</h3>
+        <p>Unable to load submissions.</p>
+      `;
+    }
+
+    let html = `
+      <h3>Survey / Task Submissions</h3>
+    `;
+
+    if (!data || data.length === 0) {
+      html += "<p>No submissions found.</p>";
+      return html;
+    }
+
+    html += data.map(submission => `
+      <div class="panel">
+
+        <h4>
+          Submission #${escapeHTML(submission.id)}
+        </h4>
+
+        <p>
+          <strong>Task:</strong>
+          ${escapeHTML(
+            submission.tasks?.title || "Unknown Task"
+          )}
+        </p>
+
+        <p>
+          <strong>User ID:</strong>
+          ${escapeHTML(submission.user_id)}
+        </p>
+
+        <p>
+          <strong>Status:</strong>
+          ${escapeHTML(submission.status)}
+        </p>
+
+        <p>
+          <strong>Submitted:</strong>
+          ${formatDate(submission.submitted_at)}
+        </p>
+
+        ${
+          submission.reviewer_note
+            ? `
+              <p>
+                <strong>Reviewer Note:</strong>
+                ${escapeHTML(submission.reviewer_note)}
+              </p>
+            `
+            : ""
+        }
+
+        <details>
+          <summary>View Survey Answers</summary>
+
+          ${renderSurveyAnswers(
+            submission.survey_answers
+          )}
+        </details>
+
+        ${
+          submission.status === "pending"
+            ? `
+              <button
+                class="approveSubmission"
+                data-id="${submission.id}"
+              >
+                Approve
+              </button>
+
+              <button
+                class="rejectSubmission"
+                data-id="${submission.id}"
+              >
+                Reject
+              </button>
+            `
+            : ""
+        }
+
+      </div>
+    `).join("");
+
+    return html;
+  }
+
+
+  // =========================================
+  // REDEMPTIONS
+  // =========================================
+
+  async function loadRedemptions() {
+    const { data, error } = await db
+      .from("redemption_requests")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return `
+        <h3>Reward Requests</h3>
+        <p>Unable to load reward requests.</p>
+      `;
+    }
+
+    let html = `
+      <h3>Reward Requests</h3>
+    `;
+
+    if (!data || data.length === 0) {
+      html += "<p>No reward requests found.</p>";
+      return html;
+    }
+
+    html += data.map(request => `
+      <div class="panel">
+
+        <h4>
+          Request #${escapeHTML(request.id)}
+        </h4>
+
+        <p>
+          User:
+          ${escapeHTML(request.user_id)}
+        </p>
+
+        <p>
+          Points:
+          ${escapeHTML(request.points_requested)}
+        </p>
+
+        <p>
+          Reward Type:
+          ${escapeHTML(request.reward_type)}
+        </p>
+
+        <p>
+          Status:
+          ${escapeHTML(request.status)}
+        </p>
+
+        <p>
+          Created:
+          ${formatDate(request.created_at)}
+        </p>
+
+      </div>
+    `).join("");
+
+    return html;
+  }
+
+
+  // =========================================
+  // ADMIN PAGE
+  // =========================================
 
   async function loadAdminPage() {
-
-    const content =
-      document.getElementById("adminContent");
+    const content = getAdminContent();
 
     if (!content) return;
 
     content.innerHTML = `
-      <div class="empty-card">
-        Checking administrator access...
-      </div>
+      <p>Checking administrator access...</p>
+    `;
+
+    if (!db) {
+      content.innerHTML = `
+        <div class="panel">
+          <h3>Supabase Configuration Error</h3>
+          <p>
+            Supabase could not be initialized.
+          </p>
+        </div>
+      `;
+
+      return;
+    }
+
+    const admin = await requireAdmin();
+
+    if (!admin) return;
+
+    content.innerHTML = `
+      <p>Loading admin dashboard...</p>
     `;
 
     try {
-
-      const admin = await requireAdmin();
-
-      if (!admin) return;
-
-      content.innerHTML = `
-        <div class="panel">
-
-          <h3>
-            Welcome,
-            ${escapeHTML(
-              admin.profile.name ||
-              admin.user.email ||
-              "Administrator"
-            )}
-          </h3>
-
-          <p>
-            Administrator account verified.
-          </p>
-
-        </div>
-
-        <div id="adminTools"></div>
-      `;
-
-      const tools =
-        document.getElementById("adminTools");
-
-      tools.innerHTML = buildAdminToolsHTML();
-
-      bindAdminControls();
-
-      await Promise.all([
+      const [
+        tasksHTML,
+        categoriesHTML,
+        businessesHTML,
+        submissionsHTML,
+        redemptionsHTML
+      ] = await Promise.all([
         loadTasks(),
         loadCategories(),
         loadBusinesses(),
@@ -172,380 +570,179 @@
         loadRedemptions()
       ]);
 
-    } catch (error) {
+      content.innerHTML = `
 
-      console.error(
-        "Admin dashboard error:",
-        error
-      );
+        <section class="panel">
+          ${tasksHTML}
+        </section>
+
+        <section class="panel">
+          ${categoriesHTML}
+        </section>
+
+        <section class="panel">
+          ${businessesHTML}
+        </section>
+
+        <section class="panel">
+          ${submissionsHTML}
+        </section>
+
+        <section class="panel">
+          ${redemptionsHTML}
+        </section>
+
+      `;
+
+      attachAdminEvents();
+
+    } catch (error) {
+      console.error("Admin dashboard error:", error);
 
       content.innerHTML = `
-        <div class="empty-card">
-          Unable to load the admin dashboard.
-          <small>
-            ${escapeHTML(error.message)}
-          </small>
+        <div class="panel">
+          <h3>Admin Dashboard Error</h3>
+          <p>
+            Something went wrong while loading the dashboard.
+          </p>
         </div>
       `;
     }
   }
 
 
-  /* =========================================================
-     ADMIN UI
-     ========================================================= */
+  // =========================================
+  // ADMIN ACTIONS
+  // =========================================
 
-  function buildAdminToolsHTML() {
+  function attachAdminEvents() {
 
-    return `
+    const createTaskForm =
+      document.getElementById("createTaskForm");
 
-      <!-- TASK MANAGEMENT -->
+    if (createTaskForm) {
+      createTaskForm.addEventListener(
+        "submit",
+        async event => {
 
-      <section class="panel">
+          event.preventDefault();
 
-        <h3>Task Management</h3>
+          const title =
+            document.getElementById("taskTitle").value.trim();
 
-        <input
-          id="adminTaskTitle"
-          type="text"
-          placeholder="Task title"
-        >
+          const description =
+            document
+              .getElementById("taskDescription")
+              .value
+              .trim();
 
-        <textarea
-          id="adminTaskDescription"
-          placeholder="Task description"
-        ></textarea>
+          const points =
+            Number(
+              document
+                .getElementById("taskPoints")
+                .value
+            );
 
-        <input
-          id="adminTaskPoints"
-          type="number"
-          min="1"
-          step="1"
-          placeholder="Points"
-        >
+          const message =
+            document.getElementById("taskMessage");
 
-        <select id="adminTaskStatus">
-          <option value="draft">
-            Draft
-          </option>
+          if (!title) {
+            message.textContent =
+              "Enter a task title.";
 
-          <option value="active">
-            Active
-          </option>
+            return;
+          }
 
-          <option value="paused">
-            Paused
-          </option>
-        </select>
+          const { error } = await db
+            .from("tasks")
+            .insert({
+              title,
+              description,
+              points,
+              status: "active"
+            });
 
-        <button
-          id="adminCreateTask"
-          class="gradient-button"
-          type="button"
-        >
-          Create Task
-        </button>
+          if (error) {
+            console.error(error);
 
-        <p id="adminTaskMsg"></p>
+            message.textContent =
+              "Unable to create task.";
 
-        <div id="adminTasks">
-          Loading tasks...
-        </div>
+            return;
+          }
 
-      </section>
+          message.textContent =
+            "Task created successfully.";
 
-
-      <!-- CATEGORIES -->
-
-      <section class="panel">
-
-        <h3>Category Management</h3>
-
-        <input
-          id="adminCategoryName"
-          type="text"
-          placeholder="Category name"
-        >
-
-        <input
-          id="adminCategoryDescription"
-          type="text"
-          placeholder="Category description"
-        >
-
-        <button
-          id="adminCreateCategory"
-          class="gradient-button"
-          type="button"
-        >
-          Create Category
-        </button>
-
-        <p id="adminCategoryMsg"></p>
-
-        <div id="adminCategories">
-          Loading categories...
-        </div>
-
-      </section>
-
-
-      <!-- BUSINESSES -->
-
-      <section class="panel">
-
-        <h3>Business Management</h3>
-
-        <div id="adminBusinesses">
-          Loading businesses...
-        </div>
-
-      </section>
-
-
-      <!-- SUBMISSIONS -->
-
-      <section class="panel">
-
-        <h3>Task Submissions</h3>
-
-        <select id="adminSubmissionStatus">
-
-          <option value="all">
-            All
-          </option>
-
-          <option value="pending">
-            Pending
-          </option>
-
-          <option value="approved">
-            Approved
-          </option>
-
-          <option value="rejected">
-            Rejected
-          </option>
-
-        </select>
-
-        <button
-          id="adminRefreshSubmissions"
-          class="outline-button"
-          type="button"
-        >
-          Refresh Submissions
-        </button>
-
-        <div id="adminSubmissions">
-          Loading submissions...
-        </div>
-
-      </section>
-
-
-      <!-- REDEMPTIONS -->
-
-      <section class="panel">
-
-        <h3>Reward Requests</h3>
-
-        <div id="adminRedemptions">
-          Loading reward requests...
-        </div>
-
-      </section>
-
-    `;
-  }
-
-
-  /* =========================================================
-     EVENT BINDINGS
-     ========================================================= */
-
-  function bindAdminControls() {
-
-    document
-      .getElementById("adminCreateTask")
-      ?.addEventListener(
-        "click",
-        createTask
+          await loadAdminPage();
+        }
       );
-
-    document
-      .getElementById("adminCreateCategory")
-      ?.addEventListener(
-        "click",
-        createCategory
-      );
-
-    document
-      .getElementById("adminSubmissionStatus")
-      ?.addEventListener(
-        "change",
-        loadSubmissions
-      );
-
-    document
-      .getElementById("adminRefreshSubmissions")
-      ?.addEventListener(
-        "click",
-        loadSubmissions
-      );
-  }
-
-
-  /* =========================================================
-     TASKS
-     ========================================================= */
-
-  async function loadTasks() {
-
-    const box =
-      document.getElementById("adminTasks");
-
-    if (!box) return;
-
-    const {
-      data: tasks,
-      error
-    } = await db
-      .from("tasks")
-      .select(`
-        id,
-        title,
-        description,
-        points,
-        status,
-        business_id,
-        category_id,
-        created_at
-      `)
-      .order("id", {
-        ascending: false
-      });
-
-    if (error) {
-      box.innerHTML = `
-        <div class="empty-card">
-          Unable to load tasks.
-          <small>
-            ${escapeHTML(error.message)}
-          </small>
-        </div>
-      `;
-      return;
     }
 
-    if (!tasks?.length) {
-      box.innerHTML = `
-        <div class="empty-card">
-          No tasks found.
-        </div>
-      `;
-      return;
+
+    const createCategoryForm =
+      document.getElementById(
+        "createCategoryForm"
+      );
+
+    if (createCategoryForm) {
+      createCategoryForm.addEventListener(
+        "submit",
+        async event => {
+
+          event.preventDefault();
+
+          const name =
+            document
+              .getElementById("categoryName")
+              .value
+              .trim();
+
+          const description =
+            document
+              .getElementById("categoryDescription")
+              .value
+              .trim();
+
+          const message =
+            document.getElementById(
+              "categoryMessage"
+            );
+
+          if (!name) {
+            message.textContent =
+              "Enter a category name.";
+
+            return;
+          }
+
+          const { error } = await db
+            .from("task_categories")
+            .insert({
+              name,
+              description
+            });
+
+          if (error) {
+            console.error(error);
+
+            message.textContent =
+              "Unable to create category.";
+
+            return;
+          }
+
+          message.textContent =
+            "Category created successfully.";
+
+          await loadAdminPage();
+        }
+      );
     }
 
-    box.innerHTML =
-      tasks.map(task => `
 
-        <div class="history-row">
-
-          <div style="min-width:0">
-
-            <strong>
-              ${escapeHTML(task.title)}
-            </strong>
-
-            <small>
-              ${escapeHTML(
-                task.description || ""
-              )}
-            </small>
-
-            <small>
-              ${task.points} points
-            </small>
-
-            <small>
-              Status:
-              ${escapeHTML(task.status)}
-            </small>
-
-            <small>
-              Task ID:
-              ${task.id}
-            </small>
-
-          </div>
-
-          <div style="
-            display:flex;
-            gap:8px;
-            flex-wrap:wrap;
-          ">
-
-            ${
-              task.status !== "active"
-                ? `
-                  <button
-                    class="gradient-button
-                      admin-task-status"
-                    data-id="${task.id}"
-                    data-status="active"
-                    type="button"
-                  >
-                    Activate
-                  </button>
-                `
-                : `
-                  <button
-                    class="outline-button
-                      admin-task-status"
-                    data-id="${task.id}"
-                    data-status="paused"
-                    type="button"
-                  >
-                    Pause
-                  </button>
-                `
-            }
-
-            ${
-              task.status !== "completed"
-                ? `
-                  <button
-                    class="outline-button
-                      admin-task-status"
-                    data-id="${task.id}"
-                    data-status="completed"
-                    type="button"
-                  >
-                    Complete
-                  </button>
-                `
-                : ""
-            }
-
-            <button
-              class="outline-button
-                admin-task-edit"
-              data-id="${task.id}"
-              type="button"
-            >
-              Edit
-            </button>
-
-          </div>
-
-        </div>
-
-      `).join("");
-
-
-    box
-      .querySelectorAll(".admin-task-status")
+    document
+      .querySelectorAll(".taskStatusButton")
       .forEach(button => {
 
         button.addEventListener(
@@ -558,28 +755,25 @@
             const status =
               button.dataset.status;
 
-            button.disabled = true;
-
-            const { error } =
-              await db
-                .from("tasks")
-                .update({ status })
-                .eq("id", id);
+            const { error } = await db
+              .from("tasks")
+              .update({ status })
+              .eq("id", id);
 
             if (error) {
-              alert(error.message);
-              button.disabled = false;
+              console.error(error);
+              alert("Unable to update task.");
               return;
             }
 
-            await loadTasks();
+            await loadAdminPage();
           }
         );
       });
 
 
-    box
-      .querySelectorAll(".admin-task-edit")
+    document
+      .querySelectorAll(".approveSubmission")
       .forEach(button => {
 
         button.addEventListener(
@@ -589,944 +783,92 @@
             const id =
               Number(button.dataset.id);
 
-            const task =
-              tasks.find(
-                item =>
-                  Number(item.id) === id
-              );
-
-            if (!task) return;
-
-            const title =
+            const note =
               prompt(
-                "Task title:",
-                task.title || ""
+                "Reviewer note (optional):",
+                ""
               );
 
-            if (title === null) return;
-
-            const description =
-              prompt(
-                "Task description:",
-                task.description || ""
-              );
-
-            if (description === null) return;
-
-            const pointsText =
-              prompt(
-                "Task points:",
-                task.points
-              );
-
-            if (pointsText === null) return;
-
-            const points =
-              Number(pointsText);
-
-            if (!title.trim()) {
-              alert(
-                "Task title cannot be empty."
-              );
-              return;
-            }
-
-            if (
-              !Number.isInteger(points) ||
-              points <= 0
-            ) {
-              alert(
-                "Points must be a whole number greater than 0."
-              );
-              return;
-            }
-
-            const { error } =
-              await db
-                .from("tasks")
-                .update({
-                  title: title.trim(),
-                  description:
-                    description.trim(),
-                  points
-                })
-                .eq("id", id);
+            const { error } = await db.rpc(
+              "approve_task_submission",
+              {
+                p_submission_id: id,
+                p_reviewer_note: note || null
+              }
+            );
 
             if (error) {
-              alert(error.message);
+              console.error(error);
+
+              alert(
+                "Approval failed. " +
+                error.message
+              );
+
               return;
             }
 
-            await loadTasks();
+            await loadAdminPage();
           }
         );
       });
-  }
 
 
-  async function createTask() {
-
-    const titleInput =
-      document.getElementById(
-        "adminTaskTitle"
-      );
-
-    const descriptionInput =
-      document.getElementById(
-        "adminTaskDescription"
-      );
-
-    const pointsInput =
-      document.getElementById(
-        "adminTaskPoints"
-      );
-
-    const statusInput =
-      document.getElementById(
-        "adminTaskStatus"
-      );
-
-    const message =
-      document.getElementById(
-        "adminTaskMsg"
-      );
-
-    const title =
-      titleInput?.value.trim();
-
-    const description =
-      descriptionInput?.value.trim() || "";
-
-    const points =
-      Number(pointsInput?.value);
-
-    const status =
-      statusInput?.value || "draft";
-
-    if (!title) {
-      message.textContent =
-        "Enter a task title.";
-      return;
-    }
-
-    if (
-      !Number.isInteger(points) ||
-      points <= 0
-    ) {
-      message.textContent =
-        "Points must be a whole number greater than 0.";
-      return;
-    }
-
-    const { error } =
-      await db
-        .from("tasks")
-        .insert({
-          title,
-          description,
-          points,
-          status
-        });
-
-    if (error) {
-      message.textContent =
-        error.message;
-      return;
-    }
-
-    titleInput.value = "";
-
-    if (descriptionInput) {
-      descriptionInput.value = "";
-    }
-
-    pointsInput.value = "";
-
-    message.textContent =
-      "Task created successfully.";
-
-    await loadTasks();
-  }
-
-
-  /* =========================================================
-     CATEGORIES
-     ========================================================= */
-
-  async function loadCategories() {
-
-    const box =
-      document.getElementById(
-        "adminCategories"
-      );
-
-    if (!box) return;
-
-    const {
-      data: categories,
-      error
-    } = await db
-      .from("task_categories")
-      .select(`
-        id,
-        name,
-        description
-      `)
-      .order("id", {
-        ascending: false
-      });
-
-    if (error) {
-
-      box.innerHTML = `
-        <div class="empty-card">
-          Unable to load categories.
-          <small>
-            ${escapeHTML(error.message)}
-          </small>
-        </div>
-      `;
-
-      return;
-    }
-
-    if (!categories?.length) {
-
-      box.innerHTML = `
-        <div class="empty-card">
-          No categories found.
-        </div>
-      `;
-
-      return;
-    }
-
-    box.innerHTML =
-      categories.map(category => `
-
-        <div class="history-row">
-
-          <div style="min-width:0">
-
-            <strong>
-              ${escapeHTML(category.name)}
-            </strong>
-
-            <small>
-              ${escapeHTML(
-                category.description || ""
-              )}
-            </small>
-
-            <small>
-              Category ID:
-              ${category.id}
-            </small>
-
-          </div>
-
-        </div>
-
-      `).join("");
-  }
-
-
-  async function createCategory() {
-
-    const nameInput =
-      document.getElementById(
-        "adminCategoryName"
-      );
-
-    const descriptionInput =
-      document.getElementById(
-        "adminCategoryDescription"
-      );
-
-    const message =
-      document.getElementById(
-        "adminCategoryMsg"
-      );
-
-    const name =
-      nameInput?.value.trim();
-
-    const description =
-      descriptionInput?.value.trim() || "";
-
-    if (!name) {
-
-      message.textContent =
-        "Enter a category name.";
-
-      return;
-    }
-
-    const { error } =
-      await db
-        .from("task_categories")
-        .insert({
-          name,
-          description
-        });
-
-    if (error) {
-
-      message.textContent =
-        error.message;
-
-      return;
-    }
-
-    nameInput.value = "";
-
-    if (descriptionInput) {
-      descriptionInput.value = "";
-    }
-
-    message.textContent =
-      "Category created successfully.";
-
-    await loadCategories();
-  }
-
-
-  /* =========================================================
-     BUSINESSES
-     ========================================================= */
-
-  async function loadBusinesses() {
-
-    const box =
-      document.getElementById(
-        "adminBusinesses"
-      );
-
-    if (!box) return;
-
-    const {
-      data: businesses,
-      error
-    } = await db
-      .from("businesses")
-      .select("*")
-      .order("id", {
-        ascending: false
-      });
-
-    if (error) {
-
-      box.innerHTML = `
-        <div class="empty-card">
-          Unable to load businesses.
-          <small>
-            ${escapeHTML(error.message)}
-          </small>
-        </div>
-      `;
-
-      return;
-    }
-
-    if (!businesses?.length) {
-
-      box.innerHTML = `
-        <div class="empty-card">
-          No businesses found.
-        </div>
-      `;
-
-      return;
-    }
-
-    box.innerHTML =
-      businesses.map(business => {
-
-        const name =
-          business.name ||
-          business.business_name ||
-          `Business #${business.id}`;
-
-        return `
-
-          <div class="history-row">
-
-            <div style="min-width:0">
-
-              <strong>
-                ${escapeHTML(name)}
-              </strong>
-
-              <small>
-                Business ID:
-                ${business.id}
-              </small>
-
-            </div>
-
-          </div>
-
-        `;
-      }).join("");
-  }
-
-
-  /* =========================================================
-     SUBMISSIONS
-     ========================================================= */
-
-  async function loadSubmissions() {
-
-    const box =
-      document.getElementById(
-        "adminSubmissions"
-      );
-
-    if (!box) return;
-
-    const filter =
-      document.getElementById(
-        "adminSubmissionStatus"
-      )?.value || "all";
-
-    let query =
-      db
-        .from("task_submissions")
-        .select(`
-          id,
-          task_id,
-          user_id,
-          proof,
-          survey_answers,
-          status,
-          reviewer_note,
-          submitted_at,
-          reviewed_at,
-          tasks (
-            title,
-            points
-          )
-        `)
-        .order("submitted_at", {
-          ascending: false
-        });
-
-    if (filter !== "all") {
-      query =
-        query.eq(
-          "status",
-          filter
-        );
-    }
-
-    const {
-      data: submissions,
-      error
-    } = await query;
-
-    if (error) {
-
-      box.innerHTML = `
-        <div class="empty-card">
-          Unable to load submissions.
-          <small>
-            ${escapeHTML(error.message)}
-          </small>
-        </div>
-      `;
-
-      return;
-    }
-
-    if (!submissions?.length) {
-
-      box.innerHTML = `
-        <div class="empty-card">
-          No submissions found.
-        </div>
-      `;
-
-      return;
-    }
-
-
-    box.innerHTML =
-      submissions.map(submission => {
-
-        const task =
-          submission.tasks || {};
-
-        const taskTitle =
-          task.title ||
-          `Task #${submission.task_id}`;
-
-        const points =
-          task.points ?? 0;
-
-        let answers =
-          submission.survey_answers;
-
-        if (
-          typeof answers === "string"
-        ) {
-          try {
-            answers =
-              JSON.parse(answers);
-          } catch {
-            answers = null;
-          }
-        }
-
-        let answersHTML = "";
-
-        if (
-          answers &&
-          typeof answers === "object"
-        ) {
-
-          const entries =
-            Array.isArray(answers)
-              ? answers.map(
-                  (item, index) => [
-                    index + 1,
-                    item
-                  ]
-                )
-              : Object.entries(answers);
-
-          answersHTML =
-            entries.map(
-              ([number, item]) => {
-
-                const question =
-                  item &&
-                  typeof item === "object" &&
-                  item.question
-                    ? item.question
-                    : `Question ${number}`;
-
-                const answer =
-                  item &&
-                  typeof item === "object" &&
-                  Object.prototype.hasOwnProperty.call(
-                    item,
-                    "answer"
-                  )
-                    ? item.answer
-                    : item;
-
-                const answerText =
-                  typeof answer === "string"
-                    ? answer
-                    : JSON.stringify(answer);
-
-                return `
-
-                  <div style="
-                    margin-top:8px;
-                    padding:10px;
-                    border:1px solid
-                      rgba(0,200,255,.20);
-                    border-radius:10px;
-                  ">
-
-                    <strong>
-                      ${escapeHTML(question)}
-                    </strong>
-
-                    <div style="
-                      margin-top:4px;
-                      word-break:break-word;
-                    ">
-                      ${escapeHTML(answerText)}
-                    </div>
-
-                  </div>
-
-                `;
-              }
-            ).join("");
-        }
-
-
-        return `
-
-          <div class="history-row">
-
-            <div style="min-width:0">
-
-              <strong>
-                ${escapeHTML(taskTitle)}
-              </strong>
-
-              <small>
-                Submission #${submission.id}
-              </small>
-
-              <small>
-                User ID:
-                ${escapeHTML(
-                  submission.user_id
-                )}
-              </small>
-
-              <small>
-                Reward:
-                ${points} points
-              </small>
-
-              <small>
-                Status:
-                ${escapeHTML(
-                  submission.status
-                )}
-              </small>
-
-              <small>
-                Submitted:
-                ${escapeHTML(
-                  formatDate(
-                    submission.submitted_at
-                  )
-                )}
-              </small>
-
-              <small>
-                Reviewed:
-                ${escapeHTML(
-                  formatDate(
-                    submission.reviewed_at
-                  )
-                )}
-              </small>
-
-              ${
-                submission.proof
-                  ? `
-                    <div style="
-                      margin-top:8px;
-                      padding:10px;
-                      border:1px solid
-                        rgba(0,200,255,.25);
-                      border-radius:10px;
-                      word-break:break-word;
-                    ">
-
-                      <strong>
-                        Proof
-                      </strong>
-
-                      <div>
-                        ${escapeHTML(
-                          submission.proof
-                        )}
-                      </div>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-              ${
-                answersHTML
-                  ? `
-                    <div style="
-                      margin-top:10px;
-                      padding:10px;
-                      border:1px solid
-                        rgba(0,200,255,.25);
-                      border-radius:10px;
-                    ">
-
-                      <strong>
-                        Survey Answers
-                      </strong>
-
-                      ${answersHTML}
-
-                    </div>
-                  `
-                  : ""
-              }
-
-              ${
-                submission.reviewer_note
-                  ? `
-                    <div style="
-                      margin-top:8px;
-                      padding:10px;
-                      border:1px solid
-                        rgba(0,200,255,.25);
-                      border-radius:10px;
-                    ">
-
-                      <strong>
-                        Reviewer Note
-                      </strong>
-
-                      <div>
-                        ${escapeHTML(
-                          submission.reviewer_note
-                        )}
-                      </div>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-            </div>
-
-            ${
-              submission.status === "pending"
-                ? `
-                  <div style="
-                    display:flex;
-                    flex-direction:column;
-                    gap:8px;
-                  ">
-
-                    <button
-                      class="gradient-button
-                        admin-approve"
-                      data-id="${submission.id}"
-                      type="button"
-                    >
-                      Approve
-                    </button>
-
-                    <button
-                      class="outline-button
-                        admin-reject"
-                      data-id="${submission.id}"
-                      type="button"
-                    >
-                      Reject
-                    </button>
-
-                  </div>
-                `
-                : ""
+    document
+      .querySelectorAll(".rejectSubmission")
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          async () => {
+
+            const id =
+              Number(button.dataset.id);
+
+            const note =
+              prompt(
+                "Reason for rejection:",
+                ""
+              );
+
+            const { error } = await db
+              .from("task_submissions")
+              .update({
+                status: "rejected",
+                reviewer_note: note || null,
+                reviewed_at: new Date().toISOString()
+              })
+              .eq("id", id);
+
+            if (error) {
+              console.error(error);
+
+              alert(
+                "Rejection failed. " +
+                error.message
+              );
+
+              return;
             }
 
-          </div>
-
-        `;
-
-      }).join("");
-
-
-    box
-      .querySelectorAll(".admin-approve")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () =>
-            reviewSubmission(
-              Number(button.dataset.id),
-              "approved"
-            )
-        );
-      });
-
-
-    box
-      .querySelectorAll(".admin-reject")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () =>
-            reviewSubmission(
-              Number(button.dataset.id),
-              "rejected"
-            )
+            await loadAdminPage();
+          }
         );
       });
   }
 
 
-  async function reviewSubmission(
-    submissionId,
-    status
-  ) {
-
-    const note =
-      prompt(
-        status === "approved"
-          ? "Admin note (optional):"
-          : "Reason for rejection:"
-      );
-
-    if (note === null) return;
-
-    const {
-      error
-    } = await db
-      .from("task_submissions")
-      .update({
-        status,
-        reviewer_note:
-          note.trim(),
-        reviewed_at:
-          new Date().toISOString()
-      })
-      .eq("id", submissionId)
-      .eq("status", "pending");
-
-    if (error) {
-
-      alert(error.message);
-
-      return;
-    }
-
-    await loadSubmissions();
-  }
-
-
-  /* =========================================================
-     REWARD / REDEMPTION REQUESTS
-     ========================================================= */
-
-  async function loadRedemptions() {
-
-    const box =
-      document.getElementById(
-        "adminRedemptions"
-      );
-
-    if (!box) return;
-
-    const {
-      data: requests,
-      error
-    } = await db
-      .from("redemption_requests")
-      .select(`
-        id,
-        user_id,
-        points_requested,
-        reward_type,
-        status,
-        user_note,
-        admin_note,
-        created_at,
-        reviewed_at,
-        paid_at
-      `)
-      .order("created_at", {
-        ascending: false
-      });
-
-    if (error) {
-
-      box.innerHTML = `
-        <div class="empty-card">
-          Unable to load reward requests.
-          <small>
-            ${escapeHTML(error.message)}
-          </small>
-        </div>
-      `;
-
-      return;
-    }
-
-    if (!requests?.length) {
-
-      box.innerHTML = `
-        <div class="empty-card">
-          No reward requests found.
-        </div>
-      `;
-
-      return;
-    }
-
-
-    box.innerHTML =
-      requests.map(request => `
-
-        <div class="history-row">
-
-          <div style="min-width:0">
-
-            <strong>
-              Reward Request #${request.id}
-            </strong>
-
-            <small>
-              User:
-              ${escapeHTML(
-                request.user_id
-              )}
-            </small>
-
-            <small>
-              Points:
-              ${request.points_requested}
-            </small>
-
-            <small>
-              Reward type:
-              ${escapeHTML(
-                request.reward_type
-              )}
-            </small>
-
-            <small>
-              Status:
-              ${escapeHTML(
-                request.status
-              )}
-            </small>
-
-            <small>
-              Created:
-              ${escapeHTML(
-                formatDate(
-                  request.created_at
-                )
-              )}
-            </small>
-
-          </div>
-
-        </div>
-
-      `).join("");
-  }
-
-
-  /* =========================================================
-     START
-     ========================================================= */
-
-  if (!db) {
-
-    const content =
-      document.getElementById(
-        "adminContent"
-      );
-
-    if (content) {
-
-      content.innerHTML = `
-        <div class="empty-card">
-          Supabase configuration could not be loaded.
-        </div>
-      `;
-    }
-
-    return;
-  }
-
+  // =========================================
+  // START
+  // =========================================
 
   document.addEventListener(
     "DOMContentLoaded",
     loadAdminPage
   );
+
+  window.PULSEAdmin = {
+    load: loadAdminPage
+  };
 
 })();
