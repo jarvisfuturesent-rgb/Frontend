@@ -28,7 +28,6 @@
         Complete • Earn • Get Rewarded
       </p>
 
-      <!-- DROPDOWN MENU -->
       <details class="menu">
         <summary>☰ Menu</summary>
 
@@ -66,13 +65,18 @@
     </header>
 
 
-    <!-- AUTH AREA -->
+    <!-- AUTH -->
     <section
       id="auth"
       class="panel"
       hidden
     >
-      <h2>Account</h2>
+      <div class="panel-heading">
+        <h2>
+          <span class="blue-icon">🔐</span>
+          Account
+        </h2>
+      </div>
 
       <p>
         Please log in to access your PULSE dashboard.
@@ -80,131 +84,189 @@
     </section>
 
 
-    <!-- USER DASHBOARD -->
+    <!-- DASHBOARD -->
     <section
       id="dashboard"
-      class="panel"
       hidden
     >
 
-      <h2>Your PULSE Dashboard</h2>
-
       <!-- PROFILE -->
-      <div class="panel">
+      <section class="panel">
 
-        <h3>Welcome</h3>
+        <div class="panel-heading">
+          <h2>
+            <span class="blue-icon">👤</span>
+            Welcome
+          </h2>
+        </div>
 
-        <p>
-          <strong id="profileName">
-            Loading...
-          </strong>
-        </p>
+        <div class="profile-row">
+          <span>Account</span>
+          <strong id="profileName">Loading...</strong>
+        </div>
 
-      </div>
+      </section>
 
 
       <!-- BALANCE -->
-      <div class="panel">
+      <section class="balance-card">
 
-        <h3>PULSE Balance</h3>
+        <div>
+          <div class="balance-label">
+            PULSE BALANCE
+          </div>
 
-        <p>
-          <strong id="balance">
+          <div
+            id="balance"
+            class="balance-number"
+          >
             0
-          </strong>
-          PLS
-        </p>
+          </div>
+        </div>
 
-      </div>
+        <strong>PLS</strong>
+
+      </section>
 
 
       <!-- EARNINGS -->
-      <div class="panel">
+      <section class="panel">
 
-        <h3>Earnings Summary</h3>
+        <div class="panel-heading">
+          <h2>
+            <span class="blue-icon">💎</span>
+            Earnings
+          </h2>
+        </div>
 
-        <p>
-          Total Earned:
-          <strong id="totalEarned">
-            0 PLS
-          </strong>
-        </p>
+        <div class="earnings-summary">
 
-        <p>
-          Pending:
-          <strong id="pendingWithdrawal">
-            0 PLS
-          </strong>
-        </p>
+          <div class="profile-row">
+            <span>Total Earned</span>
+            <strong id="totalEarned">
+              0 PLS
+            </strong>
+          </div>
 
-        <p>
-          Available:
-          <strong id="availableBalance">
-            0 PLS
-          </strong>
-        </p>
+          <div class="profile-row">
+            <span>Pending</span>
+            <strong id="pendingWithdrawal">
+              0 PLS
+            </strong>
+          </div>
 
-      </div>
+          <div class="profile-row">
+            <span>Available</span>
+            <strong id="availableBalance">
+              0 PLS
+            </strong>
+          </div>
+
+        </div>
+
+      </section>
 
 
-      <!-- AVAILABLE WITHDRAWAL -->
-      <div class="panel">
+      <!-- AVAILABLE REWARD -->
+      <section class="panel reward-box">
 
-        <h3>Available Reward Balance</h3>
+        <div class="panel-heading">
+          <h2>
+            <span class="blue-icon">🎁</span>
+            Available Rewards
+          </h2>
+        </div>
 
-        <p>
+        <div class="profile-row">
+          <span>Available Balance</span>
+
           <strong id="withdrawAvailable">
             0 PLS
           </strong>
-        </p>
+        </div>
 
-      </div>
+      </section>
 
 
       <!-- TASKS -->
-      <div class="panel">
+      <section class="panel">
 
-        <h2>Available Tasks</h2>
-
-        <div id="tasks">
-          Loading tasks...
+        <div class="panel-heading">
+          <h2>
+            <span class="blue-icon">⚡</span>
+            Available Tasks
+          </h2>
         </div>
 
-      </div>
+        <div id="tasks">
+          <div class="loading-box">
+            Loading tasks...
+          </div>
+        </div>
+
+      </section>
 
 
       <!-- SUBMISSIONS -->
-      <div class="panel">
+      <section class="panel">
 
-        <h2>My Submissions</h2>
-
-        <div id="submissions">
-          Loading submissions...
+        <div class="panel-heading">
+          <h2>
+            <span class="blue-icon">📋</span>
+            My Submissions
+          </h2>
         </div>
 
-      </div>
+        <div id="submissions">
+          <div class="loading-box">
+            Loading submissions...
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- NOTIFICATIONS -->
+      <section class="panel">
+
+        <details>
+
+          <summary>
+            <strong>
+              🔔 Notifications
+            </strong>
+          </summary>
+
+          <div
+            id="notifications"
+            style="margin-top:8px;"
+          >
+            <div class="loading-box">
+              Loading notifications...
+            </div>
+          </div>
+
+        </details>
+
+      </section>
 
     </section>
 
 
-    <!-- ADMIN CONTAINER
-         Kept for compatibility with app.js -->
+    <!-- COMPATIBILITY CONTAINERS -->
+
     <section
       id="adminDashboard"
       class="panel"
       hidden
-    >
-    </section>
+    ></section>
 
-
-    <!-- PASSWORD RESET CONTAINER
-         Kept for compatibility with app.js -->
     <section
       id="resetPasswordPanel"
       class="panel"
       hidden
-    >
-    </section>
+    ></section>
+
 
   </main>
 
