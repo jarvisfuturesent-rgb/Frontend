@@ -68,19 +68,57 @@
     </header>
 
 
+    <!-- AUTH STATUS -->
+    <section
+      id="authStatus"
+      class="panel"
+    >
+      Loading account...
+    </section>
+
+
     <!-- USER DASHBOARD -->
-    <section id="userDashboard" class="panel">
+    <section
+      id="dashboardContent"
+      class="panel"
+    >
+      Loading dashboard...
+    </section>
 
-      <h2>Your PULSE Dashboard</h2>
 
-      <div id="authStatus">
-        Loading account...
-      </div>
+    <!-- HIDDEN AUTH CONTAINER
+         Used by app.js -->
+    <section
+      id="auth"
+      hidden
+    >
+    </section>
 
-      <div id="dashboardContent">
-        Loading dashboard...
-      </div>
 
+    <!-- HIDDEN DASHBOARD CONTAINER
+         Used by app.js -->
+    <section
+      id="dashboard"
+      hidden
+    >
+    </section>
+
+
+    <!-- HIDDEN ADMIN CONTAINER
+         Used by app.js -->
+    <section
+      id="adminDashboard"
+      hidden
+    >
+    </section>
+
+
+    <!-- HIDDEN PASSWORD RESET CONTAINER
+         Used by app.js -->
+    <section
+      id="resetPasswordPanel"
+      hidden
+    >
     </section>
 
   </main>
@@ -101,14 +139,16 @@
 
     const dashboardSupabase =
       window.supabase.createClient(
-        "https://egeftdnvgcqjjavrpohd.supabase.co",
-        "sb_publishable_bhnKTWbI3aS0yFABUMWaOg_nkEBlTgv"
+        window.SUPABASE_URL,
+        window.SUPABASE_ANON_KEY
       );
 
     async function checkDashboardAdmin() {
 
       const adminLink =
-        document.getElementById("admin-dashboard-link");
+        document.getElementById(
+          "admin-dashboard-link"
+        );
 
       if (!adminLink) return;
 
@@ -118,29 +158,37 @@
           data: {
             user
           }
-        } = await dashboardSupabase.auth.getUser();
+        } =
+          await dashboardSupabase.auth.getUser();
 
         if (!user) {
-          adminLink.style.display = "none";
+
+          adminLink.style.display =
+            "none";
+
           return;
         }
 
         const {
           data: profile,
           error
-        } = await dashboardSupabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .maybeSingle();
+        } =
+          await dashboardSupabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .maybeSingle();
 
         if (error) {
+
           console.error(
             "Admin check failed:",
             error
           );
 
-          adminLink.style.display = "none";
+          adminLink.style.display =
+            "none";
+
           return;
         }
 
@@ -148,9 +196,14 @@
           profile &&
           profile.role === "admin"
         ) {
-          adminLink.style.display = "block";
+
+          adminLink.style.display =
+            "block";
+
         } else {
-          adminLink.style.display = "none";
+
+          adminLink.style.display =
+            "none";
         }
 
       } catch (error) {
@@ -160,9 +213,11 @@
           error
         );
 
-        adminLink.style.display = "none";
+        adminLink.style.display =
+          "none";
       }
     }
+
 
     checkDashboardAdmin();
 
