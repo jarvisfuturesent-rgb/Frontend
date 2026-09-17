@@ -109,12 +109,15 @@ function findSurvey(title) {
 ========================= */
 
 function renderQuestion(question, index) {
+
   const questionText = escapeHtml(question[0]);
   const number = index + 1;
 
   if (question[1] === "yesno") {
+
     return `
       <div class="survey-question-block">
+
         <div class="survey-question-text">
           ${number}. ${questionText}
         </div>
@@ -128,13 +131,17 @@ function renderQuestion(question, index) {
           <option value="Yes">Yes</option>
           <option value="No">No</option>
         </select>
+
       </div>
     `;
   }
 
+
   if (question[1] === "rating") {
+
     return `
       <div class="survey-question-block">
+
         <div class="survey-question-text">
           ${number}. ${questionText}
         </div>
@@ -151,12 +158,15 @@ function renderQuestion(question, index) {
           <option value="4">4 - Good</option>
           <option value="5">5 - Excellent</option>
         </select>
+
       </div>
     `;
   }
 
+
   return `
     <div class="survey-question-block">
+
       <div class="survey-question-text">
         ${number}. ${questionText}
       </div>
@@ -168,6 +178,7 @@ function renderQuestion(question, index) {
         required
         placeholder="Your feedback"
       ></textarea>
+
     </div>
   `;
 }
@@ -190,14 +201,19 @@ async function openSurvey(taskId, title, points) {
     document.getElementById("pulseSurveyModal");
 
   if (!modal) {
+
     modal = document.createElement("div");
+
     modal.id = "pulseSurveyModal";
+
     document.body.appendChild(modal);
   }
 
   const questions = SURVEYS[surveyName];
 
+
   modal.innerHTML = `
+
     <div class="survey-modal-box">
 
       <h2>
@@ -205,22 +221,31 @@ async function openSurvey(taskId, title, points) {
       </h2>
 
       <p class="survey-intro">
+
         Please answer every question below.
+
         <br><br>
+
         Reward:
         <strong>
           +${Number(points) || 25} points
         </strong>
+
         after admin approval.
+
       </p>
+
 
       <form id="pulseSurveyForm">
 
         <div class="survey-questions">
+
           ${questions
             .map(renderQuestion)
             .join("")}
+
         </div>
+
 
         <div class="survey-actions">
 
@@ -230,6 +255,7 @@ async function openSurvey(taskId, title, points) {
           >
             Submit Survey
           </button>
+
 
           <button
             type="button"
@@ -241,6 +267,7 @@ async function openSurvey(taskId, title, points) {
 
         </div>
 
+
         <p
           id="pulseSurveyMsg"
           class="status"
@@ -249,40 +276,62 @@ async function openSurvey(taskId, title, points) {
       </form>
 
     </div>
+
   `;
 
   modal.hidden = false;
 
 
-  /* CLOSE */
+  /* =========================
+     CLOSE
+  ========================= */
 
   document
     .getElementById("closePulseSurvey")
     ?.addEventListener("click", () => {
+
       modal.remove();
+
     });
 
 
-  /* SUBMIT */
+  /* =========================
+     SUBMIT
+  ========================= */
 
   const form =
     document.getElementById("pulseSurveyForm");
 
   if (!form) return;
 
+
   form.onsubmit = async function (event) {
 
     event.preventDefault();
 
+
+    /* =========================
+       COLLECT ANSWERS
+    ========================= */
+
     const answers = {};
 
-    for (let i = 0; i < questions.length; i++) {
+
+    for (
+      let i = 0;
+      i < questions.length;
+      i++
+    ) {
 
       const field =
-        form.querySelector(`[name="q${i}"]`);
+        form.querySelector(
+          `[name="q${i}"]`
+        );
+
 
       const value =
         field?.value?.trim();
+
 
       if (!value) {
 
@@ -291,27 +340,51 @@ async function openSurvey(taskId, title, points) {
             "pulseSurveyMsg"
           );
 
+
         if (message) {
+
           message.textContent =
             `Please answer question ${i + 1}.`;
+
         }
+
 
         field?.focus();
 
         return;
       }
 
-      answers[i + 1] = value;
+
+      /*
+       * Save both the question and answer.
+       * This makes the record understandable
+       * when viewed later in Management Hub.
+       */
+
+      answers[i + 1] = {
+
+        question: questions[i][0],
+
+        type: questions[i][1],
+
+        answer: value
+
+      };
+
     }
 
 
-    /* AUTH */
+    /* =========================
+       AUTH
+    ========================= */
 
     const {
       data: { user }
     } = await db.auth.getUser();
 
+
     if (!user) {
+
       alert(
         "Please sign in before taking a survey."
       );
@@ -320,35 +393,73 @@ async function openSurvey(taskId, title, points) {
     }
 
 
-    /* DISABLE BUTTON */
+    /* =========================
+       DISABLE BUTTON
+    ========================= */
 
     const button =
       form.querySelector(
         'button[type="submit"]'
       );
 
+
     if (button) {
+
       button.disabled = true;
-      button.textContent = "Submitting...";
+
+      button.textContent =
+        "Submitting...";
+
     }
 
 
-    /* SUBMIT TO SUPABASE */
+    /* =========================
+       SAVE SUBMISSION
+    ========================= */
 
     const { error } =
       await db
         .from("task_submissions")
         .insert({
-          task_id: Number(taskId),
-          user_id: user.id,
-          proof: JSON.stringify({
-            survey: title,
-            answers: answers
-          })
+
+          task_id:
+            Number(taskId),
+
+          user_id:
+            user.id,
+
+          /*
+           * Keep proof as a simple
+           * description of the submission.
+           */
+
+          proof:
+            `Survey: ${title}`,
+
+          /*
+           * IMPORTANT:
+           * The complete survey answers
+           * are now stored in the
+           * dedicated survey_answers
+           * JSONB database column.
+           */
+
+          survey_answers:
+            answers,
+
+          /*
+           * Explicitly start as pending.
+           */
+
+          status:
+            "pending"
+
         });
 
 
-    /* ERROR */
+    /* =========================
+       ERROR
+    ========================= */
 
     if (error) {
 
@@ -357,38 +468,57 @@ async function openSurvey(taskId, title, points) {
         error
       );
 
+
       if (button) {
+
         button.disabled = false;
+
         button.textContent =
           "Submit Survey";
+
       }
+
 
       const message =
         document.getElementById(
           "pulseSurveyMsg"
         );
 
+
       if (message) {
+
         message.textContent =
           error.message;
+
       }
 
       return;
     }
 
 
-    /* SUCCESS */
+    /* =========================
+       SUCCESS
+    ========================= */
 
     modal.remove();
+
 
     alert(
       "Survey submitted. Your submission is now pending review."
     );
 
-    if (typeof refresh === "function") {
+
+    if (
+      typeof refresh ===
+      "function"
+    ) {
+
       await refresh();
+
     }
+
   };
+
 }
 
 
@@ -401,17 +531,23 @@ function enhanceTasks() {
   const box =
     document.getElementById("tasks");
 
+
   if (!box) return;
+
 
   box
     .querySelectorAll(".task-card")
     .forEach(card => {
 
+
       if (
         card.dataset.surveyEnhanced === "1"
       ) {
+
         return;
+
       }
+
 
       const title =
         card
@@ -421,19 +557,26 @@ function enhanceTasks() {
           ?.textContent
           ?.trim() || "";
 
+
       if (!findSurvey(title)) {
+
         return;
+
       }
+
 
       const button =
         card.querySelector(
           ".task-submit"
         );
 
+
       if (!button) return;
+
 
       const taskId =
         button.dataset.id;
+
 
       const pointsText =
         card
@@ -442,14 +585,17 @@ function enhanceTasks() {
           )
           ?.textContent || "";
 
+
       const points =
         pointsText.replace(
           /[^0-9]/g,
           ""
         ) || "25";
 
+
       button.textContent =
         "Take Survey";
+
 
       button.onclick =
         () =>
@@ -459,9 +605,12 @@ function enhanceTasks() {
             points
           );
 
+
       card.dataset.surveyEnhanced =
         "1";
+
     });
+
 }
 
 
@@ -476,14 +625,19 @@ function addSurveyStyles() {
       "pulseSurveyStyles"
     )
   ) {
+
     return;
+
   }
+
 
   const style =
     document.createElement("style");
 
+
   style.id =
     "pulseSurveyStyles";
+
 
   style.textContent = `
 
@@ -497,6 +651,7 @@ function addSurveyStyles() {
       background: rgba(3, 6, 20, 0.94);
     }
 
+
     .survey-modal-box {
       width: 100%;
       max-width: 680px;
@@ -509,15 +664,18 @@ function addSurveyStyles() {
       color: #ffffff;
     }
 
+
     .survey-modal-box h2 {
       margin: 0 0 10px;
       line-height: 1.3;
     }
 
+
     .survey-intro {
       margin: 0 0 22px;
       line-height: 1.5;
     }
+
 
     .survey-question-block {
       margin-bottom: 18px;
@@ -528,6 +686,7 @@ function addSurveyStyles() {
       background: rgba(18, 27, 58, 0.72);
     }
 
+
     .survey-question-text {
       display: block;
       margin-bottom: 11px;
@@ -536,6 +695,7 @@ function addSurveyStyles() {
       font-weight: 700;
       line-height: 1.5;
     }
+
 
     .survey-input {
       display: block;
@@ -550,15 +710,18 @@ function addSurveyStyles() {
       font-size: 16px;
     }
 
+
     textarea.survey-input {
       min-height: 100px;
       resize: vertical;
     }
 
+
     .survey-input option {
       color: #000000;
       background: #ffffff;
     }
+
 
     .survey-actions {
       display: flex;
@@ -567,9 +730,11 @@ function addSurveyStyles() {
       margin-top: 22px;
     }
 
+
     .survey-actions button {
       min-height: 46px;
     }
+
 
     @media (max-width: 520px) {
 
@@ -577,24 +742,30 @@ function addSurveyStyles() {
         padding: 10px;
       }
 
+
       .survey-modal-box {
         margin: 5px auto;
         padding: 16px;
         border-radius: 14px;
       }
 
+
       .survey-question-block {
         padding: 13px;
       }
 
+
       .survey-question-text {
         font-size: 15px;
       }
+
     }
 
   `;
 
+
   document.head.appendChild(style);
+
 }
 
 
@@ -609,33 +780,45 @@ function wireNotificationReadButton() {
       "markNotificationsRead"
     );
 
+
   if (!button) return;
+
 
   if (
     button.dataset.readWired === "1"
   ) {
+
     return;
+
   }
 
+
   button.dataset.readWired = "1";
+
 
   button.addEventListener(
     "click",
     async () => {
 
+
       const {
         data: { user }
       } = await db.auth.getUser();
 
+
       if (!user) {
+
         alert(
           "Please sign in first."
         );
 
         return;
+
       }
 
+
       button.disabled = true;
+
 
       const { error } =
         await db
@@ -643,10 +826,18 @@ function wireNotificationReadButton() {
           .update({
             read: true
           })
-          .eq("user_id", user.id)
-          .eq("read", false);
+          .eq(
+            "user_id",
+            user.id
+          )
+          .eq(
+            "read",
+            false
+          );
+
 
       button.disabled = false;
+
 
       if (error) {
 
@@ -655,20 +846,28 @@ function wireNotificationReadButton() {
           error
         );
 
-        alert(error.message);
+
+        alert(
+          error.message
+        );
 
         return;
+
       }
+
 
       if (
         typeof loadNotifications ===
         "function"
       ) {
+
         await loadNotifications();
+
       }
 
     }
   );
+
 }
 
 
@@ -684,8 +883,12 @@ function startSurveySystem() {
 
   wireNotificationReadButton();
 
+
   const box =
-    document.getElementById("tasks");
+    document.getElementById(
+      "tasks"
+    );
+
 
   if (
     box &&
@@ -693,13 +896,16 @@ function startSurveySystem() {
   ) {
 
     const observer =
-      new MutationObserver(() => {
+      new MutationObserver(
+        () => {
 
-        enhanceTasks();
+          enhanceTasks();
 
-        wireNotificationReadButton();
+          wireNotificationReadButton();
 
-      });
+        }
+      );
+
 
     observer.observe(
       box,
@@ -709,9 +915,12 @@ function startSurveySystem() {
       }
     );
 
+
     box.dataset.surveyObserver =
       "1";
+
   }
+
 }
 
 
