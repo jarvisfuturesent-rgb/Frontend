@@ -393,6 +393,7 @@ async function loadAdminSubmissions() {
       task_id,
       user_id,
       proof,
+      survey_answers,
       status,
       reviewer_note,
       submitted_at,
@@ -447,6 +448,104 @@ async function loadAdminSubmissions() {
 
       const taskPoints =
         submission.tasks?.points ?? 0;
+
+      /* =========================
+         SURVEY ANSWERS
+      ========================= */
+
+      let surveyAnswers =
+        submission.survey_answers;
+
+      if (
+        typeof surveyAnswers === "string"
+      ) {
+        try {
+          surveyAnswers =
+            JSON.parse(surveyAnswers);
+        } catch {
+          surveyAnswers = null;
+        }
+      }
+
+      let surveyAnswersHtml = "";
+
+      if (
+        surveyAnswers &&
+        typeof surveyAnswers === "object"
+      ) {
+
+        const entries =
+          Array.isArray(surveyAnswers)
+            ? surveyAnswers.map(
+                (item, index) => [
+                  index + 1,
+                  item
+                ]
+              )
+            : Object.entries(
+                surveyAnswers
+              );
+
+        surveyAnswersHtml =
+          entries
+            .map(([number, item]) => {
+
+              const question =
+                item &&
+                typeof item === "object" &&
+                item.question
+                  ? item.question
+                  : `Question ${number}`;
+
+              const answer =
+                item &&
+                typeof item === "object" &&
+                "answer" in item
+                  ? item.answer
+                  : item;
+
+              let answerText = "";
+
+              if (
+                answer !== null &&
+                answer !== undefined
+              ) {
+                answerText =
+                  typeof answer === "string"
+                    ? answer
+                    : JSON.stringify(answer);
+              }
+
+              return `
+                <div style="
+                  margin-top:8px;
+                  padding:10px;
+                  border:1px solid
+                    rgba(0,200,255,.20);
+                  border-radius:10px;
+                ">
+
+                  <strong>
+                    ${adminEscape(
+                      question
+                    )}
+                  </strong>
+
+                  <div style="
+                    margin-top:4px;
+                    word-break:break-word;
+                  ">
+                    ${adminEscape(
+                      answerText
+                    )}
+                  </div>
+
+                </div>
+              `;
+
+            })
+            .join("");
+      }
 
       return `
 
@@ -503,6 +602,28 @@ async function loadAdminSubmissions() {
                     No proof provided.
                   </small>
                 `
+            }
+
+            ${
+              surveyAnswersHtml
+                ? `
+                  <div style="
+                    margin-top:10px;
+                    padding:10px;
+                    border:1px solid
+                      rgba(0,200,255,.25);
+                    border-radius:10px;
+                  ">
+
+                    <strong>
+                      Survey Answers
+                    </strong>
+
+                    ${surveyAnswersHtml}
+
+                  </div>
+                `
+                : ""
             }
 
           </div>
