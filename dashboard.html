@@ -7,6 +7,99 @@
   <title>PULSE — Dashboard</title>
 
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Dashboard-only refinements.
+       style.css is not replaced. */
+
+    .menu {
+      margin-top: 16px;
+    }
+
+    .menu > summary {
+      cursor: pointer;
+      list-style: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      letter-spacing: .4px;
+      border: 1px solid rgba(0, 210, 255, .45);
+      background: rgba(0, 30, 60, .55);
+      box-shadow:
+        0 0 10px rgba(0, 210, 255, .18),
+        inset 0 0 12px rgba(0, 210, 255, .08);
+    }
+
+    .menu > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .menu > summary:hover {
+      box-shadow:
+        0 0 16px rgba(0, 210, 255, .3),
+        inset 0 0 14px rgba(0, 210, 255, .12);
+    }
+
+    .menu-panel {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 210, 255, .28);
+      background: rgba(5, 12, 28, .96);
+      box-shadow:
+        0 0 20px rgba(0, 210, 255, .15),
+        inset 0 0 18px rgba(0, 210, 255, .05);
+    }
+
+    .menu-panel a {
+      display: block;
+      padding: 11px 13px;
+      margin: 4px 0;
+      border-radius: 9px;
+      text-decoration: none;
+      transition: .2s ease;
+    }
+
+    .menu-panel a:hover {
+      background: rgba(0, 210, 255, .10);
+      box-shadow: 0 0 10px rgba(0, 210, 255, .15);
+      transform: translateX(2px);
+    }
+
+    .dashboard-dropdown {
+      border-radius: 12px;
+    }
+
+    .dashboard-dropdown > summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 4px 0;
+      font-weight: 700;
+    }
+
+    .dashboard-dropdown > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .dashboard-dropdown > summary::before {
+      content: "▶";
+      display: inline-block;
+      margin-right: 8px;
+      font-size: 11px;
+      transition: transform .2s ease;
+    }
+
+    .dashboard-dropdown[open] > summary::before {
+      transform: rotate(90deg);
+    }
+
+    .dropdown-content {
+      margin-top: 12px;
+    }
+  </style>
 </head>
 
 <body>
@@ -29,26 +122,31 @@
       </p>
 
       <details class="menu">
-        <summary>☰ Menu</summary>
+
+        <summary>
+          ☰ Menu
+        </summary>
 
         <div class="menu-panel">
 
-          <a href="index.html">Home</a>
+          <a href="index.html">
+            🏠 Home
+          </a>
 
           <a href="how-it-works.html">
-            How It Works
+            ⚡ How It Works
           </a>
 
           <a href="about.html">
-            About PULSE
+            ℹ️ About PULSE
           </a>
 
           <a href="contact.html">
-            Contact
+            ✉️ Contact
           </a>
 
           <a href="dashboard.html">
-            Dashboard
+            👤 Dashboard
           </a>
 
           <a
@@ -56,10 +154,11 @@
             href="admin.html"
             style="display:none;"
           >
-            ⚙ Admin Dashboard
+            ⚙️ Admin Dashboard
           </a>
 
         </div>
+
       </details>
 
     </header>
@@ -71,6 +170,7 @@
       class="panel"
       hidden
     >
+
       <div class="panel-heading">
         <h2>
           <span class="blue-icon">🔐</span>
@@ -81,6 +181,7 @@
       <p>
         Please log in to access your PULSE dashboard.
       </p>
+
     </section>
 
 
@@ -102,7 +203,9 @@
 
         <div class="profile-row">
           <span>Account</span>
-          <strong id="profileName">Loading...</strong>
+          <strong id="profileName">
+            Loading...
+          </strong>
         </div>
 
       </section>
@@ -112,6 +215,7 @@
       <section class="balance-card">
 
         <div>
+
           <div class="balance-label">
             PULSE BALANCE
           </div>
@@ -122,9 +226,12 @@
           >
             0
           </div>
+
         </div>
 
-        <strong>PLS</strong>
+        <strong>
+          PLS
+        </strong>
 
       </section>
 
@@ -143,6 +250,7 @@
 
           <div class="profile-row">
             <span>Total Earned</span>
+
             <strong id="totalEarned">
               0 PLS
             </strong>
@@ -150,6 +258,7 @@
 
           <div class="profile-row">
             <span>Pending</span>
+
             <strong id="pendingWithdrawal">
               0 PLS
             </strong>
@@ -157,6 +266,7 @@
 
           <div class="profile-row">
             <span>Available</span>
+
             <strong id="availableBalance">
               0 PLS
             </strong>
@@ -167,61 +277,52 @@
       </section>
 
 
-      <!-- AVAILABLE REWARD -->
-      <section class="panel reward-box">
+      <!-- AVAILABLE TASKS -->
+      <section class="panel">
 
-        <div class="panel-heading">
-          <h2>
-            <span class="blue-icon">🎁</span>
-            Available Rewards
-          </h2>
-        </div>
+        <details class="dashboard-dropdown">
 
-        <div class="profile-row">
-          <span>Available Balance</span>
+          <summary>
+            ⚡ Available Tasks
+          </summary>
 
-          <strong id="withdrawAvailable">
-            0 PLS
-          </strong>
-        </div>
+          <div
+            id="tasks"
+            class="dropdown-content"
+          >
+
+            <div class="loading-box">
+              Loading tasks...
+            </div>
+
+          </div>
+
+        </details>
 
       </section>
 
 
-      <!-- TASKS -->
+      <!-- MY SUBMISSIONS -->
       <section class="panel">
 
-        <div class="panel-heading">
-          <h2>
-            <span class="blue-icon">⚡</span>
-            Available Tasks
-          </h2>
-        </div>
+        <details class="dashboard-dropdown">
 
-        <div id="tasks">
-          <div class="loading-box">
-            Loading tasks...
+          <summary>
+            📋 My Submissions
+          </summary>
+
+          <div
+            id="submissions"
+            class="dropdown-content"
+          >
+
+            <div class="loading-box">
+              Loading submissions...
+            </div>
+
           </div>
-        </div>
 
-      </section>
-
-
-      <!-- SUBMISSIONS -->
-      <section class="panel">
-
-        <div class="panel-heading">
-          <h2>
-            <span class="blue-icon">📋</span>
-            My Submissions
-          </h2>
-        </div>
-
-        <div id="submissions">
-          <div class="loading-box">
-            Loading submissions...
-          </div>
-        </div>
+        </details>
 
       </section>
 
@@ -229,21 +330,21 @@
       <!-- NOTIFICATIONS -->
       <section class="panel">
 
-        <details>
+        <details class="dashboard-dropdown">
 
           <summary>
-            <strong>
-              🔔 Notifications
-            </strong>
+            🔔 Notifications
           </summary>
 
           <div
             id="notifications"
-            style="margin-top:8px;"
+            class="dropdown-content"
           >
+
             <div class="loading-box">
               Loading notifications...
             </div>
+
           </div>
 
         </details>
@@ -309,7 +410,9 @@
           await client.auth.getUser();
 
         if (!user) {
+
           link.style.display = "none";
+
           return;
         }
 
