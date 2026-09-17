@@ -9,34 +9,97 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* Dashboard-only layout.
-       Shared styling remains in style.css. */
+    /* Dashboard-only styling.
+       Shared project styling remains in style.css. */
 
-    .dashboard-intro {
+    .dashboard-hero {
       text-align: center;
+      padding: 20px 10px 10px;
+    }
+
+    .dashboard-hero h2 {
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+
+    .dashboard-hero p {
       line-height: 1.6;
     }
 
+    /* Folder-style menu */
+
+    .menu-panel > details {
+      margin: 6px 0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .menu-panel > details > summary {
+      cursor: pointer;
+      padding: 11px 12px;
+      font-weight: 700;
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .menu-panel > details > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .menu-panel > details > summary::before {
+      content: "▶ ";
+      font-size: .75rem;
+      margin-right: 4px;
+    }
+
+    .menu-panel > details[open] > summary::before {
+      content: "▼ ";
+    }
+
+    .menu-logo {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      margin-right: 7px;
+      flex-shrink: 0;
+    }
+
+    .menu-panel > details > div {
+      padding: 2px 8px 8px;
+    }
+
+    .menu-panel > details > div a {
+      display: block;
+      padding: 9px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    /* Balance */
+
     .balance-box {
       text-align: center;
-      padding: 22px 16px;
-      border-radius: 16px;
-      border: 1px solid rgba(0, 200, 255, .30);
-      background: rgba(0, 20, 40, .30);
+      padding: 24px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(0, 200, 255, .35);
+      background: rgba(0, 20, 40, .28);
+      box-shadow: 0 0 20px rgba(0, 200, 255, .08);
       animation: balancePulse 3s ease-in-out infinite;
     }
 
-    .balance-label {
+    .balance-title {
       display: block;
+      font-size: .95rem;
       opacity: .8;
       margin-bottom: 6px;
     }
 
     .balance-amount {
       display: block;
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 800;
-      margin-bottom: 6px;
+      margin-bottom: 7px;
     }
 
     .balance-status {
@@ -51,9 +114,11 @@
       }
 
       50% {
-        transform: scale(1.015);
+        transform: scale(1.025);
       }
     }
+
+    /* Earnings */
 
     .earnings-grid {
       display: grid;
@@ -65,33 +130,34 @@
       text-align: center;
       padding: 14px 8px;
       border-radius: 12px;
-      border: 1px solid rgba(0, 200, 255, .18);
+      border: 1px solid rgba(0, 200, 255, .20);
       background: rgba(0, 20, 40, .22);
     }
 
     .earning-box strong {
       display: block;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       margin-bottom: 5px;
     }
 
     .earning-box span {
       display: block;
-      font-size: .78rem;
+      font-size: .8rem;
       opacity: .8;
     }
 
+    /* Dashboard folders */
+
     .dashboard-folder {
-      margin-top: 10px;
       border-radius: 12px;
       overflow: hidden;
     }
 
     .dashboard-folder > summary {
       cursor: pointer;
-      list-style: none;
-      padding: 14px;
+      padding: 13px 12px;
       font-weight: 700;
+      list-style: none;
     }
 
     .dashboard-folder > summary::-webkit-details-marker {
@@ -101,6 +167,7 @@
     .dashboard-folder > summary::before {
       content: "▶ ";
       font-size: .75rem;
+      margin-right: 4px;
     }
 
     .dashboard-folder[open] > summary::before {
@@ -108,32 +175,17 @@
     }
 
     .dashboard-folder-content {
-      padding: 4px 10px 10px;
+      padding: 4px 8px 10px;
     }
 
-    .dashboard-item {
-      padding: 12px;
-      margin: 7px 0;
-      border-radius: 10px;
-      border: 1px solid rgba(0, 200, 255, .15);
-      background: rgba(0, 20, 40, .18);
-    }
-
-    .dashboard-item strong {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .dashboard-item span {
-      font-size: .9rem;
-      opacity: .85;
-      line-height: 1.4;
-    }
+    /* Submission files */
 
     .submission-dropdown {
       margin: 7px 0;
       border-radius: 10px;
       overflow: hidden;
+      border: 1px solid rgba(0, 200, 255, .15);
+      background: rgba(0, 20, 40, .18);
     }
 
     .submission-dropdown > summary {
@@ -162,9 +214,33 @@
 
     .answers-dropdown > summary {
       cursor: pointer;
-      font-weight: 700;
       padding: 9px 0;
+      font-weight: 700;
     }
+
+    /* Task cards */
+
+    .task-item {
+      padding: 13px;
+      margin: 7px 0;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 200, 255, .15);
+      background: rgba(0, 20, 40, .18);
+    }
+
+    .task-item strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .task-item span {
+      display: block;
+      font-size: .9rem;
+      line-height: 1.4;
+      opacity: .85;
+    }
+
+    /* Actions */
 
     .dashboard-actions {
       display: flex;
@@ -174,16 +250,16 @@
 
     .dashboard-button {
       display: block;
-      text-align: center;
       padding: 13px 16px;
       border-radius: 11px;
+      text-align: center;
       text-decoration: none;
       font-weight: 700;
       border: 1px solid rgba(0, 200, 255, .30);
       background: rgba(0, 200, 255, .08);
     }
 
-    @media (max-width: 520px) {
+    @media (max-width: 420px) {
       .earnings-grid {
         grid-template-columns: 1fr;
       }
@@ -208,38 +284,89 @@
         Complete • Earn • Get Rewarded
       </p>
 
-      <!-- MENU -->
+      <!-- MAIN MENU -->
       <details class="menu">
 
         <summary>☰ Menu</summary>
 
         <div class="menu-panel">
 
-          <a href="index.html">🏠 Home</a>
+          <!-- PUBLIC -->
+          <details>
+            <summary>
+              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+              Public
+            </summary>
 
-          <a href="how-it-works.html">⚡ How It Works</a>
+            <div>
+              <a href="index.html">🏠 Home</a>
+              <a href="how-it-works.html">⚡ How It Works</a>
+              <a href="about.html">ℹ️ About PULSE</a>
+              <a href="contact.html">✉️ Contact</a>
+            </div>
+          </details>
 
-          <a href="about.html">ℹ️ About PULSE</a>
+          <!-- LEGAL -->
+          <details>
+            <summary>
+              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+              Legal
+            </summary>
 
-          <a href="contact.html">✉️ Contact</a>
+            <div>
+              <a href="terms.html">📜 Terms</a>
+              <a href="privacy.html">🔒 Privacy Policy</a>
+              <a href="disclosures.html">⚖️ Disclosures</a>
+            </div>
+          </details>
 
-          <a href="auth.html">🔐 Login / Sign Up</a>
+          <!-- ACCOUNT -->
+          <details>
+            <summary>
+              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+              Account
+            </summary>
 
-          <a href="dashboard.html">👤 Dashboard</a>
+            <div>
+              <a href="auth.html">🔐 Login / Sign Up</a>
+              <a href="dashboard.html">👤 Dashboard</a>
+              <a href="profile.html">⚙️ Profile & Account</a>
+              <a href="reset-password.html">🔑 Reset Password</a>
+            </div>
+          </details>
 
-          <a href="profile.html">⚙️ Profile & Account</a>
+          <!-- PULSE -->
+          <details>
+            <summary>
+              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+              PULSE
+            </summary>
 
-          <a href="tasks.html">⚡ Available Tasks</a>
+            <div>
+              <a href="tasks.html">⚡ Available Tasks</a>
+              <a href="surveys.html">📝 Surveys</a>
+              <a href="submissions.html">📋 My Submissions</a>
+              <a href="earnings.html">💰 Earnings & Balance</a>
+              <a href="notifications.html">🔔 Notifications</a>
+            </div>
+          </details>
 
-          <a href="surveys.html">📝 Surveys</a>
+          <!-- ADMINISTRATION -->
+          <details>
+            <summary>
+              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+              Administration
+            </summary>
 
-          <a href="submissions.html">📋 My Submissions</a>
-
-          <a href="earnings.html">💰 Earnings & Balance</a>
-
-          <a href="notifications.html">🔔 Notifications</a>
-
-          <a href="admin.html">⚙️ Admin Dashboard</a>
+            <div>
+              <a href="admin.html">⚙️ Admin Dashboard</a>
+              <a href="admin-tasks.html">📋 Task Management</a>
+              <a href="admin-businesses.html">🏢 Business Management</a>
+              <a href="admin-submissions.html">📝 Submission Review</a>
+              <a href="admin-rewards.html">💰 Reward Requests</a>
+              <a href="admin-reports.html">📊 Reports & Records</a>
+            </div>
+          </details>
 
         </div>
 
@@ -248,8 +375,8 @@
     </header>
 
 
-    <!-- DASHBOARD INTRO -->
-    <section class="panel dashboard-intro">
+    <!-- WELCOME -->
+    <section class="panel dashboard-hero">
 
       <h2>Welcome Back</h2>
 
@@ -266,7 +393,7 @@
 
       <div class="balance-box">
 
-        <span class="balance-label">
+        <span class="balance-title">
           Current Balance
         </span>
 
@@ -274,7 +401,7 @@
           id="balance"
           class="balance-amount"
         >
-          0 PLS
+          25 PLS
         </span>
 
         <span class="balance-status">
@@ -296,7 +423,7 @@
         <div class="earning-box">
 
           <strong id="totalEarned">
-            0
+            25
           </strong>
 
           <span>
@@ -320,7 +447,7 @@
         <div class="earning-box">
 
           <strong id="availablePoints">
-            0
+            25
           </strong>
 
           <span>
@@ -397,7 +524,7 @@
     </section>
 
 
-    <!-- DASHBOARD ACTIONS -->
+    <!-- ACTIONS -->
     <section class="panel">
 
       <div class="dashboard-actions">
@@ -452,13 +579,8 @@
   </main>
 
 
-  <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- CONFIG -->
   <script src="config.js"></script>
-
-  <!-- APP -->
   <script src="app.js"></script>
 
 </body>
