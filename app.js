@@ -62,6 +62,7 @@ function isAdminRoute() {
 ========================= */
 
 async function getCurrentUserRole() {
+
   const {
     data: { user }
   } = await db.auth.getUser();
@@ -83,6 +84,7 @@ async function getCurrentUserRole() {
     .maybeSingle();
 
   if (error) {
+
     console.error(
       "PULSE role check failed:",
       error
@@ -123,6 +125,7 @@ async function updateAuthState() {
 
   const resetPanel =
     $("resetPasswordPanel");
+
 
   /* =========================
      NOT LOGGED IN
@@ -189,11 +192,6 @@ async function updateAuthState() {
     if (auth) {
       auth.hidden = true;
     }
-
-    /*
-      Remove #admin so a normal user
-      cannot remain on the admin route.
-    */
 
     window.history.replaceState(
       null,
@@ -480,11 +478,13 @@ async function loadTasks() {
         requirements.length
           ? `
             <div class="task-requirements">
+
               <strong>
                 Requirements:
               </strong>
 
               <ul>
+
                 ${requirements
                   .map(
                     requirement => `
@@ -496,7 +496,9 @@ async function loadTasks() {
                     `
                   )
                   .join("")}
+
               </ul>
+
             </div>
           `
           : "";
@@ -635,6 +637,7 @@ window.submitTask =
 
 /* =========================
    SUBMISSIONS
+   OUTER FOLDER + INNER FILES
 ========================= */
 
 async function loadSubmissions() {
@@ -689,12 +692,15 @@ async function loadSubmissions() {
 
     box.innerHTML = `
       <div class="empty-card">
+
         Unable to load submissions.
+
         <small>
           ${escapeHtml(
             error.message
           )}
         </small>
+
       </div>
     `;
 
@@ -711,10 +717,9 @@ async function loadSubmissions() {
     return;
   }
 
+
   box.innerHTML =
     data.map(item => {
-
-      let answersHtml = "";
 
       let answers =
         item.survey_answers;
@@ -724,15 +729,22 @@ async function loadSubmissions() {
       ) {
 
         try {
+
           answers =
             JSON.parse(
               answers
             );
-        } catch {
-          answers = null;
-        }
 
+        } catch {
+
+          answers = null;
+
+        }
       }
+
+
+      let answersHtml = "";
+
 
       if (
         answers &&
@@ -741,45 +753,59 @@ async function loadSubmissions() {
 
         const entries =
           Array.isArray(answers)
+
             ? answers.map(
                 (answer, index) => [
                   index + 1,
                   answer
                 ]
               )
+
             : Object.entries(
                 answers
               );
 
+
         answersHtml =
           entries
             .map(
-              ([number, item]) => {
+              ([number, answerItem]) => {
 
                 const question =
-                  item &&
-                  typeof item === "object" &&
-                  item.question
-                    ? item.question
+                  answerItem &&
+                  typeof answerItem === "object" &&
+                  answerItem.question
+
+                    ? answerItem.question
+
                     : `Question ${number}`;
 
+
                 const answer =
-                  item &&
-                  typeof item === "object" &&
-                  "answer" in item
-                    ? item.answer
-                    : item;
+                  answerItem &&
+                  typeof answerItem === "object" &&
+                  "answer" in answerItem
+
+                    ? answerItem.answer
+
+                    : answerItem;
+
 
                 const answerText =
                   answer === null ||
                   answer === undefined
+
                     ? ""
+
                     : typeof answer ===
                       "string"
+
                       ? answer
+
                       : JSON.stringify(
                           answer
                         );
+
 
                 return `
                   <div style="
@@ -810,112 +836,239 @@ async function loadSubmissions() {
               }
             )
             .join("");
-
       }
 
-      return `
-        <div class="history-row">
 
-          <div style="min-width:0">
+      const status =
+        String(
+          item.status || ""
+        ).toLowerCase();
 
-            <strong>
-              ${escapeHtml(
-                item.tasks?.title ||
-                "Task"
-              )}
-            </strong>
 
-            <small>
-              ${item.tasks?.points ?? 0}
-              points
-            </small>
+      const statusLabel =
+        status === "approved"
 
-            <small>
-              Submission #${item.id}
-            </small>
+          ? "Approved"
 
-            <small>
-              Submitted:
-              ${new Date(
-                item.submitted_at
-              ).toLocaleString()}
-            </small>
+          : status === "rejected"
 
-            ${
+            ? "Rejected"
+
+            : "Pending";
+
+
+      const submitted =
+        item.submitted_at
+
+          ? new Date(
+              item.submitted_at
+            ).toLocaleString()
+
+          : "";
+
+
+      const reviewed =
+        item.reviewed_at
+
+          ? new Date(
               item.reviewed_at
-                ? `
-                  <small>
-                    Reviewed:
-                    ${new Date(
-                      item.reviewed_at
-                    ).toLocaleString()}
-                  </small>
-                `
-                : ""
-            }
+            ).toLocaleString()
+
+          : "";
+
+
+      const reviewerNote =
+        item.reviewer_note
+
+          ? `
+            <p>
+              <strong>
+                Reviewer Note:
+              </strong>
+
+              ${escapeHtml(
+                item.reviewer_note
+              )}
+            </p>
+          `
+
+          : "";
+
+
+      const proof =
+        item.proof
+
+          ? `
+            <div style="
+              margin-top:12px;
+            ">
+
+              <strong>
+                Proof
+              </strong>
+
+              <pre style="
+                white-space:pre-wrap;
+                word-break:break-word;
+                margin-top:6px;
+                padding:10px;
+                border-radius:10px;
+                background:rgba(0,0,0,.25);
+                overflow:auto;
+              ">${escapeHtml(
+                item.proof
+              )}</pre>
+
+            </div>
+          `
+
+          : "";
+
+
+      return `
+        <details
+          class="submission-dropdown"
+          style="
+            margin-bottom:10px;
+            padding:12px;
+            border:1px solid
+              rgba(0,200,255,.22);
+            border-radius:12px;
+            background:rgba(0,20,40,.30);
+          "
+        >
+
+          <summary
+            style="
+              cursor:pointer;
+              font-weight:700;
+              list-style:none;
+            "
+          >
+
+            ▶
+
+            ${escapeHtml(
+              item.tasks?.title ||
+              "Unknown Task"
+            )}
+
+            <span style="
+              margin-left:6px;
+              opacity:.85;
+            ">
+              ${escapeHtml(
+                item.tasks?.points ?? 0
+              )} pts
+            </span>
+
+            <span style="
+              margin-left:6px;
+              opacity:.85;
+            ">
+              • ${escapeHtml(
+                statusLabel
+              )}
+            </span>
+
+          </summary>
+
+
+          <div style="
+            margin-top:12px;
+            padding-top:10px;
+            border-top:1px solid
+              rgba(0,200,255,.15);
+          ">
+
+            <p>
+              <strong>
+                Submission #${escapeHtml(
+                  item.id
+                )}
+              </strong>
+            </p>
+
+
+            <p>
+              <strong>
+                Submitted:
+              </strong>
+
+              ${escapeHtml(
+                submitted
+              )}
+            </p>
+
 
             ${
-              item.reviewer_note
+              reviewed
                 ? `
-                  <small>
-                    Reviewer note:
-                    ${escapeHtml(
-                      item.reviewer_note
-                    )}
-                  </small>
-                `
-                : ""
-            }
-
-            ${
-              item.proof
-                ? `
-                  <div style="
-                    margin-top:8px;
-                    word-break:break-word;
-                  ">
+                  <p>
                     <strong>
-                      Proof:
+                      Reviewed:
                     </strong>
 
-                    <div>
-                      ${escapeHtml(
-                        item.proof
-                      )}
-                    </div>
-                  </div>
+                    ${escapeHtml(
+                      reviewed
+                    )}
+                  </p>
                 `
                 : ""
             }
+
+
+            ${reviewerNote}
+
+
+            ${proof}
+
 
             ${
               answersHtml
                 ? `
-                  <div style="
-                    margin-top:10px;
-                  ">
+                  <details
+                    style="
+                      margin-top:12px;
+                    "
+                  >
 
-                    <strong>
-                      Saved Answers
-                    </strong>
+                    <summary
+                      style="
+                        cursor:pointer;
+                        font-weight:700;
+                      "
+                    >
+                      📝 Saved Answers
+                    </summary>
 
-                    ${answersHtml}
+                    <div>
+                      ${answersHtml}
+                    </div>
 
-                  </div>
+                  </details>
                 `
                 : ""
             }
 
+
+            <div style="
+              margin-top:12px;
+              font-weight:700;
+            ">
+
+              Status:
+              ${escapeHtml(
+                statusLabel
+              )}
+
+            </div>
+
           </div>
 
-          <span class="status-pill">
-            ${escapeHtml(
-              item.status
-            )}
-          </span>
-
-        </div>
+        </details>
       `;
+
     })
     .join("");
 }
@@ -970,12 +1123,15 @@ async function loadActivity() {
 
     box.innerHTML = `
       <div class="empty-card">
+
         Unable to load activity.
+
         <small>
           ${escapeHtml(
             error.message
           )}
         </small>
+
       </div>
     `;
 
@@ -1018,7 +1174,9 @@ async function loadActivity() {
               ? "+"
               : ""
           }
+
           ${item.amount}
+
         </strong>
 
       </div>
@@ -1080,12 +1238,15 @@ async function loadRedemptions() {
 
     box.innerHTML = `
       <div class="empty-card">
+
         Unable to load rewards.
+
         <small>
           ${escapeHtml(
             error.message
           )}
         </small>
+
       </div>
     `;
 
@@ -1226,12 +1387,15 @@ async function loadNotifications() {
 
     box.innerHTML = `
       <div class="empty-card">
+
         Unable to load notifications.
+
         <small>
           ${escapeHtml(
             error.message
           )}
         </small>
+
       </div>
     `;
 
@@ -1712,8 +1876,10 @@ function setupAuth() {
         if (
           $("resetPasswordPanel")
         ) {
+
           $("resetPasswordPanel").hidden =
             true;
+
         }
       };
   }
@@ -1865,15 +2031,11 @@ document.addEventListener(
     db.auth.onAuthStateChange(
       async () => {
 
-        /*
-          Give Supabase time to finish
-          updating the session before
-          checking the dashboard.
-        */
-
         setTimeout(
           async () => {
+
             await refresh();
+
           },
           100
         );
