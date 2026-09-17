@@ -13,7 +13,9 @@
 
   <main class="app-shell">
 
+    <!-- HEADER -->
     <header class="hero">
+
       <img
         src="pulse-logo.png"
         alt="PULSE Token"
@@ -25,20 +27,64 @@
       <p class="tagline">
         Administration
       </p>
+
+      <!-- DROPDOWN MENU -->
+      <details class="menu">
+        <summary>☰ Menu</summary>
+
+        <div class="menu-panel">
+
+          <a href="index.html">
+            Home
+          </a>
+
+          <a href="how-it-works.html">
+            How It Works
+          </a>
+
+          <a href="about.html">
+            About PULSE
+          </a>
+
+          <a href="contact.html">
+            Contact
+          </a>
+
+          <a href="dashboard.html">
+            Dashboard
+          </a>
+
+          <a href="admin.html">
+            ⚙ Admin Dashboard
+          </a>
+
+        </div>
+      </details>
+
     </header>
 
+
+    <!-- ADMIN DASHBOARD -->
     <section id="adminDashboard" class="panel">
+
       <h2>⚙ Admin Panel</h2>
 
       <div id="adminContent">
         Loading admin dashboard...
       </div>
+
     </section>
 
   </main>
 
+
+  <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- CONFIG -->
   <script src="config.js"></script>
+
+  <!-- ADMIN -->
   <script src="admin.js"></script>
 
 </body>
