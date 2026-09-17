@@ -11,13 +11,14 @@ const db = createClient(
 
 
 /* =========================
-   PRODUCTION AUTH REDIRECT
+   PRODUCTION URLS
 ========================= */
 
-// Live GitHub Pages homepage.
-// This prevents Supabase email links from returning to localhost.
 const AUTH_REDIRECT_URL =
   "https://jarvisfuturesent-rgb.github.io/Frontend/";
+
+const HOMEPAGE_URL =
+  "https://jarvisfuturesent-rgb.github.io/pages/";
 
 
 /* =========================
@@ -45,22 +46,182 @@ function msg(element, text) {
 
 
 /* =========================
+   ADMIN ROUTE
+========================= */
+
+function isAdminRoute() {
+  return (
+    window.location.hash.toLowerCase() ===
+    "#admin"
+  );
+}
+
+
+/* =========================
+   GET CURRENT USER ROLE
+========================= */
+
+async function getCurrentUserRole() {
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  if (!user) {
+    return {
+      user: null,
+      role: null
+    };
+  }
+
+  const {
+    data: profile,
+    error
+  } = await db
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error(
+      "PULSE role check failed:",
+      error
+    );
+
+    return {
+      user,
+      role: null
+    };
+  }
+
+  return {
+    user,
+    role: profile?.role || "user"
+  };
+}
+
+
+/* =========================
    AUTH DISPLAY
 ========================= */
 
 async function updateAuthState() {
-  const { data: { user } } = await db.auth.getUser();
 
-  if (user) {
-    if ($("auth")) $("auth").hidden = true;
-    if ($("dashboard")) $("dashboard").hidden = false;
-  } else {
-    if ($("auth")) $("auth").hidden = false;
-    if ($("dashboard")) $("dashboard").hidden = true;
-    if ($("resetPasswordPanel")) {
-      $("resetPasswordPanel").hidden = true;
+  const {
+    user,
+    role
+  } = await getCurrentUserRole();
+
+  const auth =
+    $("auth");
+
+  const dashboard =
+    $("dashboard");
+
+  const adminDashboard =
+    $("adminDashboard");
+
+  const resetPanel =
+    $("resetPasswordPanel");
+
+  /* =========================
+     NOT LOGGED IN
+  ========================= */
+
+  if (!user) {
+
+    if (auth) {
+      auth.hidden = false;
     }
+
+    if (dashboard) {
+      dashboard.hidden = true;
+    }
+
+    if (adminDashboard) {
+      adminDashboard.hidden = true;
+    }
+
+    if (resetPanel) {
+      resetPanel.hidden = true;
+    }
+
+    return "logged-out";
   }
+
+
+  /* =========================
+     ADMIN ROUTE
+  ========================= */
+
+  if (isAdminRoute()) {
+
+    if (role === "admin") {
+
+      if (auth) {
+        auth.hidden = true;
+      }
+
+      if (dashboard) {
+        dashboard.hidden = true;
+      }
+
+      if (adminDashboard) {
+        adminDashboard.hidden = false;
+      }
+
+      return "admin";
+    }
+
+
+    /* =========================
+       NOT ADMIN
+    ========================= */
+
+    if (adminDashboard) {
+      adminDashboard.hidden = true;
+    }
+
+    if (dashboard) {
+      dashboard.hidden = false;
+    }
+
+    if (auth) {
+      auth.hidden = true;
+    }
+
+    /*
+      Remove #admin so a normal user
+      cannot remain on the admin route.
+    */
+
+    window.history.replaceState(
+      null,
+      "",
+      AUTH_REDIRECT_URL
+    );
+
+    return "user";
+  }
+
+
+  /* =========================
+     NORMAL USER ROUTE
+  ========================= */
+
+  if (auth) {
+    auth.hidden = true;
+  }
+
+  if (dashboard) {
+    dashboard.hidden = false;
+  }
+
+  if (adminDashboard) {
+    adminDashboard.hidden = true;
+  }
+
+  return "user";
 }
 
 
@@ -69,24 +230,38 @@ async function updateAuthState() {
 ========================= */
 
 async function loadProfile() {
-  const { data: { user } } = await db.auth.getUser();
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
   if (!user) return;
 
-  const { data, error } = await db
+  const {
+    data,
+    error
+  } = await db
     .from("profiles")
     .select("points,name,role")
     .eq("id", user.id)
     .maybeSingle();
 
   if (error) {
-    console.error("PULSE profile error:", error);
+
+    console.error(
+      "PULSE profile error:",
+      error
+    );
+
     return;
   }
 
-  const balance = Number(data?.points ?? 0);
+  const balance =
+    Number(data?.points ?? 0);
 
   if ($("balance")) {
-    $("balance").textContent = balance;
+    $("balance").textContent =
+      balance;
   }
 
   if ($("profileName")) {
@@ -105,25 +280,39 @@ async function loadProfile() {
 ========================= */
 
 async function loadEarningsSummary() {
-  const { data: { user } } = await db.auth.getUser();
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
   if (!user) return;
 
-  const { data: rewards, error: rewardError } = await db
+  const {
+    data: rewards,
+    error: rewardError
+  } = await db
     .from("points_ledger")
     .select("amount,reason")
     .eq("user_id", user.id)
     .eq("reason", "Task reward");
 
   if (rewardError) {
-    console.error("PULSE earnings error:", rewardError);
+
+    console.error(
+      "PULSE earnings error:",
+      rewardError
+    );
+
     return;
   }
 
-  const totalEarned = (rewards || []).reduce(
-    (total, row) =>
-      total + Number(row.amount || 0),
-    0
-  );
+  const totalEarned =
+    (rewards || []).reduce(
+      (total, row) =>
+        total +
+        Number(row.amount || 0),
+      0
+    );
 
   const {
     data: pendingRequests,
@@ -135,17 +324,22 @@ async function loadEarningsSummary() {
     .eq("status", "pending");
 
   if (pendingError) {
+
     console.error(
       "PULSE pending withdrawal error:",
       pendingError
     );
+
     return;
   }
 
   const pendingWithdrawal =
     (pendingRequests || []).reduce(
       (total, row) =>
-        total + Number(row.points_requested || 0),
+        total +
+        Number(
+          row.points_requested || 0
+        ),
       0
     );
 
@@ -159,19 +353,23 @@ async function loadEarningsSummary() {
     .maybeSingle();
 
   if (profileError) {
+
     console.error(
       "PULSE balance summary error:",
       profileError
     );
+
     return;
   }
 
-  const balance = Number(profile?.points ?? 0);
+  const balance =
+    Number(profile?.points ?? 0);
 
-  const available = Math.max(
-    0,
-    balance - pendingWithdrawal
-  );
+  const available =
+    Math.max(
+      0,
+      balance - pendingWithdrawal
+    );
 
   if ($("totalEarned")) {
     $("totalEarned").textContent =
@@ -200,10 +398,16 @@ async function loadEarningsSummary() {
 ========================= */
 
 async function loadTasks() {
-  const box = $("tasks");
+
+  const box =
+    $("tasks");
+
   if (!box) return;
 
-  const { data, error } = await db
+  const {
+    data,
+    error
+  } = await db
     .from("tasks")
     .select(`
       id,
@@ -218,12 +422,19 @@ async function loadTasks() {
       )
     `)
     .eq("status", "active")
-    .order("created_at", {
-      ascending: false
-    });
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
 
   if (error) {
-    console.error("PULSE tasks error:", error);
+
+    console.error(
+      "PULSE tasks error:",
+      error
+    );
 
     box.innerHTML = `
       <div class="empty-card">
@@ -238,6 +449,7 @@ async function loadTasks() {
   }
 
   if (!data?.length) {
+
     box.innerHTML = `
       <div class="empty-card">
         <strong>No tasks available.</strong>
@@ -248,76 +460,104 @@ async function loadTasks() {
     return;
   }
 
-  box.innerHTML = data.map(task => {
-    const requirements =
-      Array.isArray(task.task_requirements)
-        ? [...task.task_requirements].sort(
-            (a, b) =>
-              (a.sort_order ?? 0) -
-              (b.sort_order ?? 0)
-          )
-        : [];
+  box.innerHTML =
+    data.map(task => {
 
-    const requirementsHtml =
-      requirements.length
-        ? `
-          <div class="task-requirements">
-            <strong>Requirements:</strong>
-            <ul>
-              ${requirements.map(
-                requirement => `
-                  <li>
-                    ${escapeHtml(
-                      requirement.requirement
-                    )}
-                  </li>
-                `
-              ).join("")}
-            </ul>
+      const requirements =
+        Array.isArray(
+          task.task_requirements
+        )
+          ? [
+              ...task.task_requirements
+            ].sort(
+              (a, b) =>
+                (a.sort_order ?? 0) -
+                (b.sort_order ?? 0)
+            )
+          : [];
+
+      const requirementsHtml =
+        requirements.length
+          ? `
+            <div class="task-requirements">
+              <strong>
+                Requirements:
+              </strong>
+
+              <ul>
+                ${requirements
+                  .map(
+                    requirement => `
+                      <li>
+                        ${escapeHtml(
+                          requirement.requirement
+                        )}
+                      </li>
+                    `
+                  )
+                  .join("")}
+              </ul>
+            </div>
+          `
+          : "";
+
+      return `
+        <div class="task-card">
+
+          <div class="task-icon">
+            ⚡
           </div>
-        `
-        : "";
 
-    return `
-      <div class="task-card">
-        <div class="task-icon">⚡</div>
+          <div class="task-info">
 
-        <div class="task-info">
-          <strong>
-            ${escapeHtml(task.title)}
-          </strong>
+            <strong>
+              ${escapeHtml(
+                task.title
+              )}
+            </strong>
 
-          <small>
-            ${escapeHtml(
-              task.description || ""
-            )}
-          </small>
+            <small>
+              ${escapeHtml(
+                task.description || ""
+              )}
+            </small>
 
-          ${requirementsHtml}
+            ${requirementsHtml}
 
-          <span class="task-points">
-            +${escapeHtml(task.points)} pts
-          </span>
+            <span class="task-points">
+              +${escapeHtml(
+                task.points
+              )} pts
+            </span>
+
+          </div>
+
+          <button
+            class="gradient-button task-submit"
+            data-id="${task.id}"
+            type="button"
+          >
+            Submit
+          </button>
+
         </div>
-
-        <button
-          class="gradient-button task-submit"
-          data-id="${task.id}"
-          type="button"
-        >
-          Submit
-        </button>
-      </div>
-    `;
-  }).join("");
+      `;
+    })
+    .join("");
 
   box
-    .querySelectorAll(".task-submit")
+    .querySelectorAll(
+      ".task-submit"
+    )
     .forEach(button => {
+
       button.onclick = () =>
         submitTask(
-          Number(button.dataset.id)
+          Number(
+            button.dataset.id
+          )
         );
+
     });
 }
 
@@ -326,50 +566,71 @@ async function loadTasks() {
    SUBMIT TASK
 ========================= */
 
-window.submitTask = async function(taskId) {
-  const { data: { user } } =
-    await db.auth.getUser();
+window.submitTask =
+  async function(taskId) {
 
-  if (!user) {
-    alert("Please log in first.");
-    return;
-  }
+    const {
+      data: { user }
+    } = await db.auth.getUser();
 
-  if (!Number.isInteger(taskId)) {
-    alert("Invalid task.");
-    return;
-  }
+    if (!user) {
 
-  const proof = prompt(
-    "Enter your proof or note for this task:"
-  );
+      alert(
+        "Please log in first."
+      );
 
-  if (proof === null) return;
+      return;
+    }
 
-  const { error } = await db
-    .from("task_submissions")
-    .insert({
-      task_id: taskId,
-      user_id: user.id,
-      proof: proof.trim() || null
-    });
+    if (!Number.isInteger(taskId)) {
 
-  if (error) {
-    console.error(
-      "PULSE submission error:",
+      alert(
+        "Invalid task."
+      );
+
+      return;
+    }
+
+    const proof =
+      prompt(
+        "Enter your proof or note for this task:"
+      );
+
+    if (proof === null) {
+      return;
+    }
+
+    const {
       error
+    } = await db
+      .from("task_submissions")
+      .insert({
+        task_id: taskId,
+        user_id: user.id,
+        proof:
+          proof.trim() || null
+      });
+
+    if (error) {
+
+      console.error(
+        "PULSE submission error:",
+        error
+      );
+
+      alert(
+        error.message
+      );
+
+      return;
+    }
+
+    alert(
+      "Task submitted. Your submission is now pending review."
     );
 
-    alert(error.message);
-    return;
-  }
-
-  alert(
-    "Task submitted. Your submission is now pending review."
-  );
-
-  await refresh();
-};
+    await refresh();
+  };
 
 
 /* =========================
@@ -377,21 +638,30 @@ window.submitTask = async function(taskId) {
 ========================= */
 
 async function loadSubmissions() {
-  const box = $("submissions");
+
+  const box =
+    $("submissions");
+
   if (!box) return;
 
-  const { data: { user } } =
-    await db.auth.getUser();
+  const {
+    data: { user }
+  } = await db.auth.getUser();
 
   if (!user) return;
 
-  const { data, error } = await db
+  const {
+    data,
+    error
+  } = await db
     .from("task_submissions")
     .select(`
       id,
       task_id,
       proof,
+      survey_answers,
       status,
+      reviewer_note,
       submitted_at,
       reviewed_at,
       tasks (
@@ -399,12 +669,19 @@ async function loadSubmissions() {
         points
       )
     `)
-    .eq("user_id", user.id)
-    .order("submitted_at", {
-      ascending: false
-    });
+    .eq(
+      "user_id",
+      user.id
+    )
+    .order(
+      "submitted_at",
+      {
+        ascending: false
+      }
+    );
 
   if (error) {
+
     console.error(
       "PULSE submissions error:",
       error
@@ -414,7 +691,9 @@ async function loadSubmissions() {
       <div class="empty-card">
         Unable to load submissions.
         <small>
-          ${escapeHtml(error.message)}
+          ${escapeHtml(
+            error.message
+          )}
         </small>
       </div>
     `;
@@ -423,6 +702,7 @@ async function loadSubmissions() {
   }
 
   if (!data?.length) {
+
     box.innerHTML =
       `<div class="empty-card">
         No submissions yet.
@@ -431,29 +711,213 @@ async function loadSubmissions() {
     return;
   }
 
-  box.innerHTML = data.map(item => `
-    <div class="history-row">
-      <div>
-        <strong>
-          ${escapeHtml(
-            item.tasks?.title || "Task"
-          )}
-        </strong>
+  box.innerHTML =
+    data.map(item => {
 
-        <small>
-          ${item.tasks?.points ?? 0} points
-        </small>
+      let answersHtml = "";
 
-        <small>
-          ${escapeHtml(item.status)}
-        </small>
-      </div>
+      let answers =
+        item.survey_answers;
 
-      <span class="status-pill">
-        ${escapeHtml(item.status)}
-      </span>
-    </div>
-  `).join("");
+      if (
+        typeof answers === "string"
+      ) {
+
+        try {
+          answers =
+            JSON.parse(
+              answers
+            );
+        } catch {
+          answers = null;
+        }
+
+      }
+
+      if (
+        answers &&
+        typeof answers === "object"
+      ) {
+
+        const entries =
+          Array.isArray(answers)
+            ? answers.map(
+                (answer, index) => [
+                  index + 1,
+                  answer
+                ]
+              )
+            : Object.entries(
+                answers
+              );
+
+        answersHtml =
+          entries
+            .map(
+              ([number, item]) => {
+
+                const question =
+                  item &&
+                  typeof item === "object" &&
+                  item.question
+                    ? item.question
+                    : `Question ${number}`;
+
+                const answer =
+                  item &&
+                  typeof item === "object" &&
+                  "answer" in item
+                    ? item.answer
+                    : item;
+
+                const answerText =
+                  answer === null ||
+                  answer === undefined
+                    ? ""
+                    : typeof answer ===
+                      "string"
+                      ? answer
+                      : JSON.stringify(
+                          answer
+                        );
+
+                return `
+                  <div style="
+                    margin-top:8px;
+                    padding:10px;
+                    border:1px solid
+                      rgba(0,200,255,.20);
+                    border-radius:10px;
+                  ">
+
+                    <strong>
+                      ${escapeHtml(
+                        question
+                      )}
+                    </strong>
+
+                    <div style="
+                      margin-top:4px;
+                      word-break:break-word;
+                    ">
+                      ${escapeHtml(
+                        answerText
+                      )}
+                    </div>
+
+                  </div>
+                `;
+              }
+            )
+            .join("");
+
+      }
+
+      return `
+        <div class="history-row">
+
+          <div style="min-width:0">
+
+            <strong>
+              ${escapeHtml(
+                item.tasks?.title ||
+                "Task"
+              )}
+            </strong>
+
+            <small>
+              ${item.tasks?.points ?? 0}
+              points
+            </small>
+
+            <small>
+              Submission #${item.id}
+            </small>
+
+            <small>
+              Submitted:
+              ${new Date(
+                item.submitted_at
+              ).toLocaleString()}
+            </small>
+
+            ${
+              item.reviewed_at
+                ? `
+                  <small>
+                    Reviewed:
+                    ${new Date(
+                      item.reviewed_at
+                    ).toLocaleString()}
+                  </small>
+                `
+                : ""
+            }
+
+            ${
+              item.reviewer_note
+                ? `
+                  <small>
+                    Reviewer note:
+                    ${escapeHtml(
+                      item.reviewer_note
+                    )}
+                  </small>
+                `
+                : ""
+            }
+
+            ${
+              item.proof
+                ? `
+                  <div style="
+                    margin-top:8px;
+                    word-break:break-word;
+                  ">
+                    <strong>
+                      Proof:
+                    </strong>
+
+                    <div>
+                      ${escapeHtml(
+                        item.proof
+                      )}
+                    </div>
+                  </div>
+                `
+                : ""
+            }
+
+            ${
+              answersHtml
+                ? `
+                  <div style="
+                    margin-top:10px;
+                  ">
+
+                    <strong>
+                      Saved Answers
+                    </strong>
+
+                    ${answersHtml}
+
+                  </div>
+                `
+                : ""
+            }
+
+          </div>
+
+          <span class="status-pill">
+            ${escapeHtml(
+              item.status
+            )}
+          </span>
+
+        </div>
+      `;
+    })
+    .join("");
 }
 
 
@@ -462,15 +926,22 @@ async function loadSubmissions() {
 ========================= */
 
 async function loadActivity() {
-  const box = $("activity");
+
+  const box =
+    $("activity");
+
   if (!box) return;
 
-  const { data: { user } } =
-    await db.auth.getUser();
+  const {
+    data: { user }
+  } = await db.auth.getUser();
 
   if (!user) return;
 
-  const { data, error } = await db
+  const {
+    data,
+    error
+  } = await db
     .from("points_ledger")
     .select(`
       id,
@@ -479,12 +950,19 @@ async function loadActivity() {
       created_at,
       submission_id
     `)
-    .eq("user_id", user.id)
-    .order("created_at", {
-      ascending: false
-    });
+    .eq(
+      "user_id",
+      user.id
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
 
   if (error) {
+
     console.error(
       "PULSE activity error:",
       error
@@ -494,7 +972,9 @@ async function loadActivity() {
       <div class="empty-card">
         Unable to load activity.
         <small>
-          ${escapeHtml(error.message)}
+          ${escapeHtml(
+            error.message
+          )}
         </small>
       </div>
     `;
@@ -503,6 +983,7 @@ async function loadActivity() {
   }
 
   if (!data?.length) {
+
     box.innerHTML =
       `<div class="empty-card">
         No points activity yet.
@@ -511,26 +992,38 @@ async function loadActivity() {
     return;
   }
 
-  box.innerHTML = data.map(item => `
-    <div class="history-row">
-      <div>
+  box.innerHTML =
+    data.map(item => `
+      <div class="history-row">
+
+        <div>
+
+          <strong>
+            ${escapeHtml(
+              item.reason
+            )}
+          </strong>
+
+          <small>
+            ${new Date(
+              item.created_at
+            ).toLocaleString()}
+          </small>
+
+        </div>
+
         <strong>
-          ${escapeHtml(item.reason)}
+          ${
+            item.amount > 0
+              ? "+"
+              : ""
+          }
+          ${item.amount}
         </strong>
 
-        <small>
-          ${new Date(
-            item.created_at
-          ).toLocaleString()}
-        </small>
       </div>
-
-      <strong>
-        ${item.amount > 0 ? "+" : ""}
-        ${item.amount}
-      </strong>
-    </div>
-  `).join("");
+    `)
+    .join("");
 }
 
 
@@ -539,15 +1032,22 @@ async function loadActivity() {
 ========================= */
 
 async function loadRedemptions() {
-  const box = $("redemptions");
+
+  const box =
+    $("redemptions");
+
   if (!box) return;
 
-  const { data: { user } } =
-    await db.auth.getUser();
+  const {
+    data: { user }
+  } = await db.auth.getUser();
 
   if (!user) return;
 
-  const { data, error } = await db
+  const {
+    data,
+    error
+  } = await db
     .from("redemption_requests")
     .select(`
       id,
@@ -560,12 +1060,19 @@ async function loadRedemptions() {
       reviewed_at,
       paid_at
     `)
-    .eq("user_id", user.id)
-    .order("created_at", {
-      ascending: false
-    });
+    .eq(
+      "user_id",
+      user.id
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
 
   if (error) {
+
     console.error(
       "PULSE redemption error:",
       error
@@ -575,7 +1082,9 @@ async function loadRedemptions() {
       <div class="empty-card">
         Unable to load rewards.
         <small>
-          ${escapeHtml(error.message)}
+          ${escapeHtml(
+            error.message
+          )}
         </small>
       </div>
     `;
@@ -584,6 +1093,7 @@ async function loadRedemptions() {
   }
 
   if (!data?.length) {
+
     box.innerHTML =
       `<div class="empty-card">
         No withdrawals requested yet.
@@ -592,30 +1102,77 @@ async function loadRedemptions() {
     return;
   }
 
-  box.innerHTML = data.map(item => `
-    <div class="history-row">
-      <div>
-        <strong>
-          ${item.points_requested} PLS
-        </strong>
+  box.innerHTML =
+    data.map(item => `
+      <div class="history-row">
 
-        <small>
-          Request #${item.id}
-        </small>
+        <div>
 
-        <small>
+          <strong>
+            ${item.points_requested} PLS
+          </strong>
+
+          <small>
+            Request #${item.id}
+          </small>
+
+          <small>
+            ${escapeHtml(
+              item.reward_type ||
+              "manual_reward"
+            )}
+          </small>
+
+          ${
+            item.created_at
+              ? `
+                <small>
+                  Requested:
+                  ${new Date(
+                    item.created_at
+                  ).toLocaleString()}
+                </small>
+              `
+              : ""
+          }
+
+          ${
+            item.reviewed_at
+              ? `
+                <small>
+                  Reviewed:
+                  ${new Date(
+                    item.reviewed_at
+                  ).toLocaleString()}
+                </small>
+              `
+              : ""
+          }
+
+          ${
+            item.admin_note
+              ? `
+                <small>
+                  Admin note:
+                  ${escapeHtml(
+                    item.admin_note
+                  )}
+                </small>
+              `
+              : ""
+          }
+
+        </div>
+
+        <span class="status-pill">
           ${escapeHtml(
-            item.reward_type ||
-            "manual_reward"
+            item.status
           )}
-        </small>
-      </div>
+        </span>
 
-      <span class="status-pill">
-        ${escapeHtml(item.status)}
-      </span>
-    </div>
-  `).join("");
+      </div>
+    `)
+    .join("");
 }
 
 
@@ -624,15 +1181,22 @@ async function loadRedemptions() {
 ========================= */
 
 async function loadNotifications() {
-  const box = $("notifications");
+
+  const box =
+    $("notifications");
+
   if (!box) return;
 
-  const { data: { user } } =
-    await db.auth.getUser();
+  const {
+    data: { user }
+  } = await db.auth.getUser();
 
   if (!user) return;
 
-  const { data, error } = await db
+  const {
+    data,
+    error
+  } = await db
     .from("notifications")
     .select(`
       id,
@@ -642,12 +1206,19 @@ async function loadNotifications() {
       read,
       created_at
     `)
-    .eq("user_id", user.id)
-    .order("created_at", {
-      ascending: false
-    });
+    .eq(
+      "user_id",
+      user.id
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
 
   if (error) {
+
     console.error(
       "PULSE notifications error:",
       error
@@ -657,7 +1228,9 @@ async function loadNotifications() {
       <div class="empty-card">
         Unable to load notifications.
         <small>
-          ${escapeHtml(error.message)}
+          ${escapeHtml(
+            error.message
+          )}
         </small>
       </div>
     `;
@@ -676,6 +1249,7 @@ async function loadNotifications() {
   }
 
   if (!data?.length) {
+
     box.innerHTML =
       `<div class="empty-card">
         No notifications yet.
@@ -684,27 +1258,39 @@ async function loadNotifications() {
     return;
   }
 
-  box.innerHTML = data.map(item => `
-    <div class="history-row ${
-      item.read ? "" : "unread"
-    }">
-      <div>
-        <strong>
-          ${escapeHtml(item.title)}
-        </strong>
+  box.innerHTML =
+    data.map(item => `
+      <div class="history-row ${
+        item.read
+          ? ""
+          : "unread"
+      }">
 
-        <small>
-          ${escapeHtml(item.message)}
-        </small>
+        <div>
 
-        <small>
-          ${new Date(
-            item.created_at
-          ).toLocaleString()}
-        </small>
+          <strong>
+            ${escapeHtml(
+              item.title
+            )}
+          </strong>
+
+          <small>
+            ${escapeHtml(
+              item.message
+            )}
+          </small>
+
+          <small>
+            ${new Date(
+              item.created_at
+            ).toLocaleString()}
+          </small>
+
+        </div>
+
       </div>
-    </div>
-  `).join("");
+    `)
+    .join("");
 }
 
 
@@ -713,24 +1299,40 @@ async function loadNotifications() {
 ========================= */
 
 async function markNotificationsRead() {
-  const { data: { user } } =
-    await db.auth.getUser();
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
 
   if (!user) return;
 
-  const { error } = await db
+  const {
+    error
+  } = await db
     .from("notifications")
-    .update({ read: true })
-    .eq("user_id", user.id)
-    .eq("read", false);
+    .update({
+      read: true
+    })
+    .eq(
+      "user_id",
+      user.id
+    )
+    .eq(
+      "read",
+      false
+    );
 
   if (error) {
+
     console.error(
       "PULSE notification update error:",
       error
     );
 
-    alert(error.message);
+    alert(
+      error.message
+    );
+
     return;
   }
 
@@ -743,93 +1345,115 @@ async function markNotificationsRead() {
 ========================= */
 
 function setupRedeem() {
-  const button = $("redeem");
+
+  const button =
+    $("redeem");
+
   if (!button) return;
 
-  button.onclick = async () => {
-    const amount = Number(
-      $("redeemAmount")?.value
-    );
+  button.onclick =
+    async () => {
 
-    const rewardType =
-      $("rewardType")?.value ||
-      "manual_reward";
+      const amount =
+        Number(
+          $("redeemAmount")?.value
+        );
 
-    const userNote =
-      $("redeemNote")?.value?.trim() ||
-      null;
+      const rewardType =
+        $("rewardType")?.value ||
+        "manual_reward";
 
-    const output = $("redeemMsg");
+      const userNote =
+        $("redeemNote")?.value?.trim() ||
+        null;
 
-    msg(output, "");
+      const output =
+        $("redeemMsg");
 
-    if (
-      !Number.isInteger(amount) ||
-      amount <= 0
-    ) {
       msg(
         output,
-        "Enter a valid whole-number PLS amount."
+        ""
       );
 
-      return;
-    }
+      if (
+        !Number.isInteger(amount) ||
+        amount <= 0
+      ) {
 
-    const { data: { user } } =
-      await db.auth.getUser();
+        msg(
+          output,
+          "Enter a valid whole-number PLS amount."
+        );
 
-    if (!user) {
-      msg(
-        output,
-        "Please sign in first."
-      );
-
-      return;
-    }
-
-    button.disabled = true;
-
-    msg(
-      output,
-      "Submitting withdrawal request..."
-    );
-
-    const { error } = await db.rpc(
-      "create_redemption_request",
-      {
-        p_points: amount,
-        p_reward_type: rewardType,
-        p_user_note: userNote
+        return;
       }
-    );
 
-    button.disabled = false;
+      const {
+        data: { user }
+      } = await db.auth.getUser();
 
-    if (error) {
-      console.error(
-        "PULSE withdrawal request error:",
-        error
+      if (!user) {
+
+        msg(
+          output,
+          "Please sign in first."
+        );
+
+        return;
+      }
+
+      button.disabled = true;
+
+      msg(
+        output,
+        "Submitting withdrawal request..."
       );
 
-      msg(output, error.message);
-      return;
-    }
+      const {
+        error
+      } = await db.rpc(
+        "create_redemption_request",
+        {
+          p_points: amount,
+          p_reward_type:
+            rewardType,
+          p_user_note:
+            userNote
+        }
+      );
 
-    msg(
-      output,
-      "Withdrawal request submitted for admin approval."
-    );
+      button.disabled = false;
 
-    if ($("redeemAmount")) {
-      $("redeemAmount").value = "";
-    }
+      if (error) {
 
-    if ($("redeemNote")) {
-      $("redeemNote").value = "";
-    }
+        console.error(
+          "PULSE withdrawal request error:",
+          error
+        );
 
-    await refresh();
-  };
+        msg(
+          output,
+          error.message
+        );
+
+        return;
+      }
+
+      msg(
+        output,
+        "Withdrawal request submitted for admin approval."
+      );
+
+      if ($("redeemAmount")) {
+        $("redeemAmount").value = "";
+      }
+
+      if ($("redeemNote")) {
+        $("redeemNote").value = "";
+      }
+
+      await refresh();
+    };
 }
 
 
@@ -838,10 +1462,18 @@ function setupRedeem() {
 ========================= */
 
 function setupAuth() {
-  const signup = $("signup");
-  const login = $("login");
-  const forgot = $("forgotPassword");
-  const reset = $("resetPassword");
+
+  const signup =
+    $("signup");
+
+  const login =
+    $("login");
+
+  const forgot =
+    $("forgotPassword");
+
+  const reset =
+    $("resetPassword");
 
 
   /* =========================
@@ -849,50 +1481,58 @@ function setupAuth() {
   ========================= */
 
   if (signup) {
-    signup.onclick = async () => {
-      const email =
-        $("email")?.value?.trim();
 
-      const password =
-        $("password")?.value || "";
+    signup.onclick =
+      async () => {
 
-      if (!email || !password) {
+        const email =
+          $("email")?.value?.trim();
+
+        const password =
+          $("password")?.value ||
+          "";
+
+        if (
+          !email ||
+          !password
+        ) {
+
+          msg(
+            $("authMsg"),
+            "Enter an email and password."
+          );
+
+          return;
+        }
+
+        const {
+          error
+        } =
+          await db.auth.signUp({
+            email,
+            password,
+
+            options: {
+              emailRedirectTo:
+                AUTH_REDIRECT_URL
+            }
+          });
+
+        if (error) {
+
+          msg(
+            $("authMsg"),
+            error.message
+          );
+
+          return;
+        }
+
         msg(
           $("authMsg"),
-          "Enter an email and password."
+          "Account created. Check your email to confirm your account."
         );
-
-        return;
-      }
-
-      const { error } =
-        await db.auth.signUp({
-          email,
-          password,
-
-          // FIX:
-          // Always send confirmation back
-          // to the live GitHub Pages site.
-          options: {
-            emailRedirectTo:
-              AUTH_REDIRECT_URL
-          }
-        });
-
-      if (error) {
-        msg(
-          $("authMsg"),
-          error.message
-        );
-
-        return;
-      }
-
-      msg(
-        $("authMsg"),
-        "Account created. Check your email to confirm your account."
-      );
-    };
+      };
   }
 
 
@@ -901,44 +1541,55 @@ function setupAuth() {
   ========================= */
 
   if (login) {
-    login.onclick = async () => {
-      const email =
-        $("email")?.value?.trim();
 
-      const password =
-        $("password")?.value || "";
+    login.onclick =
+      async () => {
 
-      if (!email || !password) {
+        const email =
+          $("email")?.value?.trim();
+
+        const password =
+          $("password")?.value ||
+          "";
+
+        if (
+          !email ||
+          !password
+        ) {
+
+          msg(
+            $("authMsg"),
+            "Enter an email and password."
+          );
+
+          return;
+        }
+
+        const {
+          error
+        } =
+          await db.auth.signInWithPassword({
+            email,
+            password
+          });
+
+        if (error) {
+
+          msg(
+            $("authMsg"),
+            error.message
+          );
+
+          return;
+        }
+
         msg(
           $("authMsg"),
-          "Enter an email and password."
+          "Signed in."
         );
 
-        return;
-      }
-
-      const { error } =
-        await db.auth.signInWithPassword({
-          email,
-          password
-        });
-
-      if (error) {
-        msg(
-          $("authMsg"),
-          error.message
-        );
-
-        return;
-      }
-
-      msg(
-        $("authMsg"),
-        "Signed in."
-      );
-
-      await refresh();
-    };
+        await refresh();
+      };
   }
 
 
@@ -947,42 +1598,49 @@ function setupAuth() {
   ========================= */
 
   if (forgot) {
-    forgot.onclick = async () => {
-      const email =
-        $("email")?.value?.trim();
 
-      if (!email) {
+    forgot.onclick =
+      async () => {
+
+        const email =
+          $("email")?.value?.trim();
+
+        if (!email) {
+
+          msg(
+            $("authMsg"),
+            "Enter your email address first."
+          );
+
+          return;
+        }
+
+        const {
+          error
+        } =
+          await db.auth.resetPasswordForEmail(
+            email,
+            {
+              redirectTo:
+                AUTH_REDIRECT_URL
+            }
+          );
+
+        if (error) {
+
+          msg(
+            $("authMsg"),
+            error.message
+          );
+
+          return;
+        }
+
         msg(
           $("authMsg"),
-          "Enter your email address first."
+          "Password reset email sent."
         );
-
-        return;
-      }
-
-      const { error } =
-        await db.auth.resetPasswordForEmail(
-          email,
-          {
-            redirectTo:
-              AUTH_REDIRECT_URL
-          }
-        );
-
-      if (error) {
-        msg(
-          $("authMsg"),
-          error.message
-        );
-
-        return;
-      }
-
-      msg(
-        $("authMsg"),
-        "Password reset email sent."
-      );
-    };
+      };
   }
 
 
@@ -991,54 +1649,73 @@ function setupAuth() {
   ========================= */
 
   if (reset) {
-    reset.onclick = async () => {
-      const password =
-        $("newPassword")?.value || "";
 
-      const confirm =
-        $("confirmPassword")?.value || "";
+    reset.onclick =
+      async () => {
 
-      if (!password || !confirm) {
+        const password =
+          $("newPassword")?.value ||
+          "";
+
+        const confirm =
+          $("confirmPassword")?.value ||
+          "";
+
+        if (
+          !password ||
+          !confirm
+        ) {
+
+          msg(
+            $("resetMsg"),
+            "Enter and confirm your new password."
+          );
+
+          return;
+        }
+
+        if (
+          password !==
+          confirm
+        ) {
+
+          msg(
+            $("resetMsg"),
+            "Passwords do not match."
+          );
+
+          return;
+        }
+
+        const {
+          error
+        } =
+          await db.auth.updateUser({
+            password
+          });
+
+        if (error) {
+
+          msg(
+            $("resetMsg"),
+            error.message
+          );
+
+          return;
+        }
+
         msg(
           $("resetMsg"),
-          "Enter and confirm your new password."
+          "Password updated successfully."
         );
 
-        return;
-      }
-
-      if (password !== confirm) {
-        msg(
-          $("resetMsg"),
-          "Passwords do not match."
-        );
-
-        return;
-      }
-
-      const { error } =
-        await db.auth.updateUser({
-          password
-        });
-
-      if (error) {
-        msg(
-          $("resetMsg"),
-          error.message
-        );
-
-        return;
-      }
-
-      msg(
-        $("resetMsg"),
-        "Password updated successfully."
-      );
-
-      if ($("resetPasswordPanel")) {
-        $("resetPasswordPanel").hidden = true;
-      }
-    };
+        if (
+          $("resetPasswordPanel")
+        ) {
+          $("resetPasswordPanel").hidden =
+            true;
+        }
+      };
   }
 }
 
@@ -1048,20 +1725,32 @@ function setupAuth() {
 ========================= */
 
 function setupLogout() {
-  const button = $("logout");
+
+  const button =
+    $("logout");
+
   if (!button) return;
 
-  button.onclick = async () => {
-    const { error } =
-      await db.auth.signOut();
+  button.onclick =
+    async () => {
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+      const {
+        error
+      } =
+        await db.auth.signOut();
 
-    await refresh();
-  };
+      if (error) {
+
+        alert(
+          error.message
+        );
+
+        return;
+      }
+
+      window.location.href =
+        HOMEPAGE_URL;
+    };
 }
 
 
@@ -1070,12 +1759,45 @@ function setupLogout() {
 ========================= */
 
 async function refresh() {
-  await updateAuthState();
 
-  const { data: { user } } =
+  const view =
+    await updateAuthState();
+
+  const {
+    data: { user }
+  } =
     await db.auth.getUser();
 
-  if (!user) return;
+  if (!user) {
+    return;
+  }
+
+
+  /* =========================
+     ADMIN VIEW
+  ========================= */
+
+  if (
+    view === "admin"
+  ) {
+
+    if (
+      window.PULSEAdmin &&
+      typeof window.PULSEAdmin.load ===
+        "function"
+    ) {
+
+      await window.PULSEAdmin.load();
+
+    }
+
+    return;
+  }
+
+
+  /* =========================
+     USER VIEW
+  ========================= */
 
   await Promise.all([
     loadProfile(),
@@ -1089,30 +1811,75 @@ async function refresh() {
 
 
 /* =========================
+   HASH / VIEW CHANGES
+========================= */
+
+window.addEventListener(
+  "hashchange",
+  async () => {
+
+    await refresh();
+
+  }
+);
+
+
+/* =========================
+   EXPOSE APP FUNCTIONS
+========================= */
+
+window.PULSEApp = {
+  refresh,
+  updateAuthState,
+  isAdminRoute
+};
+
+
+/* =========================
    STARTUP
 ========================= */
 
 document.addEventListener(
   "DOMContentLoaded",
   async () => {
+
     setupAuth();
     setupLogout();
     setupRedeem();
 
     const {
       data: { session }
-    } = await db.auth.getSession();
+    } =
+      await db.auth.getSession();
 
     if (session) {
+
       await refresh();
+
     } else {
+
       await updateAuthState();
+
     }
 
     db.auth.onAuthStateChange(
       async () => {
-        await refresh();
+
+        /*
+          Give Supabase time to finish
+          updating the session before
+          checking the dashboard.
+        */
+
+        setTimeout(
+          async () => {
+            await refresh();
+          },
+          100
+        );
+
       }
     );
+
   }
 );
