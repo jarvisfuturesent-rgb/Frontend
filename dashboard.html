@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>PULSE — Dashboard</title>
+  <title>PULSE</title>
 
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* Dashboard-only refinements.
-       style.css is not replaced. */
+    /* Dashboard-only aesthetic refinements.
+       style.css remains unchanged. */
 
     .menu {
       margin-top: 16px;
@@ -115,8 +115,6 @@
         class="pulse-logo"
       >
 
-      <h1>PULSE Dashboard</h1>
-
       <p class="tagline">
         Complete • Earn • Get Rewarded
       </p>
@@ -172,10 +170,12 @@
     >
 
       <div class="panel-heading">
+
         <h2>
           <span class="blue-icon">🔐</span>
           Account
         </h2>
+
       </div>
 
       <p>
@@ -191,27 +191,35 @@
       hidden
     >
 
+
       <!-- PROFILE -->
       <section class="panel">
 
         <div class="panel-heading">
+
           <h2>
             <span class="blue-icon">👤</span>
             Welcome
           </h2>
+
         </div>
 
         <div class="profile-row">
-          <span>Account</span>
+
+          <span>
+            Account
+          </span>
+
           <strong id="profileName">
             Loading...
           </strong>
+
         </div>
 
       </section>
 
 
-      <!-- BALANCE -->
+      <!-- MAIN BALANCE -->
       <section class="balance-card">
 
         <div>
@@ -240,36 +248,50 @@
       <section class="panel">
 
         <div class="panel-heading">
+
           <h2>
             <span class="blue-icon">💎</span>
             Earnings
           </h2>
+
         </div>
 
         <div class="earnings-summary">
 
           <div class="profile-row">
-            <span>Total Earned</span>
+
+            <span>
+              Total Earned
+            </span>
 
             <strong id="totalEarned">
               0 PLS
             </strong>
+
           </div>
 
           <div class="profile-row">
-            <span>Pending</span>
+
+            <span>
+              Pending
+            </span>
 
             <strong id="pendingWithdrawal">
               0 PLS
             </strong>
+
           </div>
 
           <div class="profile-row">
-            <span>Available</span>
+
+            <span>
+              Available
+            </span>
 
             <strong id="availableBalance">
               0 PLS
             </strong>
+
           </div>
 
         </div>
@@ -414,6 +436,7 @@
           link.style.display = "none";
 
           return;
+
         }
 
         const {
@@ -448,7 +471,9 @@
         );
 
         link.style.display = "none";
+
       }
+
     }
 
     checkAdminLink();
