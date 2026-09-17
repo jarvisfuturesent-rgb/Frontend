@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PULSE Token</title>
 
-  <link rel="stylesheet" href="style.css?v=6">
+  <title>PULSE — Dashboard</title>
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
   <main class="app-shell">
 
-    <!-- PULSE HEADER -->
+    <!-- HEADER -->
     <header class="hero">
 
       <img
@@ -21,367 +22,64 @@
         class="pulse-logo"
       >
 
-      <h1>Welcome to PULSE</h1>
+      <h1>PULSE Dashboard</h1>
 
-      <p>Complete • Earn • Get Rewarded</p>
+      <p class="tagline">
+        Complete • Earn • Get Rewarded
+      </p>
+
+      <!-- DROPDOWN MENU -->
+      <details class="menu">
+        <summary>☰ Menu</summary>
+
+        <div class="menu-panel">
+
+          <a href="index.html">
+            Home
+          </a>
+
+          <a href="how-it-works.html">
+            How It Works
+          </a>
+
+          <a href="about.html">
+            About PULSE
+          </a>
+
+          <a href="contact.html">
+            Contact
+          </a>
+
+          <a href="dashboard.html">
+            Dashboard
+          </a>
+
+          <a
+            id="admin-dashboard-link"
+            href="admin.html"
+            style="display:none;"
+          >
+            ⚙ Admin Dashboard
+          </a>
+
+        </div>
+      </details>
 
     </header>
 
 
-    <!-- AUTH -->
-    <section id="auth" class="panel">
+    <!-- USER DASHBOARD -->
+    <section id="userDashboard" class="panel">
 
-      <div class="panel-heading">
-        <h2>
-          <span class="blue-icon">⚡</span>
-          Account
-        </h2>
+      <h2>Your PULSE Dashboard</h2>
+
+      <div id="authStatus">
+        Loading account...
       </div>
 
-      <input
-        id="email"
-        type="email"
-        placeholder="Email address"
-        autocomplete="email"
-      >
-
-      <input
-        id="password"
-        type="password"
-        placeholder="Password"
-        autocomplete="current-password"
-      >
-
-      <div class="auth-buttons">
-
-        <button
-          id="signup"
-          class="gradient-button"
-          type="button"
-        >
-          Create Account
-        </button>
-
-        <button
-          id="login"
-          class="outline-button"
-          type="button"
-        >
-          Sign In
-        </button>
-
+      <div id="dashboardContent">
+        Loading dashboard...
       </div>
-
-      <button
-        id="forgotPassword"
-        class="forgot-password"
-        type="button"
-      >
-        Forgot Password?
-      </button>
-
-      <p id="authMsg" class="status"></p>
-
-    </section>
-
-
-    <!-- PASSWORD RESET -->
-    <section
-      id="resetPasswordPanel"
-      class="panel"
-      hidden
-    >
-
-      <div class="panel-heading">
-        <h2>
-          <span class="blue-icon">🔐</span>
-          Reset Password
-        </h2>
-      </div>
-
-      <input
-        id="newPassword"
-        type="password"
-        placeholder="New password"
-        autocomplete="new-password"
-      >
-
-      <input
-        id="confirmPassword"
-        type="password"
-        placeholder="Confirm new password"
-        autocomplete="new-password"
-      >
-
-      <button
-        id="resetPassword"
-        class="gradient-button"
-        type="button"
-      >
-        Update Password
-      </button>
-
-      <p id="resetMsg" class="status"></p>
-
-    </section>
-
-
-    <!-- DASHBOARD -->
-    <section id="dashboard" hidden>
-
-
-      <!-- BALANCE -->
-      <section class="panel">
-
-        <div class="panel-heading">
-          <h2>
-            <span class="blue-icon">⚡</span>
-            Your PULSE Balance
-          </h2>
-        </div>
-
-        <div class="balance-card">
-
-          <div
-            id="balance"
-            class="balance-number"
-          >
-            0
-          </div>
-
-          <div class="balance-label">
-            POINTS
-          </div>
-
-        </div>
-
-
-        <!-- EARNINGS / WITHDRAWAL SUMMARY -->
-        <div class="earnings-summary">
-
-          <div class="profile-row">
-            <span>Total Earned</span>
-            <strong id="totalEarned">0 PLS</strong>
-          </div>
-
-          <div class="profile-row">
-            <span>Available to Withdraw</span>
-            <strong id="availableBalance">0 PLS</strong>
-          </div>
-
-          <div class="profile-row">
-            <span>Pending Withdrawal</span>
-            <strong id="pendingWithdrawal">0 PLS</strong>
-          </div>
-
-        </div>
-
-
-        <div class="profile-row">
-
-          <span>
-            Account
-          </span>
-
-          <strong id="profileName">
-            User
-          </strong>
-
-        </div>
-
-        <button
-          id="logout"
-          class="outline-button"
-          type="button"
-        >
-          Sign Out
-        </button>
-
-      </section>
-
-
-      <!-- AVAILABLE TASKS -->
-      <section class="panel">
-
-        <div class="panel-heading">
-          <h2>
-            <span class="blue-icon">📋</span>
-            Available Tasks
-          </h2>
-        </div>
-
-        <div id="tasks">
-
-          <div class="loading-box">
-            Loading tasks...
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- MY SUBMISSIONS -->
-      <section class="panel">
-
-        <div class="panel-heading">
-          <h2>
-            <span class="blue-icon">📊</span>
-            My Submissions
-          </h2>
-        </div>
-
-        <div id="submissions">
-
-          <div class="loading-box">
-            Loading submissions...
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- POINTS ACTIVITY -->
-      <section class="panel">
-
-        <div class="panel-heading">
-          <h2>
-            <span class="blue-icon">⚡</span>
-            Points Activity
-          </h2>
-        </div>
-
-        <div id="activity">
-
-          <div class="loading-box">
-            Loading activity...
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- REWARDS / WITHDRAWAL -->
-      <section class="panel">
-
-        <div class="panel-heading">
-          <h2>
-            <span class="blue-icon">💰</span>
-            Withdraw PLS
-          </h2>
-        </div>
-
-        <div class="reward-box">
-
-          <h3>
-            Request Withdrawal
-          </h3>
-
-          <p>
-            Available:
-            <strong id="withdrawAvailable">0 PLS</strong>
-          </p>
-
-          <input
-            id="redeemAmount"
-            type="number"
-            min="1"
-            placeholder="PLS amount to withdraw"
-          >
-
-          <select id="rewardType">
-
-            <option value="manual_reward">
-              Manual PLS Reward
-            </option>
-
-          </select>
-
-          <textarea
-            id="redeemNote"
-            rows="3"
-            placeholder="Optional note"
-          ></textarea>
-
-          <button
-            id="redeem"
-            class="gradient-button"
-            type="button"
-          >
-            Request Withdrawal
-          </button>
-
-          <p
-            id="redeemMsg"
-            class="status"
-          ></p>
-
-        </div>
-
-      </section>
-
-
-      <!-- MY REWARDS / WITHDRAWAL HISTORY -->
-      <section class="panel">
-
-        <div class="panel-heading">
-          <h2>
-            <span class="blue-icon">🎁</span>
-            My Withdrawals
-          </h2>
-        </div>
-
-        <div id="redemptions">
-
-          <div class="loading-box">
-            Loading withdrawals...
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- NOTIFICATIONS -->
-      <section class="panel">
-
-        <div class="panel-heading">
-
-          <h2>
-            <span class="blue-icon">🔔</span>
-            Notifications
-
-            <span
-              id="notificationCount"
-              class="notification-badge"
-            >
-              0
-            </span>
-
-          </h2>
-
-        </div>
-
-        <div id="notifications">
-
-          <div class="loading-box">
-            Loading notifications...
-          </div>
-
-        </div>
-
-        <button
-          id="markNotificationsRead"
-          class="outline-button"
-          type="button"
-        >
-          Mark Read
-        </button>
-
-      </section>
-
 
     </section>
 
@@ -391,13 +89,84 @@
   <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <!-- CONFIG -->
   <script src="config.js"></script>
 
+  <!-- APP -->
   <script src="app.js"></script>
 
-  <script src="survey.js"></script>
 
-  <script src="admin.js"></script>
+  <!-- ADMIN LINK CHECK -->
+  <script>
+
+    const dashboardSupabase =
+      window.supabase.createClient(
+        "https://egeftdnvgcqjjavrpohd.supabase.co",
+        "sb_publishable_bhnKTWbI3aS0yFABUMWaOg_nkEBlTgv"
+      );
+
+    async function checkDashboardAdmin() {
+
+      const adminLink =
+        document.getElementById("admin-dashboard-link");
+
+      if (!adminLink) return;
+
+      try {
+
+        const {
+          data: {
+            user
+          }
+        } = await dashboardSupabase.auth.getUser();
+
+        if (!user) {
+          adminLink.style.display = "none";
+          return;
+        }
+
+        const {
+          data: profile,
+          error
+        } = await dashboardSupabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error(
+            "Admin check failed:",
+            error
+          );
+
+          adminLink.style.display = "none";
+          return;
+        }
+
+        if (
+          profile &&
+          profile.role === "admin"
+        ) {
+          adminLink.style.display = "block";
+        } else {
+          adminLink.style.display = "none";
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Admin access check failed:",
+          error
+        );
+
+        adminLink.style.display = "none";
+      }
+    }
+
+    checkDashboardAdmin();
+
+  </script>
 
 </body>
 </html>
