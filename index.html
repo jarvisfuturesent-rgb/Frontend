@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
+    /* Homepage-only layout styling.
+       Shared project styling remains in style.css. */
+
     .home-hero {
       text-align: center;
       padding: 20px 10px 10px;
@@ -127,7 +130,9 @@
       text-decoration: none;
     }
 
-    /* Menu */
+    /* =========================================
+       MENU
+       ========================================= */
 
     .menu-panel > details {
       margin: 6px 0;
@@ -158,8 +163,6 @@
       content: "▼ ";
     }
 
-    /* PULSE logo used instead of folder icons */
-
     .menu-logo {
       width: 22px;
       height: 22px;
@@ -179,6 +182,105 @@
       text-decoration: none;
     }
 
+    /* =========================================
+       COLOR WAVE
+       ========================================= */
+
+    .wave-text {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .wave-text span {
+      display: inline-block;
+      animation: pulseColorWave 4s ease-in-out infinite;
+    }
+
+    .wave-text span:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .wave-text span:nth-child(2) {
+      animation-delay: .08s;
+    }
+
+    .wave-text span:nth-child(3) {
+      animation-delay: .16s;
+    }
+
+    .wave-text span:nth-child(4) {
+      animation-delay: .24s;
+    }
+
+    .wave-text span:nth-child(5) {
+      animation-delay: .32s;
+    }
+
+    .wave-text span:nth-child(6) {
+      animation-delay: .40s;
+    }
+
+    .wave-text span:nth-child(7) {
+      animation-delay: .48s;
+    }
+
+    .wave-text span:nth-child(8) {
+      animation-delay: .56s;
+    }
+
+    .wave-text span:nth-child(9) {
+      animation-delay: .64s;
+    }
+
+    .wave-text span:nth-child(10) {
+      animation-delay: .72s;
+    }
+
+    .wave-text span:nth-child(11) {
+      animation-delay: .80s;
+    }
+
+    .wave-text span:nth-child(12) {
+      animation-delay: .88s;
+    }
+
+    .wave-text span:nth-child(13) {
+      animation-delay: .96s;
+    }
+
+    @keyframes pulseColorWave {
+      0%, 100% {
+        color: inherit;
+        text-shadow: none;
+        transform: translateY(0);
+      }
+
+      25% {
+        color: #00d9ff;
+        text-shadow:
+          0 0 5px rgba(0, 217, 255, .65),
+          0 0 12px rgba(0, 217, 255, .25);
+        transform: translateY(-1px);
+      }
+
+      50% {
+        color: #8b5cff;
+        text-shadow:
+          0 0 5px rgba(139, 92, 255, .65),
+          0 0 12px rgba(139, 92, 255, .25);
+        transform: translateY(0);
+      }
+
+      75% {
+        color: #00ffc8;
+        text-shadow:
+          0 0 5px rgba(0, 255, 200, .65),
+          0 0 12px rgba(0, 255, 200, .25);
+        transform: translateY(1px);
+      }
+    }
+
     @media (max-width: 420px) {
       .feature-grid {
         grid-template-columns: 1fr;
@@ -194,7 +296,6 @@
     <!-- HEADER -->
     <header class="hero">
 
-      <!-- PULSE LOGO ONLY -->
       <img
         src="pulse-logo.png"
         alt="PULSE"
@@ -202,7 +303,15 @@
       >
 
       <p class="tagline">
-        Complete • Earn • Get Rewarded
+        Complete • <span class="wave-text">
+          <span>E</span><span>a</span><span>r</span><span>n</span>
+          <span> </span>
+          <span>•</span>
+          <span> </span>
+          <span>G</span><span>e</span><span>t</span>
+          <span> </span>
+          <span>R</span><span>e</span><span>w</span><span>a</span><span>r</span><span>d</span><span>e</span><span>d</span>
+        </span>
       </p>
 
       <!-- MAIN MENU -->
@@ -212,11 +321,13 @@
 
         <div class="menu-panel">
 
-          <!-- PUBLIC -->
+          <!-- MAIN -->
           <details>
             <summary>
               <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              Public
+              <span class="wave-text">
+                <span>M</span><span>a</span><span>i</span><span>n</span>
+              </span>
             </summary>
 
             <div>
@@ -227,40 +338,13 @@
             </div>
           </details>
 
-          <!-- LEGAL -->
-          <details>
-            <summary>
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              Legal
-            </summary>
-
-            <div>
-              <a href="terms.html">📜 Terms</a>
-              <a href="privacy.html">🔒 Privacy Policy</a>
-              <a href="disclosures.html">⚖️ Disclosures</a>
-            </div>
-          </details>
-
-          <!-- ACCOUNT -->
-          <details>
-            <summary>
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              Account
-            </summary>
-
-            <div>
-              <a href="auth.html">🔐 Login / Sign Up</a>
-              <a href="dashboard.html">👤 Dashboard</a>
-              <a href="profile.html">⚙️ Profile & Account</a>
-              <a href="reset-password.html">🔑 Reset Password</a>
-            </div>
-          </details>
-
           <!-- PULSE -->
           <details>
             <summary>
               <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              PULSE
+              <span class="wave-text">
+                <span>P</span><span>U</span><span>L</span><span>S</span><span>E</span>
+              </span>
             </summary>
 
             <div>
@@ -272,11 +356,50 @@
             </div>
           </details>
 
+          <!-- ACCOUNT -->
+          <details>
+            <summary>
+              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+              <span class="wave-text">
+                <span>A</span><span>c</span><span>c</span><span>o</span>
+                <span>u</span><span>n</span><span>t</span>
+              </span>
+            </summary>
+
+            <div>
+              <a href="auth.html">🔐 Login / Sign Up</a>
+              <a href="dashboard.html">👤 Dashboard</a>
+              <a href="profile.html">⚙️ Profile & Account</a>
+              <a href="reset-password.html">🔑 Reset Password</a>
+            </div>
+          </details>
+
+          <!-- LEGAL -->
+          <details>
+            <summary>
+              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+              <span class="wave-text">
+                <span>L</span><span>e</span><span>g</span><span>a</span><span>l</span>
+              </span>
+            </summary>
+
+            <div>
+              <a href="terms.html">📜 Terms</a>
+              <a href="privacy.html">🔒 Privacy Policy</a>
+              <a href="disclosures.html">⚖️ Disclosures</a>
+            </div>
+          </details>
+
           <!-- ADMINISTRATION -->
           <details>
             <summary>
               <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              Administration
+              <span class="wave-text">
+                <span>A</span><span>d</span><span>m</span><span>i</span>
+                <span>n</span><span>i</span><span>s</span><span>t</span>
+                <span>r</span><span>a</span><span>t</span><span>i</span>
+                <span>o</span><span>n</span>
+              </span>
             </summary>
 
             <div>
@@ -294,6 +417,7 @@
       </details>
 
     </header>
+
 
     <!-- HERO -->
     <section class="panel home-hero">
@@ -324,6 +448,7 @@
       </div>
 
     </section>
+
 
     <!-- WHAT PULSE DOES -->
     <section class="panel">
@@ -379,6 +504,7 @@
       </div>
 
     </section>
+
 
     <!-- HOW IT WORKS PREVIEW -->
     <section class="panel">
@@ -476,6 +602,7 @@
 
     </section>
 
+
     <!-- ACCOUNT CALLOUT -->
     <section class="panel home-note">
 
@@ -498,6 +625,7 @@
       </div>
 
     </section>
+
 
     <!-- FOOTER -->
     <footer class="panel home-footer">
