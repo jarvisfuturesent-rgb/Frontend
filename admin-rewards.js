@@ -42,14 +42,16 @@ async function getCurrentAdmin() {
 }
 
 async function loadAdminRewards() {
-  const container = document.getElementById("adminRewards");
+  const container =
+    document.getElementById("adminRewards");
 
   if (!container) {
     console.error("adminRewards element not found.");
     return;
   }
 
-  container.innerHTML = "<p>Loading reward requests...</p>";
+  container.innerHTML =
+    "<p>Loading reward requests...</p>";
 
   try {
     const admin = await getCurrentAdmin();
@@ -57,7 +59,9 @@ async function loadAdminRewards() {
     if (!admin) {
       container.innerHTML = `
         <p>Access denied.</p>
-        <a href="dashboard.html">Return to Dashboard</a>
+        <a href="dashboard.html">
+          Return to Dashboard
+        </a>
       `;
       return;
     }
@@ -65,15 +69,29 @@ async function loadAdminRewards() {
     const { data: rewards, error } =
       await window.supabaseClient
         .from("redemption_requests")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select(`
+          id,
+          user_id,
+          points_requested,
+          reward_type,
+          status,
+          user_note,
+          admin_note,
+          created_at,
+          reviewed_at,
+          paid_at
+        `)
+        .order("created_at", {
+          ascending: false
+        });
 
     if (error) {
       throw error;
     }
 
     if (!rewards || rewards.length === 0) {
-      container.innerHTML = "<p>No reward requests found.</p>";
+      container.innerHTML =
+        "<p>No reward requests found.</p>";
       return;
     }
 
@@ -86,23 +104,30 @@ async function loadAdminRewards() {
       .forEach(button => {
         button.addEventListener("click", () => {
           const requestId =
-            button.getAttribute("data-request-id");
+            button.getAttribute(
+              "data-request-id"
+            );
 
           const action =
-            button.getAttribute("data-reward-action");
+            button.getAttribute(
+              "data-reward-action"
+            );
 
           if (action === "approve") {
-            processReward(requestId, "approve");
+            approveReward(requestId);
           }
 
           if (action === "reject") {
-            processReward(requestId, "reject");
+            rejectReward(requestId);
           }
         });
       });
 
   } catch (error) {
-    console.error("Admin reward loading error:", error);
+    console.error(
+      "Admin reward loading error:",
+      error
+    );
 
     container.innerHTML = `
       <p>Unable to load reward requests.</p>
@@ -112,23 +137,8 @@ async function loadAdminRewards() {
 }
 
 function renderReward(reward) {
-  const status = reward.status || "pending";
-
-  const rewardType =
-    reward.reward_type ||
-    reward.reward ||
-    reward.type ||
-    "Not specified";
-
-  const points =
-    reward.points_requested ??
-    reward.points ??
-    reward.amount ??
-    0;
-
-  const userId =
-    reward.user_id ||
-    "Unknown";
+  const status =
+    reward.status || "pending";
 
   const actionButtons =
     status === "pending"
@@ -154,21 +164,27 @@ function renderReward(reward) {
   return `
     <div class="reward-card">
 
-      <h3>Reward Request #${reward.id}</h3>
+      <h3>
+        Reward Request #${reward.id}
+      </h3>
 
       <p>
         <strong>User ID:</strong>
-        ${escapeHTML(userId)}
+        ${escapeHTML(reward.user_id)}
       </p>
 
       <p>
         <strong>Points Requested:</strong>
-        ${escapeHTML(points)}
+        ${escapeHTML(
+          reward.points_requested
+        )}
       </p>
 
       <p>
         <strong>Reward Type:</strong>
-        ${escapeHTML(rewardType)}
+        ${escapeHTML(
+          reward.reward_type
+        )}
       </p>
 
       <p>
@@ -178,26 +194,58 @@ function renderReward(reward) {
 
       <p>
         <strong>Created:</strong>
-        ${formatDate(reward.created_at)}
+        ${formatDate(
+          reward.created_at
+        )}
       </p>
 
       ${
-        reward.updated_at
+        reward.user_note
           ? `
             <p>
-              <strong>Updated:</strong>
-              ${formatDate(reward.updated_at)}
+              <strong>User Note:</strong>
+              ${escapeHTML(
+                reward.user_note
+              )}
             </p>
           `
           : ""
       }
 
       ${
-        reward.rejection_reason
+        reward.admin_note
           ? `
             <p>
-              <strong>Rejection Reason:</strong>
-              ${escapeHTML(reward.rejection_reason)}
+              <strong>Admin Note:</strong>
+              ${escapeHTML(
+                reward.admin_note
+              )}
+            </p>
+          `
+          : ""
+      }
+
+      ${
+        reward.reviewed_at
+          ? `
+            <p>
+              <strong>Reviewed:</strong>
+              ${formatDate(
+                reward.reviewed_at
+              )}
+            </p>
+          `
+          : ""
+      }
+
+      ${
+        reward.paid_at
+          ? `
+            <p>
+              <strong>Paid:</strong>
+              ${formatDate(
+                reward.paid_at
+              )}
             </p>
           `
           : ""
@@ -211,84 +259,127 @@ function renderReward(reward) {
   `;
 }
 
-async function processReward(requestId, action) {
+async function approveReward(requestId) {
   if (!requestId) {
     return;
   }
 
-  const admin = await getCurrentAdmin();
-
-  if (!admin) {
-    alert("Access denied.");
+  if (
+    !confirm(
+      "Approve this reward request?"
+    )
+  ) {
     return;
   }
 
-  if (action === "approve") {
-    const confirmed =
-      confirm("Approve this reward request?");
-
-    if (!confirmed) {
-      return;
-    }
-  }
-
-  let rejectionReason = null;
-
-  if (action === "reject") {
-    rejectionReason = prompt(
-      "Enter a reason for rejecting this reward request:"
-    );
-
-    if (rejectionReason === null) {
-      return;
-    }
-
-    rejectionReason = rejectionReason.trim();
-
-    if (!rejectionReason) {
-      alert("A rejection reason is required.");
-      return;
-    }
-  }
-
   try {
-    let result;
+    const admin =
+      await getCurrentAdmin();
 
-    if (action === "approve") {
-      result =
-        await window.supabaseClient.rpc(
-          "process_redemption_request",
-          {
-            request_id: Number(requestId),
-            action: "approve"
-          }
-        );
-    } else {
-      result =
-        await window.supabaseClient.rpc(
-          "process_redemption_request",
-          {
-            request_id: Number(requestId),
-            action: "reject",
-            rejection_reason: rejectionReason
-          }
-        );
+    if (!admin) {
+      alert("Access denied.");
+      return;
     }
 
-    if (result.error) {
-      throw result.error;
+    const { error } =
+      await window.supabaseClient.rpc(
+        "process_redemption_request",
+        {
+          p_request_id:
+            Number(requestId)
+        }
+      );
+
+    if (error) {
+      throw error;
     }
+
+    alert(
+      "Reward request approved."
+    );
 
     await loadAdminRewards();
 
   } catch (error) {
     console.error(
-      "Reward request processing error:",
+      "Reward approval error:",
       error
     );
 
     alert(
-      "Unable to process this reward request. Please try again."
+      "Unable to approve this reward request."
+    );
+  }
+}
+
+async function rejectReward(requestId) {
+  if (!requestId) {
+    return;
+  }
+
+  const reason = prompt(
+    "Enter a reason for rejecting this reward request:"
+  );
+
+  if (reason === null) {
+    return;
+  }
+
+  const trimmedReason =
+    reason.trim();
+
+  if (!trimmedReason) {
+    alert(
+      "A rejection reason is required."
+    );
+    return;
+  }
+
+  try {
+    const admin =
+      await getCurrentAdmin();
+
+    if (!admin) {
+      alert("Access denied.");
+      return;
+    }
+
+    const { error } =
+      await window.supabaseClient
+        .from("redemption_requests")
+        .update({
+          status: "rejected",
+          admin_note: trimmedReason,
+          reviewed_at:
+            new Date().toISOString()
+        })
+        .eq(
+          "id",
+          Number(requestId)
+        )
+        .eq(
+          "status",
+          "pending"
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    alert(
+      "Reward request rejected."
+    );
+
+    await loadAdminRewards();
+
+  } catch (error) {
+    console.error(
+      "Reward rejection error:",
+      error
+    );
+
+    alert(
+      "Unable to reject this reward request."
     );
   }
 }
