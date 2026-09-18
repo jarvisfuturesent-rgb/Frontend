@@ -1,21 +1,29 @@
 // PULSE — Shared App Functions
 
-const supabaseClient = window.supabase.createClient(
+// Create the Supabase client and make it available to all PULSE JS files
+window.supabaseClient = window.supabase.createClient(
     window.SUPABASE_URL,
     window.SUPABASE_ANON_KEY
 );
 
+
 // Get the currently logged-in user
 async function getCurrentUser() {
-    const { data, error } = await supabaseClient.auth.getUser();
+    const { data, error } =
+        await window.supabaseClient.auth.getUser();
 
     if (error) {
-        console.error("Error getting current user:", error);
+        console.error(
+            "Error getting current user:",
+            error
+        );
+
         return null;
     }
 
     return data.user;
 }
+
 
 // Check if someone is logged in
 async function requireLogin() {
@@ -29,15 +37,22 @@ async function requireLogin() {
     return user;
 }
 
+
 // Sign out
 async function signOut() {
-    const { error } = await supabaseClient.auth.signOut();
+    const { error } =
+        await window.supabaseClient.auth.signOut();
 
     if (error) {
-        console.error("Sign out error:", error);
+        console.error(
+            "Sign out error:",
+            error
+        );
+
         return false;
     }
 
     window.location.href = "auth.html";
+
     return true;
 }
