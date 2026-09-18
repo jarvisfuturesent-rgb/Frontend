@@ -1,8 +1,5 @@
-/* =========================
-   PULSE TESTING SURVEYS
-========================= */
-
-(function () {
+// PULSE — Testing Surveys
+// Controls surveys.html only.
 
 const SURVEYS = {
 
@@ -79,190 +76,219 @@ const SURVEYS = {
 };
 
 
-/* =========================
-   ESCAPE HTML
-========================= */
+// =========================
+// START
+// =========================
 
-function escapeHtml(value) {
+document.addEventListener(
+  "DOMContentLoaded",
+  loadSurvey
+);
 
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 
+// =========================
+// LOAD SURVEY
+// =========================
+
+async function loadSurvey() {
+
+  const container =
+    document.getElementById("surveys");
+
+  if (!container) {
+    console.error(
+      "surveys element not found."
+    );
+    return;
+  }
+
+  container.innerHTML =
+    "<p>Loading survey...</p>";
+
+  const user =
+    await requireLogin();
+
+  if (!user) return;
+
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const taskId =
+    Number(params.get("task"));
+
+
+  if (!taskId) {
+
+    container.innerHTML = `
+      <div class="panel">
+        <h3>No Survey Selected</h3>
+        <p>
+          Please return to the task list
+          and select a survey.
+        </p>
+        <a href="tasks.html">
+          Back to Tasks
+        </a>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  try {
+
+    const { data: task, error } =
+      await window.supabaseClient
+        .from("tasks")
+        .select(`
+          id,
+          title,
+          description,
+          points,
+          status
+        `)
+        .eq("id", taskId)
+        .eq("status", "active")
+        .single();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    if (!task) {
+
+      container.innerHTML = `
+        <div class="panel">
+          <h3>Survey Unavailable</h3>
+          <p>
+            This survey is no longer available.
+          </p>
+        </div>
+      `;
+
+      return;
+    }
+
+
+    const surveyName =
+      findSurvey(task.title);
+
+
+    if (!surveyName) {
+
+      container.innerHTML = `
+        <div class="panel">
+          <h3>Survey Not Found</h3>
+          <p>
+            This task does not have a
+            matching survey.
+          </p>
+          <a href="tasks.html">
+            Back to Tasks
+          </a>
+        </div>
+      `;
+
+      return;
+    }
+
+
+    renderSurvey(
+      task,
+      surveyName,
+      user
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Survey loading error:",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="panel">
+        <h3>Unable to Load Survey</h3>
+        <p>
+          ${escapeHTML(
+            error.message ||
+            "Please try again later."
+          )}
+        </p>
+      </div>
+    `;
+  }
 }
 
 
-/* =========================
-   FIND SURVEY
-========================= */
+// =========================
+// FIND SURVEY
+// =========================
 
 function findSurvey(title) {
 
   const cleanTitle =
-    String(title || "").trim();
+    String(title || "")
+      .trim();
 
-  return Object.keys(SURVEYS).find(key =>
-    cleanTitle.startsWith(key)
-  );
-
-}
-
-
-/* =========================
-   RENDER QUESTION
-========================= */
-
-function renderQuestion(question, index) {
-
-  const questionText =
-    escapeHtml(question[0]);
-
-  const number =
-    index + 1;
-
-
-  if (question[1] === "yesno") {
-
-    return `
-      <div class="survey-question-block">
-
-        <div class="survey-question-text">
-          ${number}. ${questionText}
-        </div>
-
-        <select
-          name="q${index}"
-          class="survey-input"
-          required
-        >
-          <option value="">Choose...</option>
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>
-        </select>
-
-      </div>
-    `;
-
-  }
-
-
-  if (question[1] === "rating") {
-
-    return `
-      <div class="survey-question-block">
-
-        <div class="survey-question-text">
-          ${number}. ${questionText}
-        </div>
-
-        <select
-          name="q${index}"
-          class="survey-input"
-          required
-        >
-          <option value="">Choose a rating...</option>
-          <option value="1">1 - Very poor</option>
-          <option value="2">2 - Poor</option>
-          <option value="3">3 - Okay</option>
-          <option value="4">4 - Good</option>
-          <option value="5">5 - Excellent</option>
-        </select>
-
-      </div>
-    `;
-
-  }
-
-
-  return `
-    <div class="survey-question-block">
-
-      <div class="survey-question-text">
-        ${number}. ${questionText}
-      </div>
-
-      <textarea
-        name="q${index}"
-        class="survey-input"
-        rows="4"
-        required
-        placeholder="Your feedback"
-      ></textarea>
-
-    </div>
-  `;
-
-}
-
-
-/* =========================
-   OPEN SURVEY
-========================= */
-
-async function openSurvey(taskId, title, points) {
-
-  const surveyName =
-    findSurvey(title);
-
-
-  if (!surveyName) {
-
-    alert("This survey could not be found.");
-
-    return;
-
-  }
-
-
-  let modal =
-    document.getElementById(
-      "pulseSurveyModal"
+  return Object.keys(SURVEYS)
+    .find(key =>
+      cleanTitle.startsWith(key)
     );
+}
 
 
-  if (!modal) {
+// =========================
+// RENDER SURVEY
+// =========================
 
-    modal =
-      document.createElement("div");
+function renderSurvey(
+  task,
+  surveyName,
+  user
+) {
 
-    modal.id =
-      "pulseSurveyModal";
-
-    document.body.appendChild(modal);
-
-  }
-
+  const container =
+    document.getElementById(
+      "surveys"
+    );
 
   const questions =
     SURVEYS[surveyName];
 
 
-  modal.innerHTML = `
+  container.innerHTML = `
 
-    <div class="survey-modal-box">
+    <div class="panel survey-page">
 
       <h2>
-        ${escapeHtml(title)}
+        ${escapeHTML(task.title)}
       </h2>
 
-      <p class="survey-intro">
-
-        Please answer every question below.
-
-        <br><br>
-
-        Reward:
-        <strong>
-          +${Number(points) || 25} points
-        </strong>
-
-        after admin approval.
-
+      <p>
+        ${escapeHTML(
+          task.description || ""
+        )}
       </p>
 
+      <p>
+        <strong>
+          Points:
+        </strong>
+        ${escapeHTML(task.points)}
+      </p>
+
+      <p>
+        Complete the survey below.
+        Your submission will be reviewed
+        before points are awarded.
+      </p>
 
       <form id="pulseSurveyForm">
 
@@ -274,7 +300,6 @@ async function openSurvey(taskId, title, points) {
 
         </div>
 
-
         <div class="survey-actions">
 
           <button
@@ -284,17 +309,14 @@ async function openSurvey(taskId, title, points) {
             Submit Survey
           </button>
 
-
-          <button
-            type="button"
-            id="closePulseSurvey"
+          <a
+            href="tasks.html"
             class="outline-button"
           >
             Cancel
-          </button>
+          </a>
 
         </div>
-
 
         <p
           id="pulseSurveyMsg"
@@ -308,24 +330,8 @@ async function openSurvey(taskId, title, points) {
   `;
 
 
-  modal.hidden = false;
+  addSurveyStyles();
 
-
-  /* =========================
-     CLOSE
-  ========================= */
-
-  document
-    .getElementById("closePulseSurvey")
-    ?.addEventListener(
-      "click",
-      () => modal.remove()
-    );
-
-
-  /* =========================
-     SUBMIT
-  ========================= */
 
   const form =
     document.getElementById(
@@ -336,10 +342,23 @@ async function openSurvey(taskId, title, points) {
   if (!form) return;
 
 
-  form.onsubmit =
-    async function (event) {
+  form.addEventListener(
+    "submit",
+    async event => {
 
       event.preventDefault();
+
+
+      const message =
+        document.getElementById(
+          "pulseSurveyMsg"
+        );
+
+
+      const button =
+        form.querySelector(
+          'button[type="submit"]'
+        );
 
 
       /* =========================
@@ -367,12 +386,6 @@ async function openSurvey(taskId, title, points) {
 
         if (!value) {
 
-          const message =
-            document.getElementById(
-              "pulseSurveyMsg"
-            );
-
-
           if (message) {
 
             message.textContent =
@@ -380,11 +393,9 @@ async function openSurvey(taskId, title, points) {
 
           }
 
-
           field?.focus();
 
           return;
-
         }
 
 
@@ -405,36 +416,8 @@ async function openSurvey(taskId, title, points) {
 
 
       /* =========================
-         AUTH
-      ========================= */
-
-      const {
-        data: { user },
-        error: userError
-      } =
-        await supabaseClient.auth.getUser();
-
-
-      if (userError || !user) {
-
-        alert(
-          "Please sign in before taking a survey."
-        );
-
-        return;
-
-      }
-
-
-      /* =========================
          DISABLE BUTTON
       ========================= */
-
-      const button =
-        form.querySelector(
-          'button[type="submit"]'
-        );
-
 
       if (button) {
 
@@ -446,41 +429,133 @@ async function openSurvey(taskId, title, points) {
       }
 
 
-      /* =========================
-         SAVE SUBMISSION
-      ========================= */
+      try {
 
-      const { error } =
-        await supabaseClient
-          .from("task_submissions")
-          .insert({
+        /* =========================
+           CHECK DUPLICATE
+        ========================= */
 
-            task_id:
-              Number(taskId),
+        const {
+          data: existing,
+          error: existingError
+        } =
+          await window.supabaseClient
+            .from("task_submissions")
+            .select("id")
+            .eq(
+              "task_id",
+              task.id
+            )
+            .eq(
+              "user_id",
+              user.id
+            )
+            .in(
+              "status",
+              [
+                "pending",
+                "approved"
+              ]
+            )
+            .limit(1);
 
-            user_id:
-              user.id,
 
-            proof:
-              `Survey: ${title}`,
-
-            survey_answers:
-              answers,
-
-            status:
-              "pending"
-
-          });
+        if (existingError) {
+          throw existingError;
+        }
 
 
-      /* =========================
-         ERROR
-      ========================= */
+        if (
+          existing &&
+          existing.length > 0
+        ) {
 
-      if (error) {
+          if (message) {
+
+            message.textContent =
+              "You already have an active submission for this task.";
+
+          }
+
+          if (button) {
+
+            button.disabled = false;
+
+            button.textContent =
+              "Submit Survey";
+
+          }
+
+          return;
+        }
+
+
+        /* =========================
+           INSERT
+        ========================= */
+
+        const { error } =
+          await window.supabaseClient
+            .from("task_submissions")
+            .insert({
+
+              task_id:
+                task.id,
+
+              user_id:
+                user.id,
+
+              proof:
+                `Survey: ${task.title}`,
+
+              survey_answers:
+                answers,
+
+              status:
+                "pending"
+
+            });
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        /* =========================
+           SUCCESS
+        ========================= */
+
+        if (message) {
+
+          message.textContent =
+            "Survey submitted successfully. Your submission is now pending review.";
+
+        }
+
+
+        if (button) {
+
+          button.disabled = true;
+
+          button.textContent =
+            "Submitted";
+
+        }
+
+
+        setTimeout(() => {
+
+          window.location.href =
+            "submissions.html";
+
+        }, 1200);
+
+
+      } catch (error) {
 
         console.error(
-          "PULSE survey submission error:",
+          "Survey submission error:",
           error
         );
 
@@ -495,144 +570,150 @@ async function openSurvey(taskId, title, points) {
         }
 
 
-        const message =
-          document.getElementById(
-            "pulseSurveyMsg"
-          );
-
-
         if (message) {
 
           message.textContent =
-            error.message;
+            error.message ||
+            "Unable to submit survey.";
 
         }
 
-        return;
-
       }
 
-
-      /* =========================
-         SUCCESS
-      ========================= */
-
-      modal.remove();
-
-
-      alert(
-        "Survey submitted. Your submission is now pending review."
-      );
-
-
-      if (
-        typeof refresh ===
-        "function"
-      ) {
-
-        await refresh();
-
-      }
-
-    };
+    }
+  );
 
 }
 
 
-/* =========================
-   ENHANCE SURVEY TASKS
-========================= */
+// =========================
+// QUESTION
+// =========================
 
-function enhanceTasks() {
+function renderQuestion(
+  question,
+  index
+) {
 
-  const box =
-    document.getElementById("tasks");
-
-
-  if (!box) return;
-
-
-  box
-    .querySelectorAll(".task-card")
-    .forEach(card => {
-
-      if (
-        card.dataset.surveyEnhanced === "1"
-      ) {
-
-        return;
-
-      }
+  const text =
+    escapeHTML(question[0]);
 
 
-      const title =
-        card
-          .querySelector(
-            ".task-info strong"
-          )
-          ?.textContent
-          ?.trim() || "";
+  if (question[1] === "yesno") {
+
+    return `
+      <div class="survey-question-block">
+
+        <label
+          class="survey-question-text"
+          for="q${index}"
+        >
+          ${index + 1}. ${text}
+        </label>
+
+        <select
+          id="q${index}"
+          name="q${index}"
+          class="survey-input"
+          required
+        >
+
+          <option value="">
+            Choose...
+          </option>
+
+          <option value="Yes">
+            Yes
+          </option>
+
+          <option value="No">
+            No
+          </option>
+
+        </select>
+
+      </div>
+    `;
+  }
 
 
-      if (!findSurvey(title)) {
+  if (question[1] === "rating") {
 
-        return;
+    return `
+      <div class="survey-question-block">
 
-      }
+        <label
+          class="survey-question-text"
+          for="q${index}"
+        >
+          ${index + 1}. ${text}
+        </label>
+
+        <select
+          id="q${index}"
+          name="q${index}"
+          class="survey-input"
+          required
+        >
+
+          <option value="">
+            Choose a rating...
+          </option>
+
+          <option value="1">
+            1 - Very poor
+          </option>
+
+          <option value="2">
+            2 - Poor
+          </option>
+
+          <option value="3">
+            3 - Okay
+          </option>
+
+          <option value="4">
+            4 - Good
+          </option>
+
+          <option value="5">
+            5 - Excellent
+          </option>
+
+        </select>
+
+      </div>
+    `;
+  }
 
 
-      const button =
-        card.querySelector(
-          ".task-submit"
-        );
+  return `
+    <div class="survey-question-block">
 
+      <label
+        class="survey-question-text"
+        for="q${index}"
+      >
+        ${index + 1}. ${text}
+      </label>
 
-      if (!button) return;
+      <textarea
+        id="q${index}"
+        name="q${index}"
+        class="survey-input"
+        rows="4"
+        required
+        placeholder="Your feedback"
+      ></textarea>
 
-
-      const taskId =
-        button.dataset.id;
-
-
-      const pointsText =
-        card
-          .querySelector(
-            ".task-points"
-          )
-          ?.textContent || "";
-
-
-      const points =
-        pointsText.replace(
-          /[^0-9]/g,
-          ""
-        ) || "25";
-
-
-      button.textContent =
-        "Take Survey";
-
-
-      button.onclick =
-        () =>
-          openSurvey(
-            taskId,
-            title,
-            points
-          );
-
-
-      card.dataset.surveyEnhanced =
-        "1";
-
-    });
-
+    </div>
+  `;
 }
 
 
-/* =========================
-   SURVEY STYLES
-========================= */
+// =========================
+// STYLES
+// =========================
 
 function addSurveyStyles() {
 
@@ -641,9 +722,7 @@ function addSurveyStyles() {
       "pulseSurveyStyles"
     )
   ) {
-
     return;
-
   }
 
 
@@ -657,36 +736,9 @@ function addSurveyStyles() {
 
   style.textContent = `
 
-    #pulseSurveyModal {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      overflow-y: auto;
-      box-sizing: border-box;
-      padding: 20px;
-      background: rgba(3, 6, 20, 0.94);
-    }
-
-    .survey-modal-box {
+    .survey-page {
       width: 100%;
-      max-width: 680px;
       box-sizing: border-box;
-      margin: 20px auto;
-      padding: 22px;
-      border-radius: 18px;
-      border: 1px solid rgba(80, 170, 255, 0.60);
-      background: rgba(9, 15, 36, 0.98);
-      color: #ffffff;
-    }
-
-    .survey-modal-box h2 {
-      margin: 0 0 10px;
-      line-height: 1.3;
-    }
-
-    .survey-intro {
-      margin: 0 0 22px;
-      line-height: 1.5;
     }
 
     .survey-question-block {
@@ -694,8 +746,18 @@ function addSurveyStyles() {
       padding: 15px;
       box-sizing: border-box;
       border-radius: 12px;
-      border: 1px solid rgba(100, 150, 255, 0.28);
-      background: rgba(18, 27, 58, 0.72);
+      border: 1px solid rgba(
+        100,
+        150,
+        255,
+        0.28
+      );
+      background: rgba(
+        18,
+        27,
+        58,
+        0.72
+      );
     }
 
     .survey-question-text {
@@ -714,8 +776,18 @@ function addSurveyStyles() {
       box-sizing: border-box;
       padding: 10px 12px;
       border-radius: 9px;
-      border: 1px solid rgba(100, 180, 255, 0.48);
-      background: rgba(4, 9, 25, 0.98);
+      border: 1px solid rgba(
+        100,
+        180,
+        255,
+        0.48
+      );
+      background: rgba(
+        4,
+        9,
+        25,
+        0.98
+      );
       color: #ffffff;
       font-size: 16px;
     }
@@ -737,21 +809,13 @@ function addSurveyStyles() {
       margin-top: 22px;
     }
 
-    .survey-actions button {
+    .survey-actions button,
+    .survey-actions a {
       min-height: 46px;
+      box-sizing: border-box;
     }
 
     @media (max-width: 520px) {
-
-      #pulseSurveyModal {
-        padding: 10px;
-      }
-
-      .survey-modal-box {
-        margin: 5px auto;
-        padding: 16px;
-        border-radius: 14px;
-      }
 
       .survey-question-block {
         padding: 13px;
@@ -761,179 +825,36 @@ function addSurveyStyles() {
         font-size: 15px;
       }
 
+      .survey-actions {
+        flex-direction: column;
+      }
+
+      .survey-actions button,
+      .survey-actions a {
+        width: 100%;
+        text-align: center;
+      }
+
     }
 
   `;
 
 
   document.head.appendChild(style);
-
 }
 
 
-/* =========================
-   MARK NOTIFICATIONS READ
-========================= */
+// =========================
+// ESCAPE HTML
+// =========================
 
-function wireNotificationReadButton() {
+function escapeHTML(value) {
 
-  const button =
-    document.getElementById(
-      "markNotificationsRead"
-    );
-
-
-  if (!button) return;
-
-
-  if (
-    button.dataset.readWired === "1"
-  ) {
-
-    return;
-
-  }
-
-
-  button.dataset.readWired = "1";
-
-
-  button.addEventListener(
-    "click",
-    async () => {
-
-      const {
-        data: { user },
-        error: userError
-      } =
-        await supabaseClient.auth.getUser();
-
-
-      if (userError || !user) {
-
-        alert(
-          "Please sign in first."
-        );
-
-        return;
-
-      }
-
-
-      button.disabled = true;
-
-
-      const { error } =
-        await supabaseClient
-          .from("notifications")
-          .update({
-            read: true
-          })
-          .eq(
-            "user_id",
-            user.id
-          )
-          .eq(
-            "read",
-            false
-          );
-
-
-      button.disabled = false;
-
-
-      if (error) {
-
-        console.error(
-          "PULSE notification update error:",
-          error
-        );
-
-
-        alert(
-          error.message
-        );
-
-        return;
-
-      }
-
-
-      if (
-        typeof loadNotifications ===
-        "function"
-      ) {
-
-        await loadNotifications();
-
-      }
-
-    }
-  );
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 }
-
-
-/* =========================
-   START SURVEY SYSTEM
-========================= */
-
-function startSurveySystem() {
-
-  addSurveyStyles();
-
-  enhanceTasks();
-
-  wireNotificationReadButton();
-
-
-  const box =
-    document.getElementById(
-      "tasks"
-    );
-
-
-  if (
-    box &&
-    box.dataset.surveyObserver !== "1"
-  ) {
-
-    const observer =
-      new MutationObserver(
-        () => {
-
-          enhanceTasks();
-
-          wireNotificationReadButton();
-
-        }
-      );
-
-
-    observer.observe(
-      box,
-      {
-        childList: true,
-        subtree: true
-      }
-    );
-
-
-    box.dataset.surveyObserver =
-      "1";
-
-  }
-
-}
-
-
-/* =========================
-   START
-========================= */
-
-window.addEventListener(
-  "load",
-  startSurveySystem
-);
-
-})();
