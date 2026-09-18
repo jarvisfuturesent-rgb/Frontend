@@ -1,4 +1,5 @@
 // PULSE — Notifications
+// Controls notifications.html only.
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -7,11 +8,14 @@ document.addEventListener(
 
 async function loadNotifications() {
     const container =
-        document.getElementById(
-            "notificationsContent"
-        );
+        document.getElementById("notifications");
 
-    if (!container) return;
+    if (!container) {
+        console.error(
+            "notifications element not found."
+        );
+        return;
+    }
 
     container.innerHTML =
         "<p>Loading notifications...</p>";
@@ -24,7 +28,9 @@ async function loadNotifications() {
         const { data, error } =
             await window.supabaseClient
                 .from("notifications")
-                .select("*")
+                .select(
+                    "id, title, message, type, read, created_at"
+                )
                 .eq("user_id", user.id)
                 .order("created_at", {
                     ascending: false
@@ -58,9 +64,7 @@ async function loadNotifications() {
 
                     <p>
                         ${escapeHTML(
-                            notification.message ||
-                            notification.body ||
-                            ""
+                            notification.message || ""
                         )}
                     </p>
 
@@ -131,13 +135,18 @@ async function loadNotifications() {
 
 async function markAsRead(id) {
     try {
+        const user = await requireLogin();
+
+        if (!user) return;
+
         const { error } =
             await window.supabaseClient
                 .from("notifications")
                 .update({
                     read: true
                 })
-                .eq("id", id);
+                .eq("id", id)
+                .eq("user_id", user.id);
 
         if (error) {
             throw error;
@@ -174,7 +183,10 @@ function formatDate(value) {
 
 
 function escapeHTML(value) {
-    if (value === null || value === undefined) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
         return "";
     }
 
