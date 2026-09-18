@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
+    /* PULSE EFFECT */
     .pulse-link,
     .pulse-folder {
       display: inline-flex;
@@ -28,41 +29,63 @@
         text-shadow: none;
         transform: scale(1);
       }
+
       12% {
         color: #00f6ff;
-        text-shadow: 0 0 4px #00f6ff, 0 0 10px rgba(0,246,255,.7);
+        text-shadow:
+          0 0 4px #00f6ff,
+          0 0 10px rgba(0,246,255,.7);
         transform: scale(1.08);
       }
+
       24% {
         color: #008cff;
-        text-shadow: 0 0 5px #008cff, 0 0 12px rgba(0,140,255,.7);
+        text-shadow:
+          0 0 5px #008cff,
+          0 0 12px rgba(0,140,255,.7);
         transform: scale(1);
       }
+
       36% {
         color: #5c5cff;
-        text-shadow: 0 0 5px #5c5cff, 0 0 12px rgba(92,92,255,.7);
+        text-shadow:
+          0 0 5px #5c5cff,
+          0 0 12px rgba(92,92,255,.7);
         transform: scale(1.06);
       }
+
       48% {
         color: #9b4dff;
-        text-shadow: 0 0 5px #9b4dff, 0 0 12px rgba(155,77,255,.7);
+        text-shadow:
+          0 0 5px #9b4dff,
+          0 0 12px rgba(155,77,255,.7);
         transform: scale(1);
       }
+
       60% {
         color: #ff3bd4;
-        text-shadow: 0 0 5px #ff3bd4, 0 0 12px rgba(255,59,212,.7);
+        text-shadow:
+          0 0 5px #ff3bd4,
+          0 0 12px rgba(255,59,212,.7);
         transform: scale(1.08);
       }
+
       72% {
         color: #ff4f81;
-        text-shadow: 0 0 5px #ff4f81, 0 0 12px rgba(255,79,129,.7);
+        text-shadow:
+          0 0 5px #ff4f81,
+          0 0 12px rgba(255,79,129,.7);
         transform: scale(1);
       }
+
       84% {
         color: #00ffc8;
-        text-shadow: 0 0 5px #00ffc8, 0 0 12px rgba(0,255,200,.7);
+        text-shadow:
+          0 0 5px #00ffc8,
+          0 0 12px rgba(0,255,200,.7);
         transform: scale(1.06);
       }
+
       100% {
         color: inherit;
         text-shadow: none;
@@ -97,171 +120,327 @@
 </head>
 
 <body>
-  <main class="app-shell">
 
-    <header class="hero">
-      <img src="pulse-logo.png" alt="PULSE Token" class="pulse-logo">
-      <h1>PULSE</h1>
-      <p class="tagline">Complete • Earn • Get Rewarded</p>
+<main class="app-shell">
 
-      <details class="menu">
-        <summary>☰ Menu</summary>
+  <header class="hero">
 
-        <div class="menu-panel">
+    <img
+      src="pulse-logo.png"
+      alt="PULSE"
+      class="pulse-logo"
+    >
 
-          <details>
-            <summary class="pulse-folder">
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              <span style="--i:0">M</span>
-              <span style="--i:1">a</span>
-              <span style="--i:2">i</span>
-              <span style="--i:3">n</span>
-            </summary>
+    <h1>PULSE</h1>
 
-            <div>
-              <a class="page-link" href="index.html">🏠 Home</a>
-              <a class="page-link" href="how-it-works.html">ℹ️ How It Works</a>
-              <a class="page-link" href="about.html">📖 About PULSE</a>
-              <a class="page-link" href="contact.html">📩 Contact</a>
-            </div>
-          </details>
+    <p class="tagline">
+      Complete • Earn • Get Rewarded
+    </p>
 
-          <details>
-            <summary class="pulse-folder">
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              <span style="--i:0">P</span>
-              <span style="--i:1">U</span>
-              <span style="--i:2">L</span>
-              <span style="--i:3">S</span>
-              <span style="--i:4">E</span>
-            </summary>
+    <!-- LEVEL 1 -->
+    <details class="menu">
 
-            <div>
-              <a class="page-link" href="dashboard.html">📊 Dashboard</a>
-              <a class="page-link" href="tasks.html">📋 Available Tasks</a>
-              <a class="page-link" href="surveys.html">📝 Surveys</a>
-              <a class="page-link" href="submissions.html">📂 My Submissions</a>
-              <a class="page-link" href="earnings.html">💰 Earnings &amp; Balance</a>
-              <a class="page-link" href="notifications.html">🔔 Notifications</a>
-            </div>
-          </details>
+      <summary>☰ Menu</summary>
 
-          <details>
-            <summary class="pulse-folder">
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              <span style="--i:0">A</span>
-              <span style="--i:1">c</span>
-              <span style="--i:2">c</span>
-              <span style="--i:3">o</span>
-              <span style="--i:4">u</span>
-              <span style="--i:5">n</span>
-              <span style="--i:6">t</span>
-            </summary>
+      <div class="menu-panel">
 
-            <div>
-              <a class="page-link" href="profile.html">👤 Profile &amp; Account</a>
-              <a class="page-link" href="auth.html">🔐 Login / Sign Up</a>
-              <a class="page-link" href="reset-password.html">🔑 Reset Password</a>
-            </div>
-          </details>
+        <!-- MAIN -->
+        <details>
 
-          <details>
-            <summary class="pulse-folder">
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              <span style="--i:0">L</span>
-              <span style="--i:1">e</span>
-              <span style="--i:2">g</span>
-              <span style="--i:3">a</span>
-              <span style="--i:4">l</span>
-            </summary>
+          <summary class="pulse-folder">
 
-            <div>
-              <a class="page-link" href="terms.html">📜 Terms</a>
-              <a class="page-link" href="privacy.html">🔒 Privacy Policy</a>
-              <a class="page-link" href="disclosures.html">📢 Disclosures</a>
-            </div>
-          </details>
+            <img
+              src="pulse-logo.png"
+              alt="PULSE"
+              class="menu-logo"
+            >
 
-          <details>
-            <summary class="pulse-folder">
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              <span style="--i:0">A</span>
-              <span style="--i:1">d</span>
-              <span style="--i:2">m</span>
-              <span style="--i:3">i</span>
-              <span style="--i:4">n</span>
-              <span style="--i:5">i</span>
-              <span style="--i:6">s</span>
-              <span style="--i:7">t</span>
-              <span style="--i:8">r</span>
-              <span style="--i:9">a</span>
-              <span style="--i:10">t</span>
-              <span style="--i:11">i</span>
-              <span style="--i:12">o</span>
-              <span style="--i:13">n</span>
-            </summary>
+            <span style="--i:0">M</span>
+            <span style="--i:1">a</span>
+            <span style="--i:2">i</span>
+            <span style="--i:3">n</span>
 
-            <div>
-              <a class="page-link" href="admin.html">⚙ Admin Dashboard</a>
-              <a class="page-link" href="admin-tasks.html">📋 Task Management</a>
-              <a class="page-link" href="admin-businesses.html">🏢 Business Management</a>
-              <a class="page-link" href="admin-submissions.html">📂 Submission Review</a>
-              <a class="page-link" href="admin-rewards.html">🎁 Reward Requests</a>
-              <a class="page-link" href="admin-reports.html">📊 Reports &amp; Records</a>
-            </div>
-          </details>
+          </summary>
 
-        </div>
-      </details>
-    </header>
+          <!-- LEVEL 3 -->
+          <div>
+            <a class="page-link" href="index.html">
+              🏠 Home
+            </a>
 
-    <section class="panel">
+            <a class="page-link" href="how-it-works.html">
+              ℹ️ How It Works
+            </a>
 
-      <h1>Business Management</h1>
+            <a class="page-link" href="about.html">
+              📖 About PULSE
+            </a>
 
-      <p>
-        Manage businesses connected with PULSE, including
-        business information and task relationships.
-      </p>
+            <a class="page-link" href="contact.html">
+              📩 Contact
+            </a>
+          </div>
 
-      <div id="adminBusinesses">
-        Loading businesses...
+        </details>
+
+
+        <!-- PULSE -->
+        <details>
+
+          <summary class="pulse-folder">
+
+            <img
+              src="pulse-logo.png"
+              alt="PULSE"
+              class="menu-logo"
+            >
+
+            <span style="--i:0">P</span>
+            <span style="--i:1">U</span>
+            <span style="--i:2">L</span>
+            <span style="--i:3">S</span>
+            <span style="--i:4">E</span>
+
+          </summary>
+
+          <!-- LEVEL 3 -->
+          <div>
+
+            <a class="page-link" href="dashboard.html">
+              📊 Dashboard
+            </a>
+
+            <a class="page-link" href="tasks.html">
+              📋 Available Tasks
+            </a>
+
+            <a class="page-link" href="surveys.html">
+              📝 Surveys
+            </a>
+
+            <a class="page-link" href="submissions.html">
+              📂 My Submissions
+            </a>
+
+            <a class="page-link" href="earnings.html">
+              💰 Earnings &amp; Balance
+            </a>
+
+            <a class="page-link" href="notifications.html">
+              🔔 Notifications
+            </a>
+
+          </div>
+
+        </details>
+
+
+        <!-- ACCOUNT -->
+        <details>
+
+          <summary class="pulse-folder">
+
+            <img
+              src="pulse-logo.png"
+              alt="PULSE"
+              class="menu-logo"
+            >
+
+            <span style="--i:0">A</span>
+            <span style="--i:1">c</span>
+            <span style="--i:2">c</span>
+            <span style="--i:3">o</span>
+            <span style="--i:4">u</span>
+            <span style="--i:5">n</span>
+            <span style="--i:6">t</span>
+
+          </summary>
+
+          <!-- LEVEL 3 -->
+          <div>
+
+            <a class="page-link" href="profile.html">
+              👤 Profile &amp; Account
+            </a>
+
+            <a class="page-link" href="auth.html">
+              🔐 Login / Sign Up
+            </a>
+
+            <a class="page-link" href="reset-password.html">
+              🔑 Reset Password
+            </a>
+
+          </div>
+
+        </details>
+
+
+        <!-- LEGAL -->
+        <details>
+
+          <summary class="pulse-folder">
+
+            <img
+              src="pulse-logo.png"
+              alt="PULSE"
+              class="menu-logo"
+            >
+
+            <span style="--i:0">L</span>
+            <span style="--i:1">e</span>
+            <span style="--i:2">g</span>
+            <span style="--i:3">a</span>
+            <span style="--i:4">l</span>
+
+          </summary>
+
+          <!-- LEVEL 3 -->
+          <div>
+
+            <a class="page-link" href="terms.html">
+              📜 Terms
+            </a>
+
+            <a class="page-link" href="privacy.html">
+              🔒 Privacy Policy
+            </a>
+
+            <a class="page-link" href="disclosures.html">
+              📢 Disclosures
+            </a>
+
+          </div>
+
+        </details>
+
+
+        <!-- ADMINISTRATION -->
+        <details>
+
+          <summary class="pulse-folder">
+
+            <img
+              src="pulse-logo.png"
+              alt="PULSE"
+              class="menu-logo"
+            >
+
+            <span style="--i:0">A</span>
+            <span style="--i:1">d</span>
+            <span style="--i:2">m</span>
+            <span style="--i:3">i</span>
+            <span style="--i:4">n</span>
+            <span style="--i:5">i</span>
+            <span style="--i:6">s</span>
+            <span style="--i:7">t</span>
+            <span style="--i:8">r</span>
+            <span style="--i:9">a</span>
+            <span style="--i:10">t</span>
+            <span style="--i:11">i</span>
+            <span style="--i:12">o</span>
+            <span style="--i:13">n</span>
+
+          </summary>
+
+          <!-- LEVEL 3 -->
+          <div>
+
+            <a class="page-link" href="admin.html">
+              ⚙ Admin Dashboard
+            </a>
+
+            <a class="page-link" href="admin-tasks.html">
+              📋 Task Management
+            </a>
+
+            <a class="page-link" href="admin-businesses.html">
+              🏢 Business Management
+            </a>
+
+            <a class="page-link" href="admin-submissions.html">
+              📂 Submission Review
+            </a>
+
+            <a class="page-link" href="admin-rewards.html">
+              🎁 Reward Requests
+            </a>
+
+            <a class="page-link" href="admin-reports.html">
+              📊 Reports &amp; Records
+            </a>
+
+          </div>
+
+        </details>
+
       </div>
 
-      <a class="pulse-link" href="admin.html">
-        <span style="--i:0">G</span>
-        <span style="--i:1">o</span>
-        <span style="--i:2">&nbsp;</span>
-        <span style="--i:3">t</span>
-        <span style="--i:4">o</span>
-        <span style="--i:5">&nbsp;</span>
-        <span style="--i:6">A</span>
-        <span style="--i:7">d</span>
-        <span style="--i:8">m</span>
-        <span style="--i:9">i</span>
-        <span style="--i:10">n</span>
-        <span style="--i:11">&nbsp;</span>
-        <span style="--i:12">D</span>
-        <span style="--i:13">a</span>
-        <span style="--i:14">s</span>
-        <span style="--i:15">h</span>
-        <span style="--i:16">b</span>
-        <span style="--i:17">o</span>
-        <span style="--i:18">a</span>
-        <span style="--i:19">r</span>
-        <span style="--i:20">d</span>
-      </a>
+    </details>
 
-    </section>
+  </header>
 
-    <footer>
+
+  <!-- BUSINESS MANAGEMENT -->
+  <section class="panel">
+
+    <h1>Business Management</h1>
+
+    <p>
+      Manage businesses connected with PULSE, including
+      business information and task relationships.
+    </p>
+
+    <div id="adminBusinesses">
+      Loading businesses...
+    </div>
+
+    <!-- OUTSIDE-MENU LINK: PULSE EFFECT -->
+    <a class="pulse-link" href="admin.html">
+
+      <span style="--i:0">G</span>
+      <span style="--i:1">o</span>
+      <span style="--i:2">&nbsp;</span>
+      <span style="--i:3">t</span>
+      <span style="--i:4">o</span>
+      <span style="--i:5">&nbsp;</span>
+      <span style="--i:6">A</span>
+      <span style="--i:7">d</span>
+      <span style="--i:8">m</span>
+      <span style="--i:9">i</span>
+      <span style="--i:10">n</span>
+      <span style="--i:11">&nbsp;</span>
+      <span style="--i:12">D</span>
+      <span style="--i:13">a</span>
+      <span style="--i:14">s</span>
+      <span style="--i:15">h</span>
+      <span style="--i:16">b</span>
+      <span style="--i:17">o</span>
+      <span style="--i:18">a</span>
+      <span style="--i:19">r</span>
+      <span style="--i:20">d</span>
+
+    </a>
+
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer>
+
+    <p>© 2026 PULSE</p>
+
+    <div>
+
       <a class="pulse-link" href="index.html">
         <span style="--i:0">H</span>
         <span style="--i:1">o</span>
         <span style="--i:2">m</span>
         <span style="--i:3">e</span>
       </a>
-      |
+
+      <span> • </span>
+
       <a class="pulse-link" href="privacy.html">
         <span style="--i:0">P</span>
         <span style="--i:1">r</span>
@@ -271,7 +450,9 @@
         <span style="--i:5">c</span>
         <span style="--i:6">y</span>
       </a>
-      |
+
+      <span> • </span>
+
       <a class="pulse-link" href="terms.html">
         <span style="--i:0">T</span>
         <span style="--i:1">e</span>
@@ -279,7 +460,9 @@
         <span style="--i:3">m</span>
         <span style="--i:4">s</span>
       </a>
-      |
+
+      <span> • </span>
+
       <a class="pulse-link" href="contact.html">
         <span style="--i:0">C</span>
         <span style="--i:1">o</span>
@@ -289,13 +472,22 @@
         <span style="--i:5">c</span>
         <span style="--i:6">t</span>
       </a>
-    </footer>
 
-  </main>
+    </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="admin.js"></script>
+  </footer>
+
+</main>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- PULSE CONFIG -->
+<script src="config.js"></script>
+
+<!-- ADMIN FUNCTIONS -->
+<script src="admin.js"></script>
 
 </body>
 </html>
