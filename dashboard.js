@@ -10,35 +10,52 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutBtn.addEventListener("click", handleLogout);
   }
 
-  const markReadBtn = document.getElementById("markNotificationsRead");
+  const markReadBtn =
+    document.getElementById("markNotificationsRead");
 
   if (markReadBtn) {
-    markReadBtn.addEventListener("click", markNotificationsRead);
+    markReadBtn.addEventListener(
+      "click",
+      markNotificationsRead
+    );
   }
 });
 
 
 async function loadDashboard() {
-  const balance = document.getElementById("balance");
-  const totalEarned = document.getElementById("totalEarned");
+  const balance =
+    document.getElementById("balance");
+
+  const totalEarned =
+    document.getElementById("totalEarned");
+
   const pendingWithdrawal =
     document.getElementById("pendingWithdrawal");
+
   const availableBalance =
     document.getElementById("availableBalance");
+
   const profileName =
     document.getElementById("profileName");
+
   const profile =
     document.getElementById("profile");
+
   const tasks =
     document.getElementById("tasks");
+
   const submissions =
     document.getElementById("submissions");
+
   const activity =
     document.getElementById("activity");
+
   const redemptions =
     document.getElementById("redemptions");
+
   const notifications =
     document.getElementById("notifications");
+
 
   try {
     const user = await requireLogin();
@@ -48,8 +65,15 @@ async function loadDashboard() {
     }
 
     if (!window.supabaseClient) {
-      throw new Error("Supabase client is not available.");
+      throw new Error(
+        "Supabase client is not available."
+      );
     }
+
+
+    // -----------------------------
+    // LOAD DATABASE DATA
+    // -----------------------------
 
     const [
       profileResult,
@@ -68,19 +92,27 @@ async function loadDashboard() {
 
       window.supabaseClient
         .from("task_submissions")
-        .select(
-          "id, task_id, status, reviewer_note, created_at"
-        )
+        .select(`
+          id,
+          task_id,
+          status,
+          reviewer_note,
+          submitted_at
+        `)
         .eq("user_id", user.id)
-        .order("created_at", {
+        .order("submitted_at", {
           ascending: false
         }),
 
       window.supabaseClient
         .from("tasks")
-        .select(
-          "id, title, description, points, status"
-        )
+        .select(`
+          id,
+          title,
+          description,
+          points,
+          status
+        `)
         .eq("status", "active")
         .order("created_at", {
           ascending: false
@@ -88,7 +120,14 @@ async function loadDashboard() {
 
       window.supabaseClient
         .from("points_ledger")
-        .select("*")
+        .select(`
+          id,
+          user_id,
+          submission_id,
+          amount,
+          reason,
+          created_at
+        `)
         .eq("user_id", user.id)
         .order("created_at", {
           ascending: false
@@ -96,7 +135,18 @@ async function loadDashboard() {
 
       window.supabaseClient
         .from("redemption_requests")
-        .select("*")
+        .select(`
+          id,
+          user_id,
+          points_requested,
+          reward_type,
+          status,
+          user_note,
+          admin_note,
+          created_at,
+          reviewed_at,
+          paid_at
+        `)
         .eq("user_id", user.id)
         .order("created_at", {
           ascending: false
@@ -104,12 +154,21 @@ async function loadDashboard() {
 
       window.supabaseClient
         .from("notifications")
-        .select("*")
+        .select(`
+          id,
+          user_id,
+          title,
+          message,
+          type,
+          read,
+          created_at
+        `)
         .eq("user_id", user.id)
         .order("created_at", {
           ascending: false
         })
     ]);
+
 
     if (profileResult.error) {
       throw profileResult.error;
@@ -136,22 +195,28 @@ async function loadDashboard() {
     }
 
 
-    const userProfile = profileResult.data;
+    const userProfile =
+      profileResult.data;
+
     const userSubmissions =
       submissionsResult.data || [];
+
     const userTasks =
       tasksResult.data || [];
+
     const ledger =
       ledgerResult.data || [];
+
     const rewards =
       rewardsResult.data || [];
+
     const userNotifications =
       notificationsResult.data || [];
 
 
-    // ---------------------------------
+    // -----------------------------
     // PROFILE
-    // ---------------------------------
+    // -----------------------------
 
     const name =
       userProfile?.name ||
@@ -161,9 +226,11 @@ async function loadDashboard() {
     const points =
       Number(userProfile?.points) || 0;
 
+
     if (profileName) {
       profileName.textContent = name;
     }
+
 
     if (profile) {
       profile.innerHTML = `
@@ -174,25 +241,30 @@ async function loadDashboard() {
 
         <p>
           <strong>Points:</strong>
-          ${points}
+          ${points.toLocaleString()}
         </p>
       `;
     }
 
 
-    // ---------------------------------
-    // POINTS / BALANCE
-    // ---------------------------------
+    // -----------------------------
+    // POINTS
+    // -----------------------------
 
-    let earned = 0;
+    let totalEarnedValue = 0;
 
     ledger.forEach(entry => {
-      const amount = Number(entry.amount);
+      const amount =
+        Number(entry.amount);
 
-      if (Number.isFinite(amount) && amount > 0) {
-        earned += amount;
+      if (
+        Number.isFinite(amount) &&
+        amount > 0
+      ) {
+        totalEarnedValue += amount;
       }
     });
+
 
     let pendingPoints = 0;
 
@@ -201,27 +273,32 @@ async function loadDashboard() {
         Number(request.points_requested);
 
       if (
+        request.status === "pending" &&
         Number.isFinite(amount) &&
-        request.status === "pending"
+        amount > 0
       ) {
         pendingPoints += amount;
       }
     });
+
 
     if (balance) {
       balance.textContent =
         points.toLocaleString();
     }
 
+
     if (totalEarned) {
       totalEarned.textContent =
-        earned.toLocaleString();
+        totalEarnedValue.toLocaleString();
     }
+
 
     if (pendingWithdrawal) {
       pendingWithdrawal.textContent =
         pendingPoints.toLocaleString();
     }
+
 
     if (availableBalance) {
       availableBalance.textContent =
@@ -229,18 +306,23 @@ async function loadDashboard() {
     }
 
 
-    // ---------------------------------
+    // -----------------------------
     // TASKS
-    // ---------------------------------
+    // -----------------------------
 
     if (tasks) {
+
       if (userTasks.length === 0) {
+
         tasks.innerHTML =
           "<p>No active tasks available.</p>";
+
       } else {
+
         tasks.innerHTML =
           userTasks.map(task => `
             <div class="panel">
+
               <h3>
                 ${escapeHTML(task.title)}
               </h3>
@@ -257,23 +339,28 @@ async function loadDashboard() {
               </p>
 
               <a href="tasks.html">
-                Open Task
+                Open Tasks
               </a>
+
             </div>
           `).join("");
       }
     }
 
 
-    // ---------------------------------
+    // -----------------------------
     // SUBMISSIONS
-    // ---------------------------------
+    // -----------------------------
 
     if (submissions) {
+
       if (userSubmissions.length === 0) {
+
         submissions.innerHTML =
           "<p>No submissions yet.</p>";
+
       } else {
+
         submissions.innerHTML =
           userSubmissions.map(item => `
             <div class="panel">
@@ -287,7 +374,9 @@ async function loadDashboard() {
 
               <p>
                 <strong>Submitted:</strong>
-                ${formatDate(item.created_at)}
+                ${formatDate(
+                  item.submitted_at
+                )}
               </p>
 
               ${
@@ -309,15 +398,19 @@ async function loadDashboard() {
     }
 
 
-    // ---------------------------------
-    // ACTIVITY
-    // ---------------------------------
+    // -----------------------------
+    // POINTS ACTIVITY
+    // -----------------------------
 
     if (activity) {
+
       if (ledger.length === 0) {
+
         activity.innerHTML =
           "<p>No points activity yet.</p>";
+
       } else {
+
         activity.innerHTML =
           ledger.map(entry => `
             <div class="panel">
@@ -327,9 +420,24 @@ async function loadDashboard() {
                 ${Number(entry.amount) || 0}
               </p>
 
+              ${
+                entry.reason
+                  ? `
+                    <p>
+                      <strong>Reason:</strong>
+                      ${escapeHTML(
+                        entry.reason
+                      )}
+                    </p>
+                  `
+                  : ""
+              }
+
               <p>
                 <strong>Date:</strong>
-                ${formatDate(entry.created_at)}
+                ${formatDate(
+                  entry.created_at
+                )}
               </p>
 
             </div>
@@ -338,15 +446,19 @@ async function loadDashboard() {
     }
 
 
-    // ---------------------------------
+    // -----------------------------
     // REWARD REQUESTS
-    // ---------------------------------
+    // -----------------------------
 
     if (redemptions) {
+
       if (rewards.length === 0) {
+
         redemptions.innerHTML =
           "<p>No reward requests yet.</p>";
+
       } else {
+
         redemptions.innerHTML =
           rewards.map(request => `
             <div class="panel">
@@ -374,6 +486,19 @@ async function loadDashboard() {
                 )}
               </p>
 
+              ${
+                request.user_note
+                  ? `
+                    <p>
+                      <strong>Note:</strong>
+                      ${escapeHTML(
+                        request.user_note
+                      )}
+                    </p>
+                  `
+                  : ""
+              }
+
               <p>
                 <strong>Date:</strong>
                 ${formatDate(
@@ -387,15 +512,19 @@ async function loadDashboard() {
     }
 
 
-    // ---------------------------------
+    // -----------------------------
     // NOTIFICATIONS
-    // ---------------------------------
+    // -----------------------------
 
     if (notifications) {
+
       if (userNotifications.length === 0) {
+
         notifications.innerHTML =
           "<p>No notifications.</p>";
+
       } else {
+
         notifications.innerHTML =
           userNotifications.map(item => `
             <div class="panel">
@@ -423,7 +552,9 @@ async function loadDashboard() {
       }
     }
 
+
   } catch (error) {
+
     console.error(
       "Dashboard loading error:",
       error
@@ -436,27 +567,36 @@ async function loadDashboard() {
 }
 
 
-// ---------------------------------
+// -----------------------------
 // SIGN OUT
-// ---------------------------------
+// -----------------------------
 
 async function handleLogout() {
+
   const button =
     document.getElementById("logoutBtn");
 
+
   if (button) {
     button.disabled = true;
-    button.textContent = "Signing Out...";
+    button.textContent =
+      "Signing Out...";
   }
 
+
   try {
-    const success = await signOut();
+
+    const success =
+      await signOut();
 
     if (!success) {
-      throw new Error("Sign out failed.");
+      throw new Error(
+        "Sign out failed."
+      );
     }
 
   } catch (error) {
+
     console.error(
       "Dashboard sign-out error:",
       error
@@ -464,7 +604,8 @@ async function handleLogout() {
 
     if (button) {
       button.disabled = false;
-      button.textContent = "Sign Out";
+      button.textContent =
+        "Sign Out";
     }
 
     alert(
@@ -474,22 +615,27 @@ async function handleLogout() {
 }
 
 
-// ---------------------------------
+// -----------------------------
 // MARK NOTIFICATIONS READ
-// ---------------------------------
+// -----------------------------
 
 async function markNotificationsRead() {
+
   const button =
     document.getElementById(
       "markNotificationsRead"
     );
 
+
   try {
-    const user = await requireLogin();
+
+    const user =
+      await requireLogin();
 
     if (!user) {
       return;
     }
+
 
     if (!window.supabaseClient) {
       throw new Error(
@@ -497,10 +643,13 @@ async function markNotificationsRead() {
       );
     }
 
+
     if (button) {
       button.disabled = true;
-      button.textContent = "Updating...";
+      button.textContent =
+        "Updating...";
     }
+
 
     const { error } =
       await window.supabaseClient
@@ -511,26 +660,35 @@ async function markNotificationsRead() {
         .eq("user_id", user.id)
         .eq("read", false);
 
+
     if (error) {
       throw error;
     }
 
+
     if (button) {
-      button.textContent = "Marked Read";
+      button.textContent =
+        "Marked Read";
     }
+
 
     await loadDashboard();
 
+
   } catch (error) {
+
     console.error(
       "Mark notifications read error:",
       error
     );
 
+
     if (button) {
       button.disabled = false;
-      button.textContent = "Mark Read";
+      button.textContent =
+        "Mark Read";
     }
+
 
     alert(
       "Unable to update notifications."
@@ -539,11 +697,12 @@ async function markNotificationsRead() {
 }
 
 
-// ---------------------------------
-// ERROR DISPLAY
-// ---------------------------------
+// -----------------------------
+// DASHBOARD ERROR
+// -----------------------------
 
 function showDashboardError(message) {
+
   const ids = [
     "balance",
     "totalEarned",
@@ -551,7 +710,9 @@ function showDashboardError(message) {
     "availableBalance"
   ];
 
+
   ids.forEach(id => {
+
     const element =
       document.getElementById(id);
 
@@ -560,8 +721,10 @@ function showDashboardError(message) {
     }
   });
 
+
   const profile =
     document.getElementById("profile");
+
 
   if (profile) {
     profile.innerHTML =
@@ -570,30 +733,38 @@ function showDashboardError(message) {
 }
 
 
-// ---------------------------------
+// -----------------------------
 // DATE
-// ---------------------------------
+// -----------------------------
 
 function formatDate(value) {
+
   if (!value) {
     return "Unknown";
   }
 
-  const date = new Date(value);
 
-  if (Number.isNaN(date.getTime())) {
+  const date =
+    new Date(value);
+
+
+  if (Number.isNaN(
+    date.getTime()
+  )) {
     return "Unknown";
   }
+
 
   return date.toLocaleString();
 }
 
 
-// ---------------------------------
+// -----------------------------
 // HTML SAFETY
-// ---------------------------------
+// -----------------------------
 
 function escapeHTML(value) {
+
   return String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
