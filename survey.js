@@ -5,6 +5,7 @@
 (function () {
 
 const SURVEYS = {
+
   "PULSE Survey 1": [
     ["Did creating your account go smoothly?", "yesno"],
     ["Did your first login work correctly?", "yesno"],
@@ -34,21 +35,21 @@ const SURVEYS = {
   ],
 
   "PULSE Survey 3": [
-    ["Did the reward section load properly?", "yesno"],
-    ["Could you enter the number of PLS you wanted to withdraw?", "yesno"],
-    ["Could you select the reward type?", "yesno"],
-    ["Could you submit the withdrawal request successfully?", "yesno"],
-    ["Did the app confirm that your withdrawal request was submitted?", "yesno"],
-    ["Did your withdrawal request appear under My Withdrawals?", "yesno"],
-    ["Did the request show the correct PLS amount and status?", "yesno"],
-    ["Did you receive a notification about the withdrawal request?", "yesno"],
-    ["Was anything confusing, broken, or delayed?", "yesno"],
-    ["Overall, how smooth was the withdrawal request experience?", "rating"],
+    ["Did the rewards section load properly?", "yesno"],
+    ["Could you see your available points correctly?", "yesno"],
+    ["Could you see the available reward options?", "yesno"],
+    ["Could you select a reward option successfully?", "yesno"],
+    ["Could you submit a reward request successfully?", "yesno"],
+    ["Did the app confirm that your reward request was submitted?", "yesno"],
+    ["Did your reward request appear under your submissions or requests?", "yesno"],
+    ["Did the request show the correct points amount and status?", "yesno"],
+    ["Did you receive a notification about the reward request?", "yesno"],
+    ["Overall, how smooth was the reward request experience?", "rating"],
     ["Final feedback: What happened, and what should we improve?", "text"]
   ],
 
   "PULSE Survey 4": [
-    ["Did your PLS balance display correctly?", "yesno"],
+    ["Did your points balance display correctly?", "yesno"],
     ["Did the points activity/history load correctly?", "yesno"],
     ["Did the points amount look correct?", "yesno"],
     ["Did the balance update when it was supposed to?", "yesno"],
@@ -68,12 +69,13 @@ const SURVEYS = {
     ["Were the tasks easy to understand and complete?", "yesno"],
     ["Did submitting tasks work correctly?", "yesno"],
     ["Did your points and balance behave correctly?", "yesno"],
-    ["Did requesting a PLS withdrawal work correctly?", "yesno"],
+    ["Did requesting a reward work correctly?", "yesno"],
     ["Were notifications clear and useful?", "yesno"],
     ["Did anything break, freeze, or behave unexpectedly?", "yesno"],
     ["Overall, how would you rate the app?", "rating"],
     ["Final feedback: What did you like most, what went wrong, and what should we improve?", "text"]
   ]
+
 };
 
 
@@ -82,12 +84,14 @@ const SURVEYS = {
 ========================= */
 
 function escapeHtml(value) {
+
   return String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+
 }
 
 
@@ -96,11 +100,14 @@ function escapeHtml(value) {
 ========================= */
 
 function findSurvey(title) {
-  const cleanTitle = String(title || "").trim();
+
+  const cleanTitle =
+    String(title || "").trim();
 
   return Object.keys(SURVEYS).find(key =>
     cleanTitle.startsWith(key)
   );
+
 }
 
 
@@ -110,8 +117,12 @@ function findSurvey(title) {
 
 function renderQuestion(question, index) {
 
-  const questionText = escapeHtml(question[0]);
-  const number = index + 1;
+  const questionText =
+    escapeHtml(question[0]);
+
+  const number =
+    index + 1;
+
 
   if (question[1] === "yesno") {
 
@@ -134,6 +145,7 @@ function renderQuestion(question, index) {
 
       </div>
     `;
+
   }
 
 
@@ -161,6 +173,7 @@ function renderQuestion(question, index) {
 
       </div>
     `;
+
   }
 
 
@@ -181,6 +194,7 @@ function renderQuestion(question, index) {
 
     </div>
   `;
+
 }
 
 
@@ -190,26 +204,40 @@ function renderQuestion(question, index) {
 
 async function openSurvey(taskId, title, points) {
 
-  const surveyName = findSurvey(title);
+  const surveyName =
+    findSurvey(title);
+
 
   if (!surveyName) {
+
     alert("This survey could not be found.");
+
     return;
+
   }
 
+
   let modal =
-    document.getElementById("pulseSurveyModal");
+    document.getElementById(
+      "pulseSurveyModal"
+    );
+
 
   if (!modal) {
 
-    modal = document.createElement("div");
+    modal =
+      document.createElement("div");
 
-    modal.id = "pulseSurveyModal";
+    modal.id =
+      "pulseSurveyModal";
 
     document.body.appendChild(modal);
+
   }
 
-  const questions = SURVEYS[surveyName];
+
+  const questions =
+    SURVEYS[surveyName];
 
 
   modal.innerHTML = `
@@ -279,6 +307,7 @@ async function openSurvey(taskId, title, points) {
 
   `;
 
+
   modal.hidden = false;
 
 
@@ -288,11 +317,10 @@ async function openSurvey(taskId, title, points) {
 
   document
     .getElementById("closePulseSurvey")
-    ?.addEventListener("click", () => {
-
-      modal.remove();
-
-    });
+    ?.addEventListener(
+      "click",
+      () => modal.remove()
+    );
 
 
   /* =========================
@@ -300,40 +328,172 @@ async function openSurvey(taskId, title, points) {
   ========================= */
 
   const form =
-    document.getElementById("pulseSurveyForm");
+    document.getElementById(
+      "pulseSurveyForm"
+    );
+
 
   if (!form) return;
 
 
-  form.onsubmit = async function (event) {
+  form.onsubmit =
+    async function (event) {
 
-    event.preventDefault();
-
-
-    /* =========================
-       COLLECT ANSWERS
-    ========================= */
-
-    const answers = {};
+      event.preventDefault();
 
 
-    for (
-      let i = 0;
-      i < questions.length;
-      i++
-    ) {
+      /* =========================
+         COLLECT ANSWERS
+      ========================= */
 
-      const field =
+      const answers = {};
+
+
+      for (
+        let i = 0;
+        i < questions.length;
+        i++
+      ) {
+
+        const field =
+          form.querySelector(
+            `[name="q${i}"]`
+          );
+
+
+        const value =
+          field?.value?.trim();
+
+
+        if (!value) {
+
+          const message =
+            document.getElementById(
+              "pulseSurveyMsg"
+            );
+
+
+          if (message) {
+
+            message.textContent =
+              `Please answer question ${i + 1}.`;
+
+          }
+
+
+          field?.focus();
+
+          return;
+
+        }
+
+
+        answers[i + 1] = {
+
+          question:
+            questions[i][0],
+
+          type:
+            questions[i][1],
+
+          answer:
+            value
+
+        };
+
+      }
+
+
+      /* =========================
+         AUTH
+      ========================= */
+
+      const {
+        data: { user },
+        error: userError
+      } =
+        await supabaseClient.auth.getUser();
+
+
+      if (userError || !user) {
+
+        alert(
+          "Please sign in before taking a survey."
+        );
+
+        return;
+
+      }
+
+
+      /* =========================
+         DISABLE BUTTON
+      ========================= */
+
+      const button =
         form.querySelector(
-          `[name="q${i}"]`
+          'button[type="submit"]'
         );
 
 
-      const value =
-        field?.value?.trim();
+      if (button) {
+
+        button.disabled = true;
+
+        button.textContent =
+          "Submitting...";
+
+      }
 
 
-      if (!value) {
+      /* =========================
+         SAVE SUBMISSION
+      ========================= */
+
+      const { error } =
+        await supabaseClient
+          .from("task_submissions")
+          .insert({
+
+            task_id:
+              Number(taskId),
+
+            user_id:
+              user.id,
+
+            proof:
+              `Survey: ${title}`,
+
+            survey_answers:
+              answers,
+
+            status:
+              "pending"
+
+          });
+
+
+      /* =========================
+         ERROR
+      ========================= */
+
+      if (error) {
+
+        console.error(
+          "PULSE survey submission error:",
+          error
+        );
+
+
+        if (button) {
+
+          button.disabled = false;
+
+          button.textContent =
+            "Submit Survey";
+
+        }
+
 
         const message =
           document.getElementById(
@@ -344,180 +504,37 @@ async function openSurvey(taskId, title, points) {
         if (message) {
 
           message.textContent =
-            `Please answer question ${i + 1}.`;
+            error.message;
 
         }
 
-
-        field?.focus();
-
         return;
+
       }
 
 
-      /*
-       * Save both the question and answer.
-       * This makes the record understandable
-       * when viewed later in Management Hub.
-       */
+      /* =========================
+         SUCCESS
+      ========================= */
 
-      answers[i + 1] = {
+      modal.remove();
 
-        question: questions[i][0],
-
-        type: questions[i][1],
-
-        answer: value
-
-      };
-
-    }
-
-
-    /* =========================
-       AUTH
-    ========================= */
-
-    const {
-      data: { user }
-    } = await db.auth.getUser();
-
-
-    if (!user) {
 
       alert(
-        "Please sign in before taking a survey."
-      );
-
-      return;
-    }
-
-
-    /* =========================
-       DISABLE BUTTON
-    ========================= */
-
-    const button =
-      form.querySelector(
-        'button[type="submit"]'
+        "Survey submitted. Your submission is now pending review."
       );
 
 
-    if (button) {
+      if (
+        typeof refresh ===
+        "function"
+      ) {
 
-      button.disabled = true;
-
-      button.textContent =
-        "Submitting...";
-
-    }
-
-
-    /* =========================
-       SAVE SUBMISSION
-    ========================= */
-
-    const { error } =
-      await db
-        .from("task_submissions")
-        .insert({
-
-          task_id:
-            Number(taskId),
-
-          user_id:
-            user.id,
-
-          /*
-           * Keep proof as a simple
-           * description of the submission.
-           */
-
-          proof:
-            `Survey: ${title}`,
-
-          /*
-           * IMPORTANT:
-           * The complete survey answers
-           * are now stored in the
-           * dedicated survey_answers
-           * JSONB database column.
-           */
-
-          survey_answers:
-            answers,
-
-          /*
-           * Explicitly start as pending.
-           */
-
-          status:
-            "pending"
-
-        });
-
-
-    /* =========================
-       ERROR
-    ========================= */
-
-    if (error) {
-
-      console.error(
-        "PULSE survey submission error:",
-        error
-      );
-
-
-      if (button) {
-
-        button.disabled = false;
-
-        button.textContent =
-          "Submit Survey";
+        await refresh();
 
       }
 
-
-      const message =
-        document.getElementById(
-          "pulseSurveyMsg"
-        );
-
-
-      if (message) {
-
-        message.textContent =
-          error.message;
-
-      }
-
-      return;
-    }
-
-
-    /* =========================
-       SUCCESS
-    ========================= */
-
-    modal.remove();
-
-
-    alert(
-      "Survey submitted. Your submission is now pending review."
-    );
-
-
-    if (
-      typeof refresh ===
-      "function"
-    ) {
-
-      await refresh();
-
-    }
-
-  };
+    };
 
 }
 
@@ -538,7 +555,6 @@ function enhanceTasks() {
   box
     .querySelectorAll(".task-card")
     .forEach(card => {
-
 
       if (
         card.dataset.surveyEnhanced === "1"
@@ -651,7 +667,6 @@ function addSurveyStyles() {
       background: rgba(3, 6, 20, 0.94);
     }
 
-
     .survey-modal-box {
       width: 100%;
       max-width: 680px;
@@ -664,18 +679,15 @@ function addSurveyStyles() {
       color: #ffffff;
     }
 
-
     .survey-modal-box h2 {
       margin: 0 0 10px;
       line-height: 1.3;
     }
 
-
     .survey-intro {
       margin: 0 0 22px;
       line-height: 1.5;
     }
-
 
     .survey-question-block {
       margin-bottom: 18px;
@@ -686,7 +698,6 @@ function addSurveyStyles() {
       background: rgba(18, 27, 58, 0.72);
     }
 
-
     .survey-question-text {
       display: block;
       margin-bottom: 11px;
@@ -695,7 +706,6 @@ function addSurveyStyles() {
       font-weight: 700;
       line-height: 1.5;
     }
-
 
     .survey-input {
       display: block;
@@ -710,18 +720,15 @@ function addSurveyStyles() {
       font-size: 16px;
     }
 
-
     textarea.survey-input {
       min-height: 100px;
       resize: vertical;
     }
 
-
     .survey-input option {
       color: #000000;
       background: #ffffff;
     }
-
 
     .survey-actions {
       display: flex;
@@ -730,11 +737,9 @@ function addSurveyStyles() {
       margin-top: 22px;
     }
 
-
     .survey-actions button {
       min-height: 46px;
     }
-
 
     @media (max-width: 520px) {
 
@@ -742,18 +747,15 @@ function addSurveyStyles() {
         padding: 10px;
       }
 
-
       .survey-modal-box {
         margin: 5px auto;
         padding: 16px;
         border-radius: 14px;
       }
 
-
       .survey-question-block {
         padding: 13px;
       }
-
 
       .survey-question-text {
         font-size: 15px;
@@ -800,13 +802,14 @@ function wireNotificationReadButton() {
     "click",
     async () => {
 
-
       const {
-        data: { user }
-      } = await db.auth.getUser();
+        data: { user },
+        error: userError
+      } =
+        await supabaseClient.auth.getUser();
 
 
-      if (!user) {
+      if (userError || !user) {
 
         alert(
           "Please sign in first."
@@ -821,7 +824,7 @@ function wireNotificationReadButton() {
 
 
       const { error } =
-        await db
+        await supabaseClient
           .from("notifications")
           .update({
             read: true
