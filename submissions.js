@@ -3,13 +3,11 @@
 document.addEventListener("DOMContentLoaded", loadSubmissions);
 
 async function loadSubmissions() {
-    const container =
-        document.getElementById("submissionsContent");
+    const container = document.getElementById("submissions");
 
     if (!container) return;
 
-    container.innerHTML =
-        "<p>Loading your submissions...</p>";
+    container.innerHTML = "<p>Loading your submissions...</p>";
 
     const user = await requireLogin();
 
@@ -20,7 +18,12 @@ async function loadSubmissions() {
             await window.supabaseClient
                 .from("task_submissions")
                 .select(`
-                    *,
+                    id,
+                    task_id,
+                    status,
+                    reviewer_note,
+                    submitted_at,
+                    survey_answers,
                     tasks (
                         title,
                         points
@@ -145,10 +148,11 @@ function renderAnswers(answers) {
             <div class="panel">
                 <strong>
                     ${index + 1}.
-                    ${escapeHTML(item.question || "")}
+                    ${escapeHTML(item?.question || "")}
                 </strong>
+
                 <p>
-                    ${escapeHTML(item.answer || "")}
+                    ${escapeHTML(item?.answer || "")}
                 </p>
             </div>
         `).join("");
@@ -161,8 +165,13 @@ function renderAnswers(answers) {
                     <strong>
                         ${escapeHTML(question)}
                     </strong>
+
                     <p>
-                        ${escapeHTML(answer)}
+                        ${escapeHTML(
+                            typeof answer === "object"
+                                ? JSON.stringify(answer)
+                                : answer
+                        )}
                     </p>
                 </div>
             `
