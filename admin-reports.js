@@ -35,14 +35,14 @@ async function getCurrentAdmin() {
 }
 
 async function loadAdminReports() {
-  const admin = await getCurrentAdmin();
-
-  if (!admin) {
-    showAccessDenied();
-    return;
-  }
-
   try {
+    const admin = await getCurrentAdmin();
+
+    if (!admin) {
+      showAccessDenied();
+      return;
+    }
+
     await Promise.all([
       loadUserReport(),
       loadTaskReport(),
@@ -55,8 +55,13 @@ async function loadAdminReports() {
       loadRewardList(),
       loadActivityReport()
     ]);
+
   } catch (error) {
-    console.error("Admin reports error:", error);
+    console.error(
+      "Admin reports error:",
+      error
+    );
+
     showReportError(error);
   }
 }
@@ -67,7 +72,9 @@ async function loadAdminReports() {
 // =========================
 
 async function loadUserReport() {
-  const container = document.getElementById("reportUsers");
+  const container =
+    document.getElementById("reportUsers");
+
   if (!container) return;
 
   const { count, error } =
@@ -94,7 +101,9 @@ async function loadUserReport() {
 // =========================
 
 async function loadTaskReport() {
-  const container = document.getElementById("reportTasks");
+  const container =
+    document.getElementById("reportTasks");
+
   if (!container) return;
 
   const { count, error } =
@@ -235,12 +244,14 @@ async function loadApprovedReport() {
 
 
 // =========================
-// SUBMISSION LIST
+// SUBMISSION RECORDS
 // =========================
 
 async function loadSubmissionList() {
   const container =
-    document.getElementById("reportSubmissionsList");
+    document.getElementById(
+      "reportSubmissionsList"
+    );
 
   if (!container) return;
 
@@ -251,13 +262,14 @@ async function loadSubmissionList() {
         id,
         user_id,
         task_id,
+        proof,
         status,
         reviewer_note,
-        rejection_reason,
+        submitted_at,
         reviewed_at,
-        created_at
+        survey_answers
       `)
-      .order("created_at", {
+      .order("submitted_at", {
         ascending: false
       });
 
@@ -304,8 +316,10 @@ function renderSubmission(submission) {
       </p>
 
       <p>
-        <strong>Created:</strong>
-        ${formatDate(submission.created_at)}
+        <strong>Submitted:</strong>
+        ${formatDate(
+          submission.submitted_at
+        )}
       </p>
 
       ${
@@ -313,7 +327,9 @@ function renderSubmission(submission) {
           ? `
             <p>
               <strong>Reviewed:</strong>
-              ${formatDate(submission.reviewed_at)}
+              ${formatDate(
+                submission.reviewed_at
+              )}
             </p>
           `
           : ""
@@ -324,21 +340,39 @@ function renderSubmission(submission) {
           ? `
             <p>
               <strong>Reviewer Note:</strong>
-              ${escapeHTML(submission.reviewer_note)}
+              ${escapeHTML(
+                submission.reviewer_note
+              )}
             </p>
           `
           : ""
       }
 
       ${
-        submission.rejection_reason
+        submission.proof
           ? `
             <p>
-              <strong>Rejection Reason:</strong>
+              <strong>Proof:</strong>
               ${escapeHTML(
-                submission.rejection_reason
+                submission.proof
               )}
             </p>
+          `
+          : ""
+      }
+
+      ${
+        submission.survey_answers
+          ? `
+            <details>
+              <summary>
+                View Survey Answers
+              </summary>
+
+              ${renderAnswers(
+                submission.survey_answers
+              )}
+            </details>
           `
           : ""
       }
@@ -349,12 +383,94 @@ function renderSubmission(submission) {
 
 
 // =========================
-// BUSINESS LIST
+// SURVEY ANSWERS
+// =========================
+
+function renderAnswers(answers) {
+  if (!answers) {
+    return "<p>No answers recorded.</p>";
+  }
+
+  if (typeof answers === "string") {
+    try {
+      answers = JSON.parse(answers);
+    } catch {
+      return `
+        <p>
+          ${escapeHTML(answers)}
+        </p>
+      `;
+    }
+  }
+
+  if (
+    typeof answers === "object" &&
+    !Array.isArray(answers)
+  ) {
+    return `
+      <ul>
+        ${
+          Object.entries(answers)
+            .map(([question, answer]) => `
+              <li>
+                <strong>
+                  ${escapeHTML(question)}:
+                </strong>
+
+                ${escapeHTML(
+                  typeof answer === "object"
+                    ? JSON.stringify(answer)
+                    : answer
+                )}
+              </li>
+            `)
+            .join("")
+        }
+      </ul>
+    `;
+  }
+
+  if (Array.isArray(answers)) {
+    return `
+      <ul>
+        ${
+          answers
+            .map((item, index) => `
+              <li>
+                <strong>
+                  ${index + 1}.
+                </strong>
+
+                ${escapeHTML(
+                  typeof item === "object"
+                    ? JSON.stringify(item)
+                    : item
+                )}
+              </li>
+            `)
+            .join("")
+        }
+      </ul>
+    `;
+  }
+
+  return `
+    <p>
+      ${escapeHTML(answers)}
+    </p>
+  `;
+}
+
+
+// =========================
+// BUSINESS RECORDS
 // =========================
 
 async function loadBusinessList() {
   const container =
-    document.getElementById("reportBusinessesList");
+    document.getElementById(
+      "reportBusinessesList"
+    );
 
   if (!container) return;
 
@@ -412,7 +528,9 @@ function renderBusiness(business) {
 
       <p>
         <strong>Created:</strong>
-        ${formatDate(business.created_at)}
+        ${formatDate(
+          business.created_at
+        )}
       </p>
 
     </div>
@@ -421,19 +539,32 @@ function renderBusiness(business) {
 
 
 // =========================
-// REWARDS
+// REWARD RECORDS
 // =========================
 
 async function loadRewardList() {
   const container =
-    document.getElementById("reportRewardsList");
+    document.getElementById(
+      "reportRewardsList"
+    );
 
   if (!container) return;
 
   const { data, error } =
     await window.supabaseClient
       .from("redemption_requests")
-      .select("*")
+      .select(`
+        id,
+        user_id,
+        points_requested,
+        reward_type,
+        status,
+        user_note,
+        admin_note,
+        created_at,
+        reviewed_at,
+        paid_at
+      `)
       .order("created_at", {
         ascending: false
       });
@@ -471,14 +602,82 @@ function renderReward(reward) {
       </p>
 
       <p>
+        <strong>Points Requested:</strong>
+        ${escapeHTML(
+          reward.points_requested
+        )}
+      </p>
+
+      <p>
+        <strong>Reward Type:</strong>
+        ${escapeHTML(
+          reward.reward_type
+        )}
+      </p>
+
+      <p>
         <strong>Status:</strong>
         ${escapeHTML(reward.status)}
       </p>
 
       <p>
         <strong>Created:</strong>
-        ${formatDate(reward.created_at)}
+        ${formatDate(
+          reward.created_at
+        )}
       </p>
+
+      ${
+        reward.user_note
+          ? `
+            <p>
+              <strong>User Note:</strong>
+              ${escapeHTML(
+                reward.user_note
+              )}
+            </p>
+          `
+          : ""
+      }
+
+      ${
+        reward.admin_note
+          ? `
+            <p>
+              <strong>Admin Note:</strong>
+              ${escapeHTML(
+                reward.admin_note
+              )}
+            </p>
+          `
+          : ""
+      }
+
+      ${
+        reward.reviewed_at
+          ? `
+            <p>
+              <strong>Reviewed:</strong>
+              ${formatDate(
+                reward.reviewed_at
+              )}
+            </p>
+          `
+          : ""
+      }
+
+      ${
+        reward.paid_at
+          ? `
+            <p>
+              <strong>Paid:</strong>
+              ${formatDate(
+                reward.paid_at
+              )}
+            </p>
+          `
+          : ""
+      }
 
     </div>
   `;
@@ -491,14 +690,24 @@ function renderReward(reward) {
 
 async function loadActivityReport() {
   const container =
-    document.getElementById("reportActivityList");
+    document.getElementById(
+      "reportActivityList"
+    );
 
   if (!container) return;
 
   const { data, error } =
     await window.supabaseClient
       .from("notifications")
-      .select("*")
+      .select(`
+        id,
+        user_id,
+        title,
+        message,
+        type,
+        read,
+        created_at
+      `)
       .order("created_at", {
         ascending: false
       });
@@ -536,7 +745,9 @@ function renderActivity(activity) {
 
       <p>
         <strong>Date:</strong>
-        ${formatDate(activity.created_at)}
+        ${formatDate(
+          activity.created_at
+        )}
       </p>
 
     </div>
@@ -563,7 +774,8 @@ function showAccessDenied() {
   ];
 
   containers.forEach(id => {
-    const container = document.getElementById(id);
+    const container =
+      document.getElementById(id);
 
     if (container) {
       container.innerHTML = "";
@@ -580,7 +792,9 @@ function showAccessDenied() {
         <p>
           You must be signed in as an administrator.
         </p>
-        <a href="auth.html">Login</a>
+        <a href="auth.html">
+          Login
+        </a>
       </div>
     `;
   }
