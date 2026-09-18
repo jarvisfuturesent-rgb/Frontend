@@ -42,14 +42,16 @@ async function getCurrentAdmin() {
 }
 
 async function loadAdminSubmissions() {
-  const container = document.getElementById("adminSubmissions");
+  const container =
+    document.getElementById("adminSubmissions");
 
   if (!container) {
     console.error("adminSubmissions element not found.");
     return;
   }
 
-  container.innerHTML = "<p>Loading submissions...</p>";
+  container.innerHTML =
+    "<p>Loading submissions...</p>";
 
   try {
     const admin = await getCurrentAdmin();
@@ -57,7 +59,9 @@ async function loadAdminSubmissions() {
     if (!admin) {
       container.innerHTML = `
         <p>Access denied.</p>
-        <a href="dashboard.html">Return to Dashboard</a>
+        <a href="dashboard.html">
+          Return to Dashboard
+        </a>
       `;
       return;
     }
@@ -72,18 +76,20 @@ async function loadAdminSubmissions() {
           survey_answers,
           status,
           reviewer_note,
-          rejection_reason,
-          reviewed_at,
-          created_at
+          submitted_at,
+          reviewed_at
         `)
-        .order("created_at", { ascending: false });
+        .order("submitted_at", {
+          ascending: false
+        });
 
     if (error) {
       throw error;
     }
 
     if (!submissions || submissions.length === 0) {
-      container.innerHTML = "<p>No submissions found.</p>";
+      container.innerHTML =
+        "<p>No submissions found.</p>";
       return;
     }
 
@@ -95,7 +101,7 @@ async function loadAdminSubmissions() {
       )
     ];
 
-    let tasksById = {};
+    const tasksById = {};
 
     if (taskIds.length > 0) {
       const { data: tasks, error: tasksError } =
@@ -127,10 +133,14 @@ async function loadAdminSubmissions() {
       .forEach(button => {
         button.addEventListener("click", () => {
           const submissionId =
-            button.getAttribute("data-submission-id");
+            button.getAttribute(
+              "data-submission-id"
+            );
 
           const action =
-            button.getAttribute("data-submission-action");
+            button.getAttribute(
+              "data-submission-action"
+            );
 
           if (action === "approve") {
             approveSubmission(submissionId);
@@ -143,7 +153,10 @@ async function loadAdminSubmissions() {
       });
 
   } catch (error) {
-    console.error("Admin submission loading error:", error);
+    console.error(
+      "Admin submission loading error:",
+      error
+    );
 
     container.innerHTML = `
       <p>Unable to load submissions.</p>
@@ -153,7 +166,8 @@ async function loadAdminSubmissions() {
 }
 
 function renderSubmission(submission, task) {
-  const status = submission.status || "pending";
+  const status =
+    submission.status || "pending";
 
   const taskTitle = task
     ? task.title
@@ -163,14 +177,17 @@ function renderSubmission(submission, task) {
     ? Number(task.points)
     : 0;
 
-  const answers = renderAnswers(submission.survey_answers);
+  const answers =
+    renderAnswers(submission.survey_answers);
 
   const reviewInfo =
     submission.reviewed_at
       ? `
         <p>
           <strong>Reviewed:</strong>
-          ${formatDate(submission.reviewed_at)}
+          ${formatDate(
+            submission.reviewed_at
+          )}
         </p>
       `
       : "";
@@ -180,17 +197,9 @@ function renderSubmission(submission, task) {
       ? `
         <p>
           <strong>Reviewer Note:</strong>
-          ${escapeHTML(submission.reviewer_note)}
-        </p>
-      `
-      : "";
-
-  const rejectionReason =
-    submission.rejection_reason
-      ? `
-        <p>
-          <strong>Rejection Reason:</strong>
-          ${escapeHTML(submission.rejection_reason)}
+          ${escapeHTML(
+            submission.reviewer_note
+          )}
         </p>
       `
       : "";
@@ -219,7 +228,9 @@ function renderSubmission(submission, task) {
   return `
     <div class="submission-card">
 
-      <h3>${escapeHTML(taskTitle)}</h3>
+      <h3>
+        ${escapeHTML(taskTitle)}
+      </h3>
 
       <p>
         <strong>Submission ID:</strong>
@@ -243,7 +254,9 @@ function renderSubmission(submission, task) {
 
       <p>
         <strong>Submitted:</strong>
-        ${formatDate(submission.created_at)}
+        ${formatDate(
+          submission.submitted_at
+        )}
       </p>
 
       <div class="submission-answers">
@@ -253,7 +266,6 @@ function renderSubmission(submission, task) {
 
       ${reviewInfo}
       ${reviewerNote}
-      ${rejectionReason}
 
       <div class="submission-actions">
         ${actionButtons}
@@ -268,11 +280,28 @@ function renderAnswers(answers) {
     return "<p>No survey answers recorded.</p>";
   }
 
+  if (typeof answers === "string") {
+    try {
+      answers = JSON.parse(answers);
+    } catch {
+      return `
+        <p>
+          ${escapeHTML(answers)}
+        </p>
+      `;
+    }
+  }
+
   if (typeof answers === "object") {
-    const entries = Object.entries(answers);
+    const entries =
+      Object.entries(answers);
 
     if (entries.length === 0) {
-      return "<p>No survey answers recorded.</p>";
+      return `
+        <p>
+          No survey answers recorded.
+        </p>
+      `;
     }
 
     return `
@@ -280,7 +309,10 @@ function renderAnswers(answers) {
         ${entries
           .map(([question, answer]) => `
             <li>
-              <strong>${escapeHTML(question)}:</strong>
+              <strong>
+                ${escapeHTML(question)}:
+              </strong>
+
               ${escapeHTML(
                 typeof answer === "object"
                   ? JSON.stringify(answer)
@@ -293,7 +325,11 @@ function renderAnswers(answers) {
     `;
   }
 
-  return `<p>${escapeHTML(answers)}</p>`;
+  return `
+    <p>
+      ${escapeHTML(answers)}
+    </p>
+  `;
 }
 
 async function approveSubmission(submissionId) {
@@ -313,25 +349,34 @@ async function approveSubmission(submissionId) {
       return;
     }
 
-    const { data, error } =
+    const { error } =
       await window.supabaseClient
-        .rpc("approve_task_submission", {
-          submission_id: Number(submissionId)
-        });
+        .from("task_submissions")
+        .update({
+          status: "approved",
+          reviewed_at: new Date().toISOString()
+        })
+        .eq("id", Number(submissionId))
+        .eq("status", "pending");
 
     if (error) {
       throw error;
     }
 
-    console.log("Submission approved:", data);
+    alert(
+      "Submission approved."
+    );
 
     await loadAdminSubmissions();
 
   } catch (error) {
-    console.error("Approve submission error:", error);
+    console.error(
+      "Approve submission error:",
+      error
+    );
 
     alert(
-      "Unable to approve this submission. Please check the database approval function."
+      "Unable to approve this submission."
     );
   }
 }
@@ -349,10 +394,13 @@ async function rejectSubmission(submissionId) {
     return;
   }
 
-  const trimmedReason = reason.trim();
+  const trimmedReason =
+    reason.trim();
 
   if (!trimmedReason) {
-    alert("A rejection reason is required.");
+    alert(
+      "A rejection reason is required."
+    );
     return;
   }
 
@@ -364,26 +412,36 @@ async function rejectSubmission(submissionId) {
       return;
     }
 
-    const { data, error } =
+    const { error } =
       await window.supabaseClient
-        .rpc("reject_task_submission", {
-          submission_id: Number(submissionId),
-          rejection_reason: trimmedReason
-        });
+        .from("task_submissions")
+        .update({
+          status: "rejected",
+          reviewer_note: trimmedReason,
+          reviewed_at:
+            new Date().toISOString()
+        })
+        .eq("id", Number(submissionId))
+        .eq("status", "pending");
 
     if (error) {
       throw error;
     }
 
-    console.log("Submission rejected:", data);
+    alert(
+      "Submission rejected."
+    );
 
     await loadAdminSubmissions();
 
   } catch (error) {
-    console.error("Reject submission error:", error);
+    console.error(
+      "Reject submission error:",
+      error
+    );
 
     alert(
-      "Unable to reject this submission. Please check the database rejection function."
+      "Unable to reject this submission."
     );
   }
 }
