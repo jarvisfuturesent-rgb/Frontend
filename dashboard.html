@@ -10,7 +10,7 @@
 
   <style>
     /* =========================================
-       PULSE EFFECT
+       PULSE LETTER EFFECT
        ========================================= */
 
     .pulse-link,
@@ -98,6 +98,10 @@
       }
     }
 
+    .pulse-link:hover span {
+      animation-duration: 1.4s;
+    }
+
     /* =========================================
        MENU
        ========================================= */
@@ -110,7 +114,8 @@
       flex-shrink: 0;
     }
 
-    /* LEVEL 3 LINKS — NO PULSE */
+    /* LEVEL 3 — NO PULSE EFFECT */
+
     .page-link {
       display: block;
       text-decoration: none;
@@ -127,12 +132,24 @@
     }
 
     /* =========================================
-       DASHBOARD
+       DASHBOARD VISUAL SYSTEM
        ========================================= */
 
     .dashboard-panel {
       position: relative;
       overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 15% 20%,
+          rgba(0,90,255,.12),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 85% 75%,
+          rgba(150,0,255,.13),
+          transparent 30%
+        );
     }
 
     .dashboard-panel::before {
@@ -140,20 +157,21 @@
       position: absolute;
       inset: 0;
       pointer-events: none;
-      opacity: .12;
 
       background-image:
         linear-gradient(
-          rgba(0,220,255,.06) 1px,
+          rgba(0,200,255,.035) 1px,
           transparent 1px
         ),
         linear-gradient(
           90deg,
-          rgba(0,220,255,.06) 1px,
+          rgba(0,200,255,.035) 1px,
           transparent 1px
         );
 
-      background-size: 32px 32px;
+      background-size: 28px 28px;
+
+      opacity: .5;
     }
 
     .dashboard-content {
@@ -161,51 +179,63 @@
       z-index: 2;
     }
 
+    /* =========================================
+       WELCOME
+       ========================================= */
+
     .dashboard-welcome {
       text-align: center;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
 
     .dashboard-welcome h1 {
-      margin-bottom: 8px;
-      font-size: clamp(2rem, 9vw, 3.4rem);
+      margin: 0 0 6px;
+
+      font-size: clamp(
+        2rem,
+        8vw,
+        3rem
+      );
+
+      letter-spacing: .5px;
+
       text-shadow:
-        0 0 12px rgba(0,220,255,.2),
-        0 0 28px rgba(155,77,255,.12);
+        0 0 8px rgba(0,220,255,.25),
+        0 0 18px rgba(80,80,255,.18);
     }
 
     .dashboard-welcome p {
-      opacity: .82;
+      margin: 0;
+      opacity: .72;
     }
 
     /* =========================================
-       BALANCE
+       BALANCE — MAIN NEON CARD
        ========================================= */
 
     .balance-box {
       position: relative;
       overflow: hidden;
 
-      margin: 22px 0;
-      padding: 34px 20px;
+      margin: 18px 0;
 
-      text-align: center;
+      padding: 22px 18px;
 
-      border-radius: 24px;
-      border: 1px solid rgba(0,220,255,.3);
+      border-radius: 15px;
+
+      border: 1px solid rgba(45,110,255,.7);
 
       background:
         linear-gradient(
           145deg,
-          rgba(0,30,60,.9),
-          rgba(25,8,55,.88)
+          rgba(5,25,75,.9),
+          rgba(12,5,45,.92)
         );
 
       box-shadow:
-        0 0 0 1px rgba(0,220,255,.06),
-        0 0 35px rgba(0,220,255,.13),
-        0 20px 55px rgba(0,0,0,.25),
-        inset 0 0 45px rgba(120,60,255,.08);
+        0 0 8px rgba(0,110,255,.3),
+        0 0 25px rgba(0,60,255,.16),
+        inset 0 0 30px rgba(50,50,255,.09);
     }
 
     .balance-box::before {
@@ -214,20 +244,23 @@
       position: absolute;
 
       width: 180px;
-      height: 180px;
+      height: 70px;
 
-      top: -90px;
-      left: -60px;
+      left: -25px;
+      bottom: -30px;
 
       border-radius: 50%;
 
-      background: #00eaff;
+      background:
+        radial-gradient(
+          ellipse,
+          rgba(0,160,255,.45),
+          transparent 70%
+        );
 
-      filter: blur(45px);
+      filter: blur(12px);
 
-      opacity: .2;
-
-      animation: balanceOrb 5s ease-in-out infinite;
+      animation: balanceGlow 5s ease-in-out infinite;
     }
 
     .balance-box::after {
@@ -236,32 +269,34 @@
       position: absolute;
 
       width: 180px;
-      height: 180px;
+      height: 70px;
 
-      right: -60px;
-      bottom: -90px;
+      right: -30px;
+      bottom: -20px;
 
       border-radius: 50%;
 
-      background: #9b4dff;
+      background:
+        radial-gradient(
+          ellipse,
+          rgba(160,0,255,.45),
+          transparent 70%
+        );
 
-      filter: blur(45px);
+      filter: blur(12px);
 
-      opacity: .2;
-
-      animation: balanceOrb 5s ease-in-out infinite;
-      animation-delay: 1.5s;
+      animation: balanceGlow 5s ease-in-out infinite reverse;
     }
 
-    @keyframes balanceOrb {
+    @keyframes balanceGlow {
       0%,100% {
-        transform: scale(.85);
-        opacity: .15;
+        transform: translateX(-10px) scale(.9);
+        opacity: .45;
       }
 
       50% {
-        transform: scale(1.2);
-        opacity: .32;
+        transform: translateX(25px) scale(1.15);
+        opacity: .8;
       }
     }
 
@@ -273,10 +308,12 @@
     .balance-title {
       display: block;
 
-      margin-bottom: 10px;
+      margin-bottom: 4px;
 
-      font-size: .82rem;
-      letter-spacing: 3px;
+      font-size: .7rem;
+
+      letter-spacing: 2.5px;
+
       text-transform: uppercase;
 
       opacity: .65;
@@ -285,11 +322,15 @@
     .balance-amount {
       display: inline-block;
 
-      font-size: clamp(3.2rem, 18vw, 5.5rem);
+      font-size: clamp(
+        3rem,
+        17vw,
+        4.8rem
+      );
 
       font-weight: 900;
 
-      line-height: 1;
+      line-height: .95;
 
       letter-spacing: -2px;
 
@@ -298,7 +339,7 @@
           90deg,
           #00f6ff,
           #5c5cff,
-          #ff3bd4,
+          #d946ff,
           #00ffc8
         );
 
@@ -309,11 +350,13 @@
 
       color: transparent;
 
-      animation: balanceGradient 4s linear infinite;
+      animation:
+        balanceGradient 4s linear infinite;
 
       filter:
-        drop-shadow(0 0 10px rgba(0,246,255,.2))
-        drop-shadow(0 0 24px rgba(155,77,255,.15));
+        drop-shadow(
+          0 0 8px rgba(0,246,255,.35)
+        );
     }
 
     @keyframes balanceGradient {
@@ -329,36 +372,34 @@
     .balance-unit {
       display: block;
 
-      margin-top: 8px;
+      margin-top: 5px;
 
-      font-size: 1.35rem;
-      font-weight: 700;
+      font-size: .75rem;
 
       letter-spacing: 4px;
 
-      opacity: .9;
+      opacity: .65;
     }
 
     .balance-status {
       display: inline-block;
 
-      margin-top: 16px;
+      margin-top: 10px;
 
-      padding: 7px 16px;
+      padding: 4px 11px;
 
       border-radius: 999px;
 
-      font-size: .75rem;
-      font-weight: 700;
+      font-size: .65rem;
 
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
 
       border: 1px solid rgba(0,255,200,.4);
 
-      background: rgba(0,255,200,.04);
+      background: rgba(0,255,200,.035);
 
       box-shadow:
-        0 0 12px rgba(0,255,200,.1);
+        0 0 10px rgba(0,255,200,.08);
     }
 
     /* =========================================
@@ -369,39 +410,38 @@
       display: grid;
 
       grid-template-columns:
-        repeat(auto-fit, minmax(150px, 1fr));
+        repeat(
+          auto-fit,
+          minmax(145px, 1fr)
+        );
 
-      gap: 14px;
+      gap: 8px;
 
-      margin: 22px 0;
+      margin: 12px 0;
     }
 
     .stat-card {
       position: relative;
       overflow: hidden;
 
-      min-height: 95px;
+      padding: 13px;
 
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      min-height: 72px;
 
-      padding: 18px;
+      border-radius: 11px;
 
-      border-radius: 18px;
-
-      border: 1px solid rgba(0,220,255,.16);
+      border: 1px solid rgba(40,100,255,.45);
 
       background:
         linear-gradient(
           145deg,
-          rgba(10,20,45,.7),
-          rgba(20,10,45,.58)
+          rgba(8,25,65,.78),
+          rgba(15,5,45,.72)
         );
 
       box-shadow:
-        0 10px 30px rgba(0,0,0,.18),
-        inset 0 0 25px rgba(0,220,255,.035);
+        0 0 12px rgba(0,80,255,.08),
+        inset 0 0 15px rgba(70,50,255,.05);
     }
 
     .stat-card::before {
@@ -419,29 +459,63 @@
         linear-gradient(
           90deg,
           transparent,
-          rgba(0,246,255,.5),
+          rgba(0,220,255,.7),
           transparent
         );
     }
 
     .stat-label {
-      font-size: .76rem;
+      display: block;
 
-      opacity: .62;
+      font-size: .62rem;
 
       text-transform: uppercase;
 
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
+
+      opacity: .58;
     }
 
     .stat-card strong {
       display: block;
 
-      margin-top: 7px;
+      margin-top: 5px;
 
-      font-size: 1.45rem;
+      font-size: 1.05rem;
 
-      letter-spacing: .5px;
+      font-weight: 800;
+    }
+
+    /* =========================================
+       PROFILE
+       ========================================= */
+
+    .profile-card {
+      position: relative;
+
+      padding: 14px;
+
+      margin: 12px 0;
+
+      border-radius: 12px;
+
+      border: 1px solid rgba(100,60,255,.38);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(15,15,55,.7),
+          rgba(8,20,45,.7)
+        );
+
+      box-shadow:
+        0 0 14px rgba(80,50,255,.08);
+    }
+
+    #profileName {
+      margin-top: 5px;
+
+      font-weight: 800;
     }
 
     /* =========================================
@@ -451,40 +525,42 @@
     .dashboard-folder {
       position: relative;
 
-      margin: 14px 0;
+      margin: 9px 0;
 
-      border-radius: 18px;
+      border-radius: 11px;
 
-      border: 1px solid rgba(0,220,255,.16);
+      border: 1px solid rgba(35,100,255,.42);
 
       background:
         linear-gradient(
           145deg,
-          rgba(5,15,35,.62),
-          rgba(20,8,45,.52)
+          rgba(5,20,55,.76),
+          rgba(12,7,42,.76)
         );
 
-      box-shadow:
-        0 8px 25px rgba(0,0,0,.16),
-        inset 0 0 25px rgba(100,70,255,.035);
-
       overflow: hidden;
+
+      box-shadow:
+        0 0 12px rgba(0,80,255,.07),
+        inset 0 0 15px rgba(70,50,255,.035);
     }
 
     .dashboard-folder > summary {
       cursor: pointer;
 
-      padding: 17px;
+      padding: 12px 13px;
 
       font-weight: 700;
+
+      font-size: .88rem;
 
       list-style: none;
 
       background:
         linear-gradient(
           90deg,
-          rgba(0,220,255,.08),
-          rgba(140,70,255,.08)
+          rgba(0,100,255,.09),
+          rgba(140,0,255,.08)
         );
     }
 
@@ -497,7 +573,7 @@
 
       float: right;
 
-      opacity: .7;
+      opacity: .65;
     }
 
     .dashboard-folder[open] > summary::after {
@@ -505,13 +581,10 @@
     }
 
     .folder-content {
-      padding: 15px;
+      padding: 12px;
 
       border-top:
-        1px solid rgba(0,210,255,.12);
-
-      background:
-        rgba(0,0,0,.06);
+        1px solid rgba(30,100,255,.18);
     }
 
     /* =========================================
@@ -522,93 +595,86 @@
       display: grid;
 
       grid-template-columns:
-        repeat(auto-fit, minmax(140px, 1fr));
+        repeat(
+          auto-fit,
+          minmax(125px, 1fr)
+        );
 
-      gap: 10px;
+      gap: 8px;
 
-      margin-top: 15px;
+      margin-top: 10px;
     }
 
     .quick-access a {
       display: block;
 
-      padding: 14px;
+      padding: 11px 8px;
 
       text-align: center;
 
-      border-radius: 14px;
+      border-radius: 10px;
 
-      border: 1px solid rgba(0,210,255,.18);
+      border: 1px solid rgba(40,100,255,.35);
 
       background:
-        linear-gradient(
-          145deg,
-          rgba(10,20,45,.65),
-          rgba(25,10,50,.5)
-        );
+        rgba(8,20,50,.6);
+
+      font-size: .82rem;
 
       box-shadow:
-        inset 0 0 18px rgba(0,220,255,.03),
-        0 6px 20px rgba(0,0,0,.15);
+        inset 0 0 12px rgba(0,100,255,.035);
     }
 
     /* =========================================
-       PROFILE
+       REWARD CONTROLS
        ========================================= */
 
-    .profile-card {
-      position: relative;
-      overflow: hidden;
+    #redeemAmount,
+    #rewardType,
+    #redeemNote {
+      width: 100%;
 
-      padding: 18px;
+      box-sizing: border-box;
 
-      margin-bottom: 20px;
+      margin: 4px 0;
 
-      border-radius: 18px;
+      padding: 10px;
 
-      border: 1px solid rgba(150,80,255,.18);
+      border-radius: 8px;
 
-      background:
-        linear-gradient(
-          145deg,
-          rgba(15,10,40,.65),
-          rgba(5,20,40,.5)
-        );
+      border: 1px solid rgba(45,100,255,.35);
 
-      box-shadow:
-        0 10px 30px rgba(0,0,0,.18),
-        inset 0 0 25px rgba(155,77,255,.04);
-    }
-
-    #profileName {
-      font-weight: 800;
-    }
-
-    /* =========================================
-       BUTTONS
-       ========================================= */
-
-    .dashboard-button {
-      display: inline-block;
-
-      padding: 11px 18px;
-
-      margin-top: 10px;
-
-      border-radius: 12px;
-
-      border: 1px solid rgba(0,220,255,.25);
-
-      background:
-        rgba(0,220,255,.06);
+      background: rgba(3,12,32,.75);
 
       color: inherit;
+    }
 
-      text-decoration: none;
+    .dashboard-button {
+      width: 100%;
+
+      margin-top: 7px;
+
+      padding: 10px;
+
+      border-radius: 8px;
+
+      border: 1px solid rgba(0,220,255,.55);
+
+      background:
+        linear-gradient(
+          90deg,
+          rgba(120,20,255,.75),
+          rgba(0,180,255,.75)
+        );
+
+      color: white;
+
+      font-weight: 700;
 
       cursor: pointer;
 
-      font: inherit;
+      box-shadow:
+        0 0 14px rgba(0,150,255,.12);
     }
 
     /* =========================================
@@ -617,9 +683,24 @@
 
     @media (max-width: 600px) {
 
-      .balance-box {
-        padding: 30px 14px;
+      .dashboard-stats {
+        grid-template-columns: 1fr 1fr;
       }
+
+      .quick-access {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .balance-box {
+        padding: 22px 14px;
+      }
+
+      .stat-card {
+        min-height: 68px;
+      }
+    }
+
+    @media (max-width: 390px) {
 
       .dashboard-stats {
         grid-template-columns: 1fr;
@@ -663,7 +744,7 @@
 
       <div class="menu-panel">
 
-        <!-- MAIN FOLDER -->
+        <!-- MAIN -->
 
         <details>
 
@@ -705,7 +786,7 @@
         </details>
 
 
-        <!-- PULSE FOLDER -->
+        <!-- PULSE -->
 
         <details>
 
@@ -752,7 +833,7 @@
         </details>
 
 
-        <!-- ACCOUNT FOLDER -->
+        <!-- ACCOUNT -->
 
         <details>
 
@@ -797,7 +878,7 @@
         </details>
 
 
-        <!-- LEGAL FOLDER -->
+        <!-- LEGAL -->
 
         <details>
 
@@ -836,7 +917,7 @@
         </details>
 
 
-        <!-- ADMINISTRATION FOLDER -->
+        <!-- ADMINISTRATION -->
 
         <details>
 
@@ -903,12 +984,15 @@
 
 
   <!-- =======================================
-       DASHBOARD CONTENT
+       DASHBOARD
        ======================================= -->
 
   <section class="panel dashboard-panel">
 
     <div class="dashboard-content">
+
+
+      <!-- WELCOME -->
 
       <div class="dashboard-welcome">
 
@@ -930,7 +1014,7 @@
         <div class="balance-content">
 
           <span class="balance-title">
-            Current Balance
+            Your PULSE Balance
           </span>
 
           <div
@@ -1007,7 +1091,7 @@
       <div class="profile-card">
 
         <span class="stat-label">
-          Account
+          ACCOUNT
         </span>
 
         <div id="profileName">
@@ -1022,7 +1106,7 @@
 
 
       <!-- =====================================
-           TASKS FOLDER
+           AVAILABLE TASKS
            ===================================== -->
 
       <details class="dashboard-folder">
@@ -1043,7 +1127,7 @@
 
 
       <!-- =====================================
-           SUBMISSIONS FOLDER
+           MY SUBMISSIONS
            ===================================== -->
 
       <details class="dashboard-folder">
@@ -1064,7 +1148,7 @@
 
 
       <!-- =====================================
-           ACTIVITY FOLDER
+           POINTS ACTIVITY
            ===================================== -->
 
       <details class="dashboard-folder">
@@ -1085,62 +1169,58 @@
 
 
       <!-- =====================================
-           REWARDS FOLDER
+           REWARDS
            ===================================== -->
 
       <details class="dashboard-folder">
 
         <summary>
-          💰 Rewards
+          🎁 Rewards
         </summary>
 
         <div class="folder-content">
 
-          <div>
+          <p>
+            Redeem your available PULSE points for a reward.
+          </p>
 
-            <p>
-              Request a reward using your available balance.
-            </p>
+          <input
+            id="redeemAmount"
+            type="number"
+            min="1"
+            placeholder="Points to redeem"
+          >
 
-            <input
-              id="redeemAmount"
-              type="number"
-              placeholder="Amount"
-              min="1"
-            >
+          <select id="rewardType">
 
-            <select id="rewardType">
+            <option value="">
+              Select Reward Type
+            </option>
 
-              <option value="">
-                Select Reward Type
-              </option>
+            <option value="manual">
+              Manual Reward
+            </option>
 
-              <option value="manual">
-                Manual Reward
-              </option>
+          </select>
 
-            </select>
+          <input
+            id="redeemNote"
+            type="text"
+            placeholder="Optional note"
+          >
 
-            <input
-              id="redeemNote"
-              type="text"
-              placeholder="Optional note"
-            >
+          <button
+            id="redeem"
+            type="button"
+            class="dashboard-button"
+          >
+            Request Reward
+          </button>
 
-            <button
-              id="redeem"
-              type="button"
-              class="dashboard-button"
-            >
-              Request Reward
-            </button>
+          <div id="redeemMsg"></div>
 
-            <div id="redeemMsg"></div>
-
-            <div id="redemptions">
-              Loading reward requests...
-            </div>
-
+          <div id="redemptions">
+            Loading reward requests...
           </div>
 
         </div>
@@ -1149,7 +1229,7 @@
 
 
       <!-- =====================================
-           NOTIFICATIONS FOLDER
+           NOTIFICATIONS
            ===================================== -->
 
       <details class="dashboard-folder">
@@ -1170,7 +1250,7 @@
             class="dashboard-button"
             onclick="markNotificationsRead()"
           >
-            Mark Notifications Read
+            Mark Read
           </button>
 
         </div>
@@ -1276,8 +1356,6 @@
            SIGN OUT
            ===================================== -->
 
-      <br>
-
       <button
         id="logoutBtn"
         type="button"
@@ -1357,22 +1435,11 @@
 
 
 <!-- =======================================
-     SCRIPTS
+     SUPABASE + APP
      ======================================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="config.js"></script>
 
-<script src="app.js"></script>
-
-<script>
-  const logoutBtn = document.getElementById("logoutBtn");
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", logout);
-  }
-</script>
-
-</body>
-</html>
+<script src="app
