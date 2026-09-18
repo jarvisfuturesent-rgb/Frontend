@@ -1,12 +1,16 @@
 // PULSE — Available Tasks
+// Controls tasks.html only.
 
 document.addEventListener("DOMContentLoaded", loadTasks);
 
 async function loadTasks() {
     const container =
-        document.getElementById("tasksContent");
+        document.getElementById("tasks");
 
-    if (!container) return;
+    if (!container) {
+        console.error("tasks element not found.");
+        return;
+    }
 
     container.innerHTML =
         "<p>Loading available tasks...</p>";
@@ -19,7 +23,9 @@ async function loadTasks() {
         const { data: tasks, error } =
             await window.supabaseClient
                 .from("tasks")
-                .select("*")
+                .select(
+                    "id, title, description, points, status"
+                )
                 .eq("status", "active")
                 .order("id", {
                     ascending: false
@@ -48,9 +54,7 @@ async function loadTasks() {
                 </p>
 
                 <p>
-                    <strong>
-                        Points:
-                    </strong>
+                    <strong>Points:</strong>
                     ${escapeHTML(task.points)}
                 </p>
 
