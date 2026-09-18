@@ -7,7 +7,260 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* PULSE EFFECT */
+    /* APP-LIKE DASHBOARD */
+    body {
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .dashboard-app {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .dashboard-header {
+      text-align: center;
+      padding: 10px 0 18px;
+    }
+
+    .dashboard-header .pulse-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+    }
+
+    .dashboard-header h1 {
+      margin: 8px 0 4px;
+      font-size: 1.8rem;
+    }
+
+    .dashboard-header p {
+      margin: 0;
+      opacity: .75;
+    }
+
+    .balance-card {
+      position: relative;
+      overflow: hidden;
+      padding: 24px 18px;
+      margin: 10px 0 16px;
+      border-radius: 22px;
+      text-align: center;
+      background:
+        radial-gradient(circle at top right, rgba(0,246,255,.18), transparent 45%),
+        radial-gradient(circle at bottom left, rgba(155,77,255,.18), transparent 45%);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow:
+        0 12px 35px rgba(0,0,0,.25),
+        inset 0 0 25px rgba(255,255,255,.025);
+    }
+
+    .balance-label {
+      font-size: .85rem;
+      opacity: .7;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .balance-amount {
+      display: inline-block;
+      margin: 8px 0;
+      font-size: clamp(3rem, 17vw, 4.8rem);
+      font-weight: 900;
+      line-height: .95;
+      letter-spacing: -2px;
+
+      background:
+        linear-gradient(
+          90deg,
+          #00f6ff,
+          #5c5cff,
+          #d946ff,
+          #00ffc8,
+          #00f6ff
+        );
+
+      background-size: 400% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+
+      animation:
+        balanceEnergy 4s linear infinite,
+        balancePulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes balanceEnergy {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 200% 50%;
+      }
+
+      100% {
+        background-position: 400% 50%;
+      }
+    }
+
+    @keyframes balancePulse {
+      0%, 100% {
+        transform: scale(1);
+        filter:
+          drop-shadow(0 0 7px rgba(0,246,255,.35));
+      }
+
+      45% {
+        transform: scale(1.045);
+        filter:
+          drop-shadow(0 0 12px rgba(0,246,255,.65))
+          drop-shadow(0 0 22px rgba(92,92,255,.35));
+      }
+
+      55% {
+        transform: scale(1.065);
+        filter:
+          drop-shadow(0 0 18px rgba(0,246,255,.85))
+          drop-shadow(0 0 32px rgba(155,77,255,.55));
+      }
+    }
+
+    .balance-unit {
+      font-size: .9rem;
+      opacity: .7;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      padding: 15px 12px;
+      border-radius: 17px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.09);
+      text-align: center;
+      box-shadow: 0 8px 22px rgba(0,0,0,.16);
+    }
+
+    .stat-card small {
+      display: block;
+      margin-bottom: 6px;
+      opacity: .65;
+      font-size: .72rem;
+    }
+
+    .stat-card strong {
+      font-size: 1rem;
+    }
+
+    .dashboard-profile {
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.09);
+    }
+
+    .dashboard-profile-title {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      opacity: .6;
+      margin-bottom: 7px;
+    }
+
+    .dashboard-folder {
+      margin: 10px 0;
+      border-radius: 17px;
+      overflow: hidden;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.09);
+      box-shadow: 0 7px 20px rgba(0,0,0,.14);
+    }
+
+    .dashboard-folder > summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 17px 16px;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .dashboard-folder > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .dashboard-folder > summary::after {
+      content: "›";
+      float: right;
+      font-size: 1.3rem;
+      opacity: .6;
+      transition: transform .2s ease;
+    }
+
+    .dashboard-folder[open] > summary::after {
+      transform: rotate(90deg);
+    }
+
+    .folder-content {
+      padding: 0 14px 15px;
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+
+    .quick-access {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .quick-card {
+      display: block;
+      padding: 15px 10px;
+      border-radius: 16px;
+      text-align: center;
+      text-decoration: none;
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.09);
+    }
+
+    .quick-card strong {
+      display: block;
+      margin-top: 5px;
+      font-size: .85rem;
+    }
+
+    .dashboard-button {
+      width: 100%;
+      min-height: 44px;
+      margin-top: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      cursor: pointer;
+    }
+
+    #redeemAmount,
+    #rewardType,
+    #redeemNote {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 8px;
+      min-height: 42px;
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    #redeemMsg {
+      margin-top: 10px;
+    }
+
+    /* PULSE MENU EFFECT */
     .pulse-link,
     .pulse-folder {
       display: inline-flex;
@@ -101,7 +354,7 @@
       flex-shrink: 0;
     }
 
-    /* LEVEL 3 LINKS: NO PULSE EFFECT */
+    /* LEVEL 3 LINKS: NO PULSE */
     .page-link {
       display: block;
       text-decoration: none;
@@ -131,13 +384,11 @@
       Complete • Earn • Get Rewarded
     </p>
 
-    <!-- LEVEL 1 -->
     <details class="menu">
       <summary>☰ Menu</summary>
 
       <div class="menu-panel">
 
-        <!-- MAIN FOLDER -->
         <details>
           <summary class="pulse-folder">
             <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
@@ -148,7 +399,6 @@
             <span style="--i:3">n</span>
           </summary>
 
-          <!-- LEVEL 3: NO EFFECT -->
           <div>
             <a class="page-link" href="index.html">🏠 Home</a>
             <a class="page-link" href="how-it-works.html">⚡ How It Works</a>
@@ -157,8 +407,6 @@
           </div>
         </details>
 
-
-        <!-- PULSE FOLDER -->
         <details>
           <summary class="pulse-folder">
             <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
@@ -170,7 +418,6 @@
             <span style="--i:4">E</span>
           </summary>
 
-          <!-- LEVEL 3: NO EFFECT -->
           <div>
             <a class="page-link" href="tasks.html">⚡ Available Tasks</a>
             <a class="page-link" href="surveys.html">📝 Surveys</a>
@@ -180,8 +427,6 @@
           </div>
         </details>
 
-
-        <!-- ACCOUNT FOLDER -->
         <details>
           <summary class="pulse-folder">
             <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
@@ -195,7 +440,6 @@
             <span style="--i:6">t</span>
           </summary>
 
-          <!-- LEVEL 3: NO EFFECT -->
           <div>
             <a class="page-link" href="auth.html">🔐 Login / Sign Up</a>
             <a class="page-link" href="dashboard.html">👤 Dashboard</a>
@@ -204,8 +448,6 @@
           </div>
         </details>
 
-
-        <!-- LEGAL FOLDER -->
         <details>
           <summary class="pulse-folder">
             <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
@@ -217,7 +459,6 @@
             <span style="--i:4">l</span>
           </summary>
 
-          <!-- LEVEL 3: NO EFFECT -->
           <div>
             <a class="page-link" href="terms.html">📜 Terms</a>
             <a class="page-link" href="privacy.html">🔒 Privacy Policy</a>
@@ -225,8 +466,6 @@
           </div>
         </details>
 
-
-        <!-- ADMINISTRATION FOLDER -->
         <details>
           <summary class="pulse-folder">
             <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
@@ -247,7 +486,6 @@
             <span style="--i:13">n</span>
           </summary>
 
-          <!-- LEVEL 3: NO EFFECT -->
           <div>
             <a class="page-link" href="admin.html">⚙️ Admin Dashboard</a>
             <a class="page-link" href="admin-tasks.html">📋 Task Management</a>
@@ -264,49 +502,127 @@
   </header>
 
 
-  <!-- DASHBOARD CONTENT -->
-  <section class="panel">
+  <section class="panel dashboard-app">
 
-    <h1>Dashboard</h1>
+    <div class="dashboard-header">
 
-    <p>
-      Welcome to your PULSE dashboard.
-    </p>
+      <h1>Dashboard</h1>
 
-    <div id="balance">Loading balance...</div>
-    <div id="totalEarned">Loading total earned...</div>
-    <div id="pendingWithdrawal">Loading pending withdrawal...</div>
-    <div id="availableBalance">Loading available balance...</div>
+      <p>
+        Welcome to your PULSE dashboard.
+      </p>
 
-    <br>
+    </div>
 
-    <div id="profile">Loading profile...</div>
 
-    <br>
+    <div class="balance-card">
+
+      <div class="balance-label">
+        Available Balance
+      </div>
+
+      <div class="balance-amount" id="balance">
+        Loading...
+      </div>
+
+      <div class="balance-unit">
+        PLS
+      </div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+      <div class="stat-card">
+        <small>Total Earned</small>
+        <strong id="totalEarned">Loading...</strong>
+      </div>
+
+      <div class="stat-card">
+        <small>Pending Withdrawal</small>
+        <strong id="pendingWithdrawal">Loading...</strong>
+      </div>
+
+      <div class="stat-card">
+        <small>Available</small>
+        <strong id="availableBalance">Loading...</strong>
+      </div>
+
+      <div class="stat-card">
+        <small>Account</small>
+        <strong>Active</strong>
+      </div>
+
+    </div>
+
+
+    <div class="dashboard-profile">
+
+      <div class="dashboard-profile-title">
+        Profile
+      </div>
+
+      <div id="profileName">
+        Loading profile...
+      </div>
+
+      <div id="profile">
+        Loading account information...
+      </div>
+
+    </div>
+
 
     <details class="dashboard-folder">
+
       <summary>⚡ Available Tasks</summary>
+
       <div class="folder-content">
-        <div id="tasks">Loading available tasks...</div>
+
+        <div id="tasks">
+          Loading available tasks...
+        </div>
+
       </div>
+
     </details>
 
+
     <details class="dashboard-folder">
+
       <summary>📋 My Submissions</summary>
+
       <div class="folder-content">
-        <div id="submissions">Loading your submissions...</div>
+
+        <div id="submissions">
+          Loading your submissions...
+        </div>
+
       </div>
+
     </details>
 
+
     <details class="dashboard-folder">
+
       <summary>📊 Points Activity</summary>
+
       <div class="folder-content">
-        <div id="activity">Loading activity...</div>
+
+        <div id="activity">
+          Loading activity...
+        </div>
+
       </div>
+
     </details>
 
+
     <details class="dashboard-folder">
+
       <summary>🎁 Rewards</summary>
+
       <div class="folder-content">
 
         <p>
@@ -321,8 +637,15 @@
         >
 
         <select id="rewardType">
-          <option value="">Select Reward Type</option>
-          <option value="manual">Manual Reward</option>
+
+          <option value="">
+            Select Reward Type
+          </option>
+
+          <option value="manual">
+            Manual Reward
+          </option>
+
         </select>
 
         <input
@@ -334,6 +657,7 @@
         <button
           id="redeem"
           type="button"
+          class="dashboard-button"
         >
           Request Reward
         </button>
@@ -345,10 +669,14 @@
         </div>
 
       </div>
+
     </details>
 
+
     <details class="dashboard-folder">
+
       <summary>🔔 Notifications</summary>
+
       <div class="folder-content">
 
         <div id="notifications">
@@ -358,82 +686,46 @@
         <button
           id="markNotificationsRead"
           type="button"
+          class="dashboard-button"
           onclick="markNotificationsRead()"
         >
           Mark Read
         </button>
 
       </div>
+
     </details>
 
-    <br>
 
-    <a
-      class="pulse-link"
-      href="tasks.html"
-    >
-      <span style="--i:0">V</span>
-      <span style="--i:1">i</span>
-      <span style="--i:2">e</span>
-      <span style="--i:3">w</span>
-      <span style="--i:4"> </span>
-      <span style="--i:5">T</span>
-      <span style="--i:6">a</span>
-      <span style="--i:7">s</span>
-      <span style="--i:8">k</span>
-      <span style="--i:9">s</span>
-    </a>
+    <div class="quick-access">
 
-    <br>
+      <a class="quick-card pulse-link" href="tasks.html">
+        <span style="--i:0">⚡</span>
+        <strong>Tasks</strong>
+      </a>
 
-    <a
-      class="pulse-link"
-      href="submissions.html"
-    >
-      <span style="--i:0">V</span>
-      <span style="--i:1">i</span>
-      <span style="--i:2">e</span>
-      <span style="--i:3">w</span>
-      <span style="--i:4"> </span>
-      <span style="--i:5">S</span>
-      <span style="--i:6">u</span>
-      <span style="--i:7">b</span>
-      <span style="--i:8">m</span>
-      <span style="--i:9">i</span>
-      <span style="--i:10">s</span>
-      <span style="--i:11">s</span>
-      <span style="--i:12">i</span>
-      <span style="--i:13">o</span>
-      <span style="--i:14">n</span>
-      <span style="--i:15">s</span>
-    </a>
+      <a class="quick-card pulse-link" href="surveys.html">
+        <span style="--i:0">📝</span>
+        <strong>Surveys</strong>
+      </a>
 
-    <br>
+      <a class="quick-card pulse-link" href="submissions.html">
+        <span style="--i:0">📋</span>
+        <strong>Submissions</strong>
+      </a>
 
-    <a
-      class="pulse-link"
-      href="earnings.html"
-    >
-      <span style="--i:0">V</span>
-      <span style="--i:1">i</span>
-      <span style="--i:2">e</span>
-      <span style="--i:3">w</span>
-      <span style="--i:4"> </span>
-      <span style="--i:5">E</span>
-      <span style="--i:6">a</span>
-      <span style="--i:7">r</span>
-      <span style="--i:8">n</span>
-      <span style="--i:9">i</span>
-      <span style="--i:10">n</span>
-      <span style="--i:11">g</span>
-      <span style="--i:12">s</span>
-    </a>
+      <a class="quick-card pulse-link" href="earnings.html">
+        <span style="--i:0">💰</span>
+        <strong>Earnings</strong>
+      </a>
 
-    <br><br>
+    </div>
+
 
     <button
       id="logoutBtn"
       type="button"
+      class="dashboard-button"
     >
       Sign Out
     </button>
@@ -500,6 +792,7 @@
   </footer>
 
 </main>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
