@@ -3,125 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PULSE — About</title>
+  <title>PULSE — About PULSE</title>
   <link rel="stylesheet" href="style.css">
 
   <style>
-    .pulse-link {
-      display:inline-flex;
-      align-items:center;
-      text-decoration:none;
-      white-space:nowrap;
+    /* PULSE EFFECT */
+    .pulse-link,
+    .pulse-folder {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      text-decoration: none;
     }
 
-    .pulse-link span {
-      display:inline-block;
-      animation:pulseLetter 3.6s ease-in-out infinite;
-      animation-delay:calc(var(--i) * 0.08s);
+    .pulse-link span,
+    .pulse-folder span {
+      display: inline-block;
+      animation: pulseLetter 3.6s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 0.08s);
     }
 
     @keyframes pulseLetter {
-      0% { color:inherit; text-shadow:none; transform:scale(1); }
-      12% { color:#00f6ff; text-shadow:0 0 4px #00f6ff,0 0 10px rgba(0,246,255,.7); transform:scale(1.08); }
-      24% { color:#008cff; text-shadow:0 0 5px #008cff,0 0 12px rgba(0,140,255,.7); transform:scale(1); }
-      36% { color:#5c5cff; text-shadow:0 0 5px #5c5cff,0 0 12px rgba(92,92,255,.7); transform:scale(1.06); }
-      48% { color:#9b4dff; text-shadow:0 0 5px #9b4dff,0 0 12px rgba(155,77,255,.7); transform:scale(1); }
-      60% { color:#ff3bd4; text-shadow:0 0 5px #ff3bd4,0 0 12px rgba(255,59,212,.7); transform:scale(1.08); }
-      72% { color:#ff4f81; text-shadow:0 0 5px #ff4f81,0 0 12px rgba(255,79,129,.7); transform:scale(1); }
-      84% { color:#00ffc8; text-shadow:0 0 5px #00ffc8,0 0 12px rgba(0,255,200,.7); transform:scale(1.06); }
-      100% { color:inherit; text-shadow:none; transform:scale(1); }
+      0% {
+        color: inherit;
+        text-shadow: none;
+        transform: scale(1);
+      }
+
+      12% {
+        color: #00f6ff;
+        text-shadow:
+          0 0 4px #00f6ff,
+          0 0 10px rgba(0,246,255,.7);
+        transform: scale(1.08);
+      }
+
+      24% {
+        color: #008cff;
+        text-shadow:
+          0 0 5px #008cff,
+          0 0 12px rgba(0,140,255,.7);
+        transform: scale(1);
+      }
+
+      36% {
+        color: #5c5cff;
+        text-shadow:
+          0 0 5px #5c5cff,
+          0 0 12px rgba(92,92,255,.7);
+        transform: scale(1.06);
+      }
+
+      48% {
+        color: #9b4dff;
+        text-shadow:
+          0 0 5px #9b4dff,
+          0 0 12px rgba(155,77,255,.7);
+        transform: scale(1);
+      }
+
+      60% {
+        color: #ff3bd4;
+        text-shadow:
+          0 0 5px #ff3bd4,
+          0 0 12px rgba(255,59,212,.7);
+        transform: scale(1.08);
+      }
+
+      72% {
+        color: #ff4f81;
+        text-shadow:
+          0 0 5px #ff4f81,
+          0 0 12px rgba(255,79,129,.7);
+        transform: scale(1);
+      }
+
+      84% {
+        color: #00ffc8;
+        text-shadow:
+          0 0 5px #00ffc8,
+          0 0 12px rgba(0,255,200,.7);
+        transform: scale(1.06);
+      }
+
+      100% {
+        color: inherit;
+        text-shadow: none;
+        transform: scale(1);
+      }
     }
 
     .menu-logo {
-      width:22px;
-      height:22px;
-      object-fit:contain;
-      margin-right:7px;
-      flex-shrink:0;
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      margin-right: 8px;
+      flex-shrink: 0;
     }
 
-    .about-header {
-      text-align:center;
-      margin-bottom:25px;
+    /* LEVEL 3 LINKS: NO PULSE EFFECT */
+    .page-link {
+      display: block;
+      text-decoration: none;
+      animation: none !important;
+      text-shadow: none !important;
+      transform: none !important;
     }
 
-    .about-section {
-      margin:15px 0;
-      padding:20px;
-      border-radius:16px;
-      border:1px solid rgba(0,210,255,.18);
-      background:rgba(5,15,35,.38);
-      box-shadow:inset 0 0 20px rgba(0,200,255,.03);
-    }
-
-    .about-section h2 {
-      margin-top:0;
-    }
-
-    .about-section p {
-      line-height:1.6;
-      opacity:.88;
-    }
-
-    .about-folder {
-      margin:15px 0;
-      border-radius:16px;
-      border:1px solid rgba(120,100,255,.2);
-      background:rgba(10,15,35,.4);
-      overflow:hidden;
-    }
-
-    .about-folder > summary {
-      cursor:pointer;
-      padding:17px;
-      font-weight:700;
-      list-style:none;
-      background:linear-gradient(
-        90deg,
-        rgba(0,220,255,.07),
-        rgba(140,70,255,.07)
-      );
-    }
-
-    .about-folder > summary::-webkit-details-marker {
-      display:none;
-    }
-
-    .about-folder > summary::after {
-      content:"＋";
-      float:right;
-      opacity:.7;
-    }
-
-    .about-folder[open] > summary::after {
-      content:"−";
-    }
-
-    .folder-content {
-      padding:17px;
-      border-top:1px solid rgba(0,210,255,.12);
-    }
-
-    .quick-access {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-      gap:10px;
-      margin-top:15px;
-    }
-
-    .quick-access a {
-      display:block;
-      padding:14px;
-      text-align:center;
-      border-radius:12px;
-      border:1px solid rgba(0,210,255,.18);
-      background:rgba(10,20,45,.4);
-    }
-
-    @media (max-width:600px) {
-      .quick-access {
-        grid-template-columns:1fr;
-      }
+    .page-link span {
+      animation: none !important;
+      color: inherit !important;
+      text-shadow: none !important;
+      transform: none !important;
     }
   </style>
 </head>
@@ -138,75 +131,130 @@
       Complete • Earn • Get Rewarded
     </p>
 
+    <!-- LEVEL 1 -->
     <details class="menu">
       <summary>☰ Menu</summary>
 
       <div class="menu-panel">
 
+        <!-- MAIN FOLDER -->
         <details>
-          <summary>
+          <summary class="pulse-folder">
             <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-            Main
+
+            <span style="--i:0">M</span>
+            <span style="--i:1">a</span>
+            <span style="--i:2">i</span>
+            <span style="--i:3">n</span>
           </summary>
+
+          <!-- LEVEL 3: NO EFFECT -->
           <div>
-            <a class="pulse-link" href="index.html">🏠 Home</a>
-            <a class="pulse-link" href="how-it-works.html">⚡ How It Works</a>
-            <a class="pulse-link" href="about.html">ℹ️ About PULSE</a>
-            <a class="pulse-link" href="contact.html">✉️ Contact</a>
+            <a class="page-link" href="index.html">🏠 Home</a>
+            <a class="page-link" href="how-it-works.html">⚡ How It Works</a>
+            <a class="page-link" href="about.html">ℹ️ About PULSE</a>
+            <a class="page-link" href="contact.html">✉️ Contact</a>
           </div>
         </details>
 
+
+        <!-- PULSE FOLDER -->
         <details>
-          <summary>
+          <summary class="pulse-folder">
             <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-            PULSE
+
+            <span style="--i:0">P</span>
+            <span style="--i:1">U</span>
+            <span style="--i:2">L</span>
+            <span style="--i:3">S</span>
+            <span style="--i:4">E</span>
           </summary>
+
+          <!-- LEVEL 3: NO EFFECT -->
           <div>
-            <a class="pulse-link" href="tasks.html">⚡ Available Tasks</a>
-            <a class="pulse-link" href="surveys.html">📝 Surveys</a>
-            <a class="pulse-link" href="submissions.html">📋 My Submissions</a>
-            <a class="pulse-link" href="earnings.html">💰 Earnings &amp; Balance</a>
-            <a class="pulse-link" href="notifications.html">🔔 Notifications</a>
+            <a class="page-link" href="tasks.html">⚡ Available Tasks</a>
+            <a class="page-link" href="surveys.html">📝 Surveys</a>
+            <a class="page-link" href="submissions.html">📋 My Submissions</a>
+            <a class="page-link" href="earnings.html">💰 Earnings &amp; Balance</a>
+            <a class="page-link" href="notifications.html">🔔 Notifications</a>
           </div>
         </details>
 
+
+        <!-- ACCOUNT FOLDER -->
         <details>
-          <summary>
+          <summary class="pulse-folder">
             <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-            Account
+
+            <span style="--i:0">A</span>
+            <span style="--i:1">c</span>
+            <span style="--i:2">c</span>
+            <span style="--i:3">o</span>
+            <span style="--i:4">u</span>
+            <span style="--i:5">n</span>
+            <span style="--i:6">t</span>
           </summary>
+
+          <!-- LEVEL 3: NO EFFECT -->
           <div>
-            <a class="pulse-link" href="auth.html">🔐 Login / Sign Up</a>
-            <a class="pulse-link" href="dashboard.html">👤 Dashboard</a>
-            <a class="pulse-link" href="profile.html">⚙️ Profile &amp; Account</a>
-            <a class="pulse-link" href="reset-password.html">🔑 Reset Password</a>
+            <a class="page-link" href="auth.html">🔐 Login / Sign Up</a>
+            <a class="page-link" href="dashboard.html">👤 Dashboard</a>
+            <a class="page-link" href="profile.html">⚙️ Profile &amp; Account</a>
+            <a class="page-link" href="reset-password.html">🔑 Reset Password</a>
           </div>
         </details>
 
+
+        <!-- LEGAL FOLDER -->
         <details>
-          <summary>
+          <summary class="pulse-folder">
             <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-            Legal
+
+            <span style="--i:0">L</span>
+            <span style="--i:1">e</span>
+            <span style="--i:2">g</span>
+            <span style="--i:3">a</span>
+            <span style="--i:4">l</span>
           </summary>
+
+          <!-- LEVEL 3: NO EFFECT -->
           <div>
-            <a class="pulse-link" href="terms.html">📜 Terms</a>
-            <a class="pulse-link" href="privacy.html">🔒 Privacy Policy</a>
-            <a class="pulse-link" href="disclosures.html">⚖️ Disclosures</a>
+            <a class="page-link" href="terms.html">📜 Terms</a>
+            <a class="page-link" href="privacy.html">🔒 Privacy Policy</a>
+            <a class="page-link" href="disclosures.html">⚖️ Disclosures</a>
           </div>
         </details>
 
+
+        <!-- ADMINISTRATION FOLDER -->
         <details>
-          <summary>
+          <summary class="pulse-folder">
             <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-            Administration
+
+            <span style="--i:0">A</span>
+            <span style="--i:1">d</span>
+            <span style="--i:2">m</span>
+            <span style="--i:3">i</span>
+            <span style="--i:4">n</span>
+            <span style="--i:5">i</span>
+            <span style="--i:6">s</span>
+            <span style="--i:7">t</span>
+            <span style="--i:8">r</span>
+            <span style="--i:9">a</span>
+            <span style="--i:10">t</span>
+            <span style="--i:11">i</span>
+            <span style="--i:12">o</span>
+            <span style="--i:13">n</span>
           </summary>
+
+          <!-- LEVEL 3: NO EFFECT -->
           <div>
-            <a class="pulse-link" href="admin.html">⚙️ Admin Dashboard</a>
-            <a class="pulse-link" href="admin-tasks.html">📋 Task Management</a>
-            <a class="pulse-link" href="admin-businesses.html">🏢 Business Management</a>
-            <a class="pulse-link" href="admin-submissions.html">📝 Submission Review</a>
-            <a class="pulse-link" href="admin-rewards.html">💰 Reward Requests</a>
-            <a class="pulse-link" href="admin-reports.html">📊 Reports &amp; Records</a>
+            <a class="page-link" href="admin.html">⚙️ Admin Dashboard</a>
+            <a class="page-link" href="admin-tasks.html">📋 Task Management</a>
+            <a class="page-link" href="admin-businesses.html">🏢 Business Management</a>
+            <a class="page-link" href="admin-submissions.html">📝 Submission Review</a>
+            <a class="page-link" href="admin-rewards.html">💰 Reward Requests</a>
+            <a class="page-link" href="admin-reports.html">📊 Reports &amp; Records</a>
           </div>
         </details>
 
@@ -215,162 +263,149 @@
 
   </header>
 
+
+  <!-- ABOUT PULSE CONTENT -->
   <section class="panel">
 
-    <div class="about-header">
-      <h1>ℹ️ About PULSE</h1>
-      <p>Complete • Earn • Get Rewarded</p>
-    </div>
+    <h1>About PULSE</h1>
 
-    <section class="about-section">
-      <h2>What Is PULSE?</h2>
+    <p>
+      PULSE is a task and survey platform designed to connect
+      people with opportunities to complete tasks, provide feedback,
+      and participate in research activities.
+    </p>
 
+    <details open>
+      <summary>What Is PULSE?</summary>
       <p>
-        PULSE is a platform designed to connect people with tasks,
-        surveys, research activities, and other opportunities to
-        participate and provide useful feedback.
+        PULSE provides a simple place to discover available tasks,
+        complete activities, submit work, and keep track of
+        submissions and activity.
       </p>
+    </details>
 
+    <details>
+      <summary>Our Purpose</summary>
       <p>
-        Users can complete available activities, submit their work,
-        and track their activity through their PULSE account.
+        The goal of PULSE is to create a straightforward system
+        for organized tasks, surveys, feedback, and record keeping.
       </p>
-    </section>
-
-    <details class="about-folder">
-      <summary>⚡ How PULSE Works</summary>
-
-      <div class="folder-content">
-        <p>
-          1. Create or access your PULSE account.
-        </p>
-
-        <p>
-          2. Browse available tasks and surveys.
-        </p>
-
-        <p>
-          3. Complete an activity according to its instructions.
-        </p>
-
-        <p>
-          4. Submit your work for review when required.
-        </p>
-
-        <p>
-          5. Track submissions, points, and account activity.
-        </p>
-      </div>
     </details>
 
-    <details class="about-folder">
-      <summary>📋 Tasks &amp; Surveys</summary>
-
-      <div class="folder-content">
-        <p>
-          PULSE may provide different types of activities,
-          including surveys, research tasks, product feedback,
-          and other user participation opportunities.
-        </p>
-
-        <p>
-          Each activity can have its own requirements,
-          instructions, and point value.
-        </p>
-      </div>
+    <details>
+      <summary>Tasks &amp; Surveys</summary>
+      <p>
+        Tasks and surveys may be created with instructions,
+        requirements, categories, and assigned point values.
+        Completed work can be submitted for review.
+      </p>
     </details>
 
-    <details class="about-folder">
-      <summary>📊 Records &amp; Submissions</summary>
-
-      <div class="folder-content">
-        <p>
-          PULSE keeps records of submitted activities so users
-          can review their submission history and activity.
-        </p>
-
-        <p>
-          Approved submissions can be reflected in the user's
-          points and account activity.
-        </p>
-      </div>
+    <details>
+      <summary>Records</summary>
+      <p>
+        PULSE is designed to retain relevant submission and
+        activity records so completed work can be reviewed and
+        tracked over time.
+      </p>
     </details>
 
-    <details class="about-folder">
-      <summary>🤝 Business Participation</summary>
-
-      <div class="folder-content">
-        <p>
-          PULSE may work with businesses or organizations that
-          need feedback, research, testing, or other task-based
-          participation.
-        </p>
-
-        <p>
-          Business participation and individual opportunities
-          may have separate requirements and disclosures.
-        </p>
-      </div>
+    <details>
+      <summary>Points</summary>
+      <p>
+        The PULSE point system is used to track activity within
+        the platform according to the rules of each task.
+      </p>
     </details>
 
-    <details class="about-folder">
-      <summary>🔒 Privacy &amp; Transparency</summary>
-
-      <div class="folder-content">
-        <p>
-          PULSE is designed with transparency in mind. Users
-          should be able to understand what an activity is,
-          what information is requested, and how their submission
-          is handled.
-        </p>
-
-        <p>
-          See the Privacy Policy, Terms, and Disclosures pages
-          for additional information.
-        </p>
-      </div>
+    <details>
+      <summary>Business Participation</summary>
+      <p>
+        PULSE may support business-created tasks, surveys,
+        research activities, and product feedback opportunities.
+      </p>
     </details>
 
-    <section class="about-section">
 
-      <h2>Quick Access</h2>
+    <!-- OUTSIDE-MENU LINK: PULSE EFFECT -->
+    <a class="pulse-link" href="dashboard.html">
 
-      <div class="quick-access">
+      <span style="--i:0">G</span>
+      <span style="--i:1">o</span>
+      <span style="--i:2"> </span>
+      <span style="--i:3">t</span>
+      <span style="--i:4">o</span>
+      <span style="--i:5"> </span>
+      <span style="--i:6">D</span>
+      <span style="--i:7">a</span>
+      <span style="--i:8">s</span>
+      <span style="--i:9">h</span>
+      <span style="--i:10">b</span>
+      <span style="--i:11">o</span>
+      <span style="--i:12">a</span>
+      <span style="--i:13">r</span>
+      <span style="--i:14">d</span>
 
-        <a class="pulse-link" href="how-it-works.html">
-          ⚡ How It Works
-        </a>
-
-        <a class="pulse-link" href="tasks.html">
-          ⚡ Tasks
-        </a>
-
-        <a class="pulse-link" href="surveys.html">
-          📝 Surveys
-        </a>
-
-        <a class="pulse-link" href="contact.html">
-          ✉️ Contact
-        </a>
-
-      </div>
-
-    </section>
+    </a>
 
   </section>
+
 
   <footer>
 
     <p>© 2026 PULSE</p>
 
+    <!-- OUTSIDE-MENU LINKS: PULSE EFFECT -->
     <div>
-      <a class="pulse-link" href="terms.html">Terms</a>
+
+      <a class="pulse-link" href="terms.html">
+        <span style="--i:0">T</span>
+        <span style="--i:1">e</span>
+        <span style="--i:2">r</span>
+        <span style="--i:3">m</span>
+        <span style="--i:4">s</span>
+      </a>
+
       <span> • </span>
-      <a class="pulse-link" href="privacy.html">Privacy</a>
+
+      <a class="pulse-link" href="privacy.html">
+        <span style="--i:0">P</span>
+        <span style="--i:1">r</span>
+        <span style="--i:2">i</span>
+        <span style="--i:3">v</span>
+        <span style="--i:4">a</span>
+        <span style="--i:5">c</span>
+        <span style="--i:6">y</span>
+      </a>
+
       <span> • </span>
-      <a class="pulse-link" href="disclosures.html">Disclosures</a>
+
+      <a class="pulse-link" href="disclosures.html">
+        <span style="--i:0">D</span>
+        <span style="--i:1">i</span>
+        <span style="--i:2">s</span>
+        <span style="--i:3">c</span>
+        <span style="--i:4">l</span>
+        <span style="--i:5">o</span>
+        <span style="--i:6">s</span>
+        <span style="--i:7">u</span>
+        <span style="--i:8">r</span>
+        <span style="--i:9">e</span>
+        <span style="--i:10">s</span>
+      </a>
+
       <span> • </span>
-      <a class="pulse-link" href="contact.html">Contact</a>
+
+      <a class="pulse-link" href="contact.html">
+        <span style="--i:0">C</span>
+        <span style="--i:1">o</span>
+        <span style="--i:2">n</span>
+        <span style="--i:3">t</span>
+        <span style="--i:4">a</span>
+        <span style="--i:5">c</span>
+        <span style="--i:6">t</span>
+      </a>
+
     </div>
 
   </footer>
