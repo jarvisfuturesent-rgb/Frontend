@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* PULSE EFFECT — SAME AS CODE 1 */
+    /* PULSE EFFECT */
     .pulse-link,
     .pulse-folder {
       display: inline-flex;
@@ -101,7 +101,7 @@
       flex-shrink: 0;
     }
 
-    /* LEVEL 3 LINKS — NO EFFECT */
+    /* LEVEL 3 LINKS: NO PULSE EFFECT */
     .page-link {
       display: block;
       text-decoration: none;
@@ -116,272 +116,6 @@
       text-shadow: none !important;
       transform: none !important;
     }
-
-    /* CODE 2 LOOK & FEEL ONLY */
-    html,
-    body {
-      background: #000 !important;
-    }
-
-    body {
-      color: #fff !important;
-
-      background:
-        radial-gradient(
-          ellipse at 50% 10%,
-          rgba(0,70,255,.20),
-          transparent 35%
-        ),
-        radial-gradient(
-          ellipse at 5% 65%,
-          rgba(90,0,255,.18),
-          transparent 30%
-        ),
-        radial-gradient(
-          ellipse at 95% 75%,
-          rgba(0,70,255,.15),
-          transparent 30%
-        ),
-        #000 !important;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: -1;
-
-      background:
-        linear-gradient(
-          125deg,
-          transparent 0%,
-          rgba(0,55,255,.10) 42%,
-          transparent 55%
-        ),
-        linear-gradient(
-          215deg,
-          transparent 30%,
-          rgba(130,0,255,.10) 50%,
-          transparent 70%
-        );
-
-      animation: backgroundFlow 8s ease-in-out infinite alternate;
-    }
-
-    @keyframes backgroundFlow {
-      0% {
-        transform: translateX(-4%);
-        opacity: .65;
-      }
-
-      100% {
-        transform: translateX(4%);
-        opacity: 1;
-      }
-    }
-
-    header {
-      background: rgba(0,0,0,.88) !important;
-      border-bottom: 1px solid rgba(0,70,255,.35);
-    }
-
-    .hero,
-    .panel {
-      background:
-        linear-gradient(
-          145deg,
-          rgba(8,20,58,.94),
-          rgba(2,8,30,.97)
-        ) !important;
-
-      border-color:
-        rgba(35,80,215,.60) !important;
-
-      box-shadow:
-        0 0 10px rgba(0,70,255,.20),
-        inset 0 0 18px rgba(30,70,180,.08) !important;
-    }
-
-    .pulse-logo {
-      filter:
-        drop-shadow(0 0 5px rgba(0,180,255,.65))
-        drop-shadow(0 0 14px rgba(130,30,255,.45));
-    }
-
-    .balance-box {
-      background:
-        linear-gradient(
-          145deg,
-          rgba(10,24,70,.96),
-          rgba(2,8,32,.98)
-        ) !important;
-
-      border: 1px solid #315cff !important;
-
-      box-shadow:
-        0 0 10px rgba(0,65,255,.45),
-        inset 0 0 22px rgba(40,50,190,.12) !important;
-    }
-
-    .balance-amount {
-      display: inline-block;
-      position: relative;
-
-      background:
-        linear-gradient(
-          90deg,
-          #00f6ff,
-          #5c5cff,
-          #d946ff,
-          #00ffc8,
-          #00f6ff
-        );
-
-      background-size: 400% 100%;
-
-      -webkit-background-clip: text;
-      background-clip: text;
-
-      color: transparent !important;
-
-      animation:
-        balanceEnergy 4s linear infinite,
-        balancePulse 2.2s ease-in-out infinite;
-
-      filter:
-        drop-shadow(
-          0 0 8px
-          rgba(0,246,255,.65)
-        );
-    }
-
-    @keyframes balanceEnergy {
-      0% {
-        background-position: 0% 50%;
-      }
-
-      100% {
-        background-position: 400% 50%;
-      }
-    }
-
-    @keyframes balancePulse {
-      0%, 100% {
-        transform: scale(1);
-
-        filter:
-          drop-shadow(
-            0 0 6px
-            rgba(0,246,255,.45)
-          );
-      }
-
-      45% {
-        transform: scale(1.04);
-
-        filter:
-          drop-shadow(
-            0 0 13px
-            rgba(0,246,255,.75)
-          )
-          drop-shadow(
-            0 0 20px
-            rgba(100,50,255,.35)
-          );
-      }
-
-      55% {
-        transform: scale(1.065);
-
-        filter:
-          drop-shadow(
-            0 0 18px
-            rgba(0,246,255,.95)
-          )
-          drop-shadow(
-            0 0 28px
-            rgba(155,77,255,.55)
-          );
-      }
-    }
-
-    .dashboard-folder,
-    .stat-card,
-    .profile-card {
-      background:
-        linear-gradient(
-          145deg,
-          rgba(6,18,53,.96),
-          rgba(2,7,27,.98)
-        ) !important;
-
-      border-color:
-        rgba(30,76,220,.68) !important;
-
-      box-shadow:
-        0 0 6px rgba(0,70,255,.15),
-        inset 0 0 12px rgba(25,60,180,.08) !important;
-    }
-
-    .dashboard-folder > summary {
-      color: #e8efff !important;
-    }
-
-    .dashboard-folder > summary::after {
-      color: #5b7cff;
-    }
-
-    .stat-label {
-      color: #8197bc !important;
-    }
-
-    .stat-card strong {
-      color: #e1eaff !important;
-    }
-
-    .profile-card #profileName {
-      color: #fff !important;
-    }
-
-    .profile-card #profile {
-      color: #8196ba !important;
-    }
-
-    .dashboard-button {
-      background:
-        linear-gradient(
-          90deg,
-          #c928ff,
-          #6a4cff,
-          #00d9ff
-        ) !important;
-
-      border-color:
-        rgba(0,220,255,.75) !important;
-
-      box-shadow:
-        0 0 8px
-        rgba(0,160,255,.35);
-    }
-
-    #logoutBtn {
-      background:
-        linear-gradient(
-          90deg,
-          #7b20ff,
-          #bd25ff,
-          #ff2cb7
-        ) !important;
-    }
-
-    .quick-access .pulse-link {
-      background:
-        rgba(5,17,50,.90) !important;
-
-      border-color:
-        rgba(35,80,215,.55) !important;
-    }
   </style>
 </head>
 
@@ -391,113 +125,66 @@
 
   <header class="hero">
 
-    <img
-      src="pulse-logo.png"
-      alt="PULSE"
-      class="pulse-logo"
-    >
+    <img src="pulse-logo.png" alt="PULSE" class="pulse-logo">
 
     <p class="tagline">
       Complete • Earn • Get Rewarded
     </p>
 
+    <!-- LEVEL 1 -->
     <details class="menu">
-
       <summary>☰ Menu</summary>
 
       <div class="menu-panel">
 
+        <!-- MAIN FOLDER -->
         <details>
           <summary class="pulse-folder">
-
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
 
             <span style="--i:0">M</span>
             <span style="--i:1">a</span>
             <span style="--i:2">i</span>
             <span style="--i:3">n</span>
-
           </summary>
 
+          <!-- LEVEL 3: NO EFFECT -->
           <div>
-
-            <a class="page-link" href="index.html">
-              🏠 Home
-            </a>
-
-            <a class="page-link" href="how-it-works.html">
-              ⚡ How It Works
-            </a>
-
-            <a class="page-link" href="about.html">
-              ℹ️ About PULSE
-            </a>
-
-            <a class="page-link" href="contact.html">
-              ✉️ Contact
-            </a>
-
+            <a class="page-link" href="index.html">🏠 Home</a>
+            <a class="page-link" href="how-it-works.html">⚡ How It Works</a>
+            <a class="page-link" href="about.html">ℹ️ About PULSE</a>
+            <a class="page-link" href="contact.html">✉️ Contact</a>
           </div>
         </details>
 
 
+        <!-- PULSE FOLDER -->
         <details>
-
           <summary class="pulse-folder">
-
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
 
             <span style="--i:0">P</span>
             <span style="--i:1">U</span>
             <span style="--i:2">L</span>
             <span style="--i:3">S</span>
             <span style="--i:4">E</span>
-
           </summary>
 
+          <!-- LEVEL 3: NO EFFECT -->
           <div>
-
-            <a class="page-link" href="tasks.html">
-              ⚡ Available Tasks
-            </a>
-
-            <a class="page-link" href="surveys.html">
-              📝 Surveys
-            </a>
-
-            <a class="page-link" href="submissions.html">
-              📋 My Submissions
-            </a>
-
-            <a class="page-link" href="earnings.html">
-              💰 Earnings &amp; Balance
-            </a>
-
-            <a class="page-link" href="notifications.html">
-              🔔 Notifications
-            </a>
-
+            <a class="page-link" href="tasks.html">⚡ Available Tasks</a>
+            <a class="page-link" href="surveys.html">📝 Surveys</a>
+            <a class="page-link" href="submissions.html">📋 My Submissions</a>
+            <a class="page-link" href="earnings.html">💰 Earnings &amp; Balance</a>
+            <a class="page-link" href="notifications.html">🔔 Notifications</a>
           </div>
         </details>
 
 
+        <!-- ACCOUNT FOLDER -->
         <details>
-
           <summary class="pulse-folder">
-
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
 
             <span style="--i:0">A</span>
             <span style="--i:1">c</span>
@@ -506,76 +193,43 @@
             <span style="--i:4">u</span>
             <span style="--i:5">n</span>
             <span style="--i:6">t</span>
-
           </summary>
 
+          <!-- LEVEL 3: NO EFFECT -->
           <div>
-
-            <a class="page-link" href="auth.html">
-              🔐 Login / Sign Up
-            </a>
-
-            <a class="page-link" href="dashboard.html">
-              👤 Dashboard
-            </a>
-
-            <a class="page-link" href="profile.html">
-              ⚙️ Profile &amp; Account
-            </a>
-
-            <a class="page-link" href="reset-password.html">
-              🔑 Reset Password
-            </a>
-
+            <a class="page-link" href="auth.html">🔐 Login / Sign Up</a>
+            <a class="page-link" href="dashboard.html">👤 Dashboard</a>
+            <a class="page-link" href="profile.html">⚙️ Profile &amp; Account</a>
+            <a class="page-link" href="reset-password.html">🔑 Reset Password</a>
           </div>
         </details>
 
 
+        <!-- LEGAL FOLDER -->
         <details>
-
           <summary class="pulse-folder">
-
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
 
             <span style="--i:0">L</span>
             <span style="--i:1">e</span>
             <span style="--i:2">g</span>
             <span style="--i:3">a</span>
             <span style="--i:4">l</span>
-
           </summary>
 
+          <!-- LEVEL 3: NO EFFECT -->
           <div>
-
-            <a class="page-link" href="terms.html">
-              📜 Terms
-            </a>
-
-            <a class="page-link" href="privacy.html">
-              🔒 Privacy Policy
-            </a>
-
-            <a class="page-link" href="disclosures.html">
-              ⚖️ Disclosures
-            </a>
-
+            <a class="page-link" href="terms.html">📜 Terms</a>
+            <a class="page-link" href="privacy.html">🔒 Privacy Policy</a>
+            <a class="page-link" href="disclosures.html">⚖️ Disclosures</a>
           </div>
         </details>
 
 
+        <!-- ADMINISTRATION FOLDER -->
         <details>
-
           <summary class="pulse-folder">
-
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
 
             <span style="--i:0">A</span>
             <span style="--i:1">d</span>
@@ -591,199 +245,68 @@
             <span style="--i:11">i</span>
             <span style="--i:12">o</span>
             <span style="--i:13">n</span>
-
           </summary>
 
+          <!-- LEVEL 3: NO EFFECT -->
           <div>
-
-            <a class="page-link" href="admin.html">
-              ⚙️ Admin Dashboard
-            </a>
-
-            <a class="page-link" href="admin-tasks.html">
-              📋 Task Management
-            </a>
-
-            <a class="page-link" href="admin-businesses.html">
-              🏢 Business Management
-            </a>
-
-            <a class="page-link" href="admin-submissions.html">
-              📝 Submission Review
-            </a>
-
-            <a class="page-link" href="admin-rewards.html">
-              💰 Reward Requests
-            </a>
-
-            <a class="page-link" href="admin-reports.html">
-              📊 Reports &amp; Records
-            </a>
-
+            <a class="page-link" href="admin.html">⚙️ Admin Dashboard</a>
+            <a class="page-link" href="admin-tasks.html">📋 Task Management</a>
+            <a class="page-link" href="admin-businesses.html">🏢 Business Management</a>
+            <a class="page-link" href="admin-submissions.html">📝 Submission Review</a>
+            <a class="page-link" href="admin-rewards.html">💰 Reward Requests</a>
+            <a class="page-link" href="admin-reports.html">📊 Reports &amp; Records</a>
           </div>
         </details>
 
       </div>
-
     </details>
 
   </header>
 
 
+  <!-- DASHBOARD CONTENT -->
   <section class="panel">
 
-    <h1>Welcome to PULSE</h1>
+    <h1>Dashboard</h1>
 
     <p>
-      Complete tasks, participate in surveys, and earn rewards.
+      Welcome to your PULSE dashboard.
     </p>
 
+    <div id="balance">Loading balance...</div>
+    <div id="totalEarned">Loading total earned...</div>
+    <div id="pendingWithdrawal">Loading pending withdrawal...</div>
+    <div id="availableBalance">Loading available balance...</div>
 
-    <div class="balance-box">
+    <br>
 
-      <div class="balance-content">
+    <div id="profile">Loading profile...</div>
 
-        <span class="balance-title">
-          Your PULSE Balance
-        </span>
-
-        <div
-          id="balance"
-          class="balance-amount"
-        >
-          25
-        </div>
-
-        <span class="balance-unit">
-          PLS
-        </span>
-
-        <div class="balance-status">
-          ● Balance Active
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <div class="dashboard-stats">
-
-      <div class="stat-card">
-
-        <span class="stat-label">
-          Total Earned
-        </span>
-
-        <strong id="totalEarned">
-          25 PLS
-        </strong>
-
-      </div>
-
-
-      <div class="stat-card">
-
-        <span class="stat-label">
-          Pending Withdrawal
-        </span>
-
-        <strong id="pendingWithdrawal">
-          0 PLS
-        </strong>
-
-      </div>
-
-
-      <div class="stat-card">
-
-        <span class="stat-label">
-          Available Balance
-        </span>
-
-        <strong id="availableBalance">
-          25 PLS
-        </strong>
-
-      </div>
-
-    </div>
-
-
-    <div class="profile-card">
-
-      <span class="stat-label">
-        ACCOUNT
-      </span>
-
-      <div id="profileName">
-        PULSE User
-      </div>
-
-      <div id="profile">
-        Loading your profile...
-      </div>
-
-    </div>
-
+    <br>
 
     <details class="dashboard-folder">
-
-      <summary>
-        ⚡ Available Tasks
-      </summary>
-
+      <summary>⚡ Available Tasks</summary>
       <div class="folder-content">
-
-        <div id="tasks">
-          Loading available tasks...
-        </div>
-
+        <div id="tasks">Loading available tasks...</div>
       </div>
-
     </details>
 
-
     <details class="dashboard-folder">
-
-      <summary>
-        📋 My Submissions
-      </summary>
-
+      <summary>📋 My Submissions</summary>
       <div class="folder-content">
-
-        <div id="submissions">
-          Loading your submissions...
-        </div>
-
+        <div id="submissions">Loading your submissions...</div>
       </div>
-
     </details>
 
-
     <details class="dashboard-folder">
-
-      <summary>
-        📊 Points Activity
-      </summary>
-
+      <summary>📊 Points Activity</summary>
       <div class="folder-content">
-
-        <div id="activity">
-          Loading activity...
-        </div>
-
+        <div id="activity">Loading activity...</div>
       </div>
-
     </details>
 
-
     <details class="dashboard-folder">
-
-      <summary>
-        🎁 Rewards
-      </summary>
-
+      <summary>🎁 Rewards</summary>
       <div class="folder-content">
 
         <p>
@@ -798,15 +321,8 @@
         >
 
         <select id="rewardType">
-
-          <option value="">
-            Select Reward Type
-          </option>
-
-          <option value="manual">
-            Manual Reward
-          </option>
-
+          <option value="">Select Reward Type</option>
+          <option value="manual">Manual Reward</option>
         </select>
 
         <input
@@ -818,7 +334,6 @@
         <button
           id="redeem"
           type="button"
-          class="dashboard-button"
         >
           Request Reward
         </button>
@@ -830,16 +345,10 @@
         </div>
 
       </div>
-
     </details>
 
-
     <details class="dashboard-folder">
-
-      <summary>
-        🔔 Notifications
-      </summary>
-
+      <summary>🔔 Notifications</summary>
       <div class="folder-content">
 
         <div id="notifications">
@@ -849,112 +358,82 @@
         <button
           id="markNotificationsRead"
           type="button"
-          class="dashboard-button"
           onclick="markNotificationsRead()"
         >
           Mark Read
         </button>
 
       </div>
-
     </details>
 
+    <br>
 
-    <h2>
-      Quick Access
-    </h2>
+    <a
+      class="pulse-link"
+      href="tasks.html"
+    >
+      <span style="--i:0">V</span>
+      <span style="--i:1">i</span>
+      <span style="--i:2">e</span>
+      <span style="--i:3">w</span>
+      <span style="--i:4"> </span>
+      <span style="--i:5">T</span>
+      <span style="--i:6">a</span>
+      <span style="--i:7">s</span>
+      <span style="--i:8">k</span>
+      <span style="--i:9">s</span>
+    </a>
 
+    <br>
 
-    <div class="quick-access">
+    <a
+      class="pulse-link"
+      href="submissions.html"
+    >
+      <span style="--i:0">V</span>
+      <span style="--i:1">i</span>
+      <span style="--i:2">e</span>
+      <span style="--i:3">w</span>
+      <span style="--i:4"> </span>
+      <span style="--i:5">S</span>
+      <span style="--i:6">u</span>
+      <span style="--i:7">b</span>
+      <span style="--i:8">m</span>
+      <span style="--i:9">i</span>
+      <span style="--i:10">s</span>
+      <span style="--i:11">s</span>
+      <span style="--i:12">i</span>
+      <span style="--i:13">o</span>
+      <span style="--i:14">n</span>
+      <span style="--i:15">s</span>
+    </a>
 
-      <a class="pulse-link" href="tasks.html">
-        <span style="--i:0">⚡</span>
-        <span style="--i:1"> </span>
-        <span style="--i:2">T</span>
-        <span style="--i:3">a</span>
-        <span style="--i:4">s</span>
-        <span style="--i:5">k</span>
-        <span style="--i:6">s</span>
-      </a>
+    <br>
 
-      <a class="pulse-link" href="surveys.html">
-        <span style="--i:0">📝</span>
-        <span style="--i:1"> </span>
-        <span style="--i:2">S</span>
-        <span style="--i:3">u</span>
-        <span style="--i:4">r</span>
-        <span style="--i:5">v</span>
-        <span style="--i:6">e</span>
-        <span style="--i:7">y</span>
-        <span style="--i:8">s</span>
-      </a>
+    <a
+      class="pulse-link"
+      href="earnings.html"
+    >
+      <span style="--i:0">V</span>
+      <span style="--i:1">i</span>
+      <span style="--i:2">e</span>
+      <span style="--i:3">w</span>
+      <span style="--i:4"> </span>
+      <span style="--i:5">E</span>
+      <span style="--i:6">a</span>
+      <span style="--i:7">r</span>
+      <span style="--i:8">n</span>
+      <span style="--i:9">i</span>
+      <span style="--i:10">n</span>
+      <span style="--i:11">g</span>
+      <span style="--i:12">s</span>
+    </a>
 
-      <a class="pulse-link" href="submissions.html">
-        <span style="--i:0">📋</span>
-        <span style="--i:1"> </span>
-        <span style="--i:2">S</span>
-        <span style="--i:3">u</span>
-        <span style="--i:4">b</span>
-        <span style="--i:5">m</span>
-        <span style="--i:6">i</span>
-        <span style="--i:7">s</span>
-        <span style="--i:8">s</span>
-        <span style="--i:9">i</span>
-        <span style="--i:10">o</span>
-        <span style="--i:11">n</span>
-        <span style="--i:12">s</span>
-      </a>
-
-      <a class="pulse-link" href="earnings.html">
-        <span style="--i:0">💰</span>
-        <span style="--i:1"> </span>
-        <span style="--i:2">E</span>
-        <span style="--i:3">a</span>
-        <span style="--i:4">r</span>
-        <span style="--i:5">n</span>
-        <span style="--i:6">i</span>
-        <span style="--i:7">n</span>
-        <span style="--i:8">g</span>
-        <span style="--i:9">s</span>
-      </a>
-
-      <a class="pulse-link" href="notifications.html">
-        <span style="--i:0">🔔</span>
-        <span style="--i:1"> </span>
-        <span style="--i:2">N</span>
-        <span style="--i:3">o</span>
-        <span style="--i:4">t</span>
-        <span style="--i:5">i</span>
-        <span style="--i:6">f</span>
-        <span style="--i:7">i</span>
-        <span style="--i:8">c</span>
-        <span style="--i:9">a</span>
-        <span style="--i:10">t</span>
-        <span style="--i:11">i</span>
-        <span style="--i:12">o</span>
-        <span style="--i:13">n</span>
-        <span style="--i:14">s</span>
-      </a>
-
-      <a class="pulse-link" href="profile.html">
-        <span style="--i:0">👤</span>
-        <span style="--i:1"> </span>
-        <span style="--i:2">P</span>
-        <span style="--i:3">r</span>
-        <span style="--i:4">o</span>
-        <span style="--i:5">f</span>
-        <span style="--i:6">i</span>
-        <span style="--i:7">l</span>
-        <span style="--i:8">e</span>
-      </a>
-
-    </div>
-
+    <br><br>
 
     <button
       id="logoutBtn"
       type="button"
-      class="dashboard-button"
     >
       Sign Out
     </button>
@@ -964,9 +443,7 @@
 
   <footer>
 
-    <p>
-      © 2026 PULSE
-    </p>
+    <p>© 2026 PULSE</p>
 
     <div>
 
@@ -1024,23 +501,15 @@
 
 </main>
 
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 
 <script>
-  const logoutBtn =
-    document.getElementById("logoutBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-  if (
-    logoutBtn &&
-    typeof logout === "function"
-  ) {
-    logoutBtn.addEventListener(
-      "click",
-      logout
-    );
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", logout);
   }
 </script>
 
