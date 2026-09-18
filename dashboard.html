@@ -9,10 +9,6 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* =====================================================
-       PULSE DASHBOARD VISUAL DESIGN
-       ===================================================== */
-
     html,
     body {
       margin: 0;
@@ -81,10 +77,6 @@
       }
     }
 
-    /* =====================================================
-       HEADER
-       ===================================================== */
-
     header {
       width: 100%;
       padding: 10px 12px;
@@ -103,10 +95,15 @@
       justify-content: space-between;
     }
 
-    .site-header > .pulse-link {
-      font-size: 1rem;
-      font-weight: 900;
-      letter-spacing: 3px;
+    .main-logo {
+      width: 185px;
+      height: auto;
+      display: block;
+      object-fit: contain;
+
+      filter:
+        drop-shadow(0 0 5px rgba(0,180,255,.65))
+        drop-shadow(0 0 14px rgba(130,30,255,.45));
     }
 
     .site-menu {
@@ -132,16 +129,8 @@
       z-index: 50;
     }
 
-    .site-menu[open] > details {
-      display: block;
-    }
-
     .site-menu > details {
       margin-top: 5px;
-    }
-
-    .site-menu > details > summary {
-      cursor: pointer;
     }
 
     .site-menu .pulse-folder {
@@ -253,8 +242,6 @@
       flex-shrink: 0;
     }
 
-    /* LEVEL 3 — NO EFFECT */
-
     .page-link {
       display: block;
       text-decoration: none;
@@ -269,10 +256,6 @@
       text-shadow: none !important;
       transform: none !important;
     }
-
-    /* =====================================================
-       MAIN
-       ===================================================== */
 
     main {
       width: 100%;
@@ -294,10 +277,6 @@
     .dashboard-content {
       width: 100%;
     }
-
-    /* =====================================================
-       WELCOME
-       ===================================================== */
 
     .dashboard-welcome {
       padding: 12px 14px;
@@ -333,13 +312,8 @@
       color: #91a8d0 !important;
     }
 
-    /* =====================================================
-       BALANCE
-       ===================================================== */
-
     .balance-box {
       position: relative;
-
       width: 100%;
       min-height: 92px;
 
@@ -347,7 +321,6 @@
       margin: 7px 0;
 
       box-sizing: border-box;
-
       overflow: hidden;
 
       border: 1px solid #315cff !important;
@@ -460,15 +433,11 @@
 
     .balance-title {
       display: block;
-
       margin-bottom: 3px;
 
       font-size: .54rem !important;
-
       font-weight: 800;
-
       letter-spacing: 2px;
-
       text-transform: uppercase;
 
       color: #8ca3ce !important;
@@ -478,11 +447,8 @@
       display: inline-block;
 
       font-size: 2.45rem !important;
-
       line-height: .9 !important;
-
       font-weight: 900 !important;
-
       letter-spacing: -1px;
 
       background:
@@ -565,11 +531,9 @@
 
     .balance-unit {
       display: block;
-
       margin-top: 2px;
 
       font-size: .54rem !important;
-
       letter-spacing: 3px;
 
       color: #8ba3ca !important;
@@ -590,29 +554,21 @@
         rgba(0,234,255,.75);
     }
 
-    /* =====================================================
-       STATS
-       ===================================================== */
-
     .dashboard-stats {
       display: grid;
-
-      grid-template-columns:
-        repeat(3, 1fr);
-
+      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
-
       margin: 7px 0;
     }
 
     .stat-card {
       padding: 8px 5px !important;
-
       min-width: 0;
 
       border-radius: 7px !important;
 
-      border: 1px solid rgba(35, 78, 220, .60) !important;
+      border: 1px solid
+        rgba(35, 78, 220, .60) !important;
 
       background:
         linear-gradient(
@@ -630,7 +586,6 @@
       display: block;
 
       font-size: .46rem !important;
-
       letter-spacing: .8px;
 
       color: #8197bc !important;
@@ -646,10 +601,6 @@
       color: #e1eaff !important;
     }
 
-    /* =====================================================
-       PROFILE
-       ===================================================== */
-
     .profile-card {
       padding: 9px 12px !important;
       margin: 7px 0;
@@ -663,14 +614,14 @@
           rgba(2, 7, 29, .97)
         ) !important;
 
-      border: 1px solid rgba(36, 77, 220, .60) !important;
+      border: 1px solid
+        rgba(36, 77, 220, .60) !important;
     }
 
     .profile-card #profileName {
       margin-top: 3px;
 
       font-size: .75rem;
-
       font-weight: 800;
 
       color: #fff;
@@ -683,10 +634,6 @@
 
       color: #8196ba;
     }
-
-    /* =====================================================
-       DASHBOARD FOLDERS
-       ===================================================== */
 
     .dashboard-folder {
       width: 100%;
@@ -704,7 +651,8 @@
           rgba(2, 7, 27, .98)
         );
 
-      border: 1px solid rgba(30, 76, 220, .68);
+      border: 1px solid
+        rgba(30, 76, 220, .68);
 
       box-shadow:
         0 0 6px
@@ -719,15 +667,12 @@
       padding: 0 11px;
 
       display: flex;
-
       align-items: center;
 
       cursor: pointer;
-
       list-style: none;
 
       font-size: .70rem;
-
       font-weight: 800;
 
       color: #e8efff;
@@ -761,10 +706,6 @@
       padding: 0 8px 8px !important;
     }
 
-    /* =====================================================
-       LOADING / CONTENT BOXES
-       ===================================================== */
-
     #tasks,
     #submissions,
     #activity,
@@ -774,13 +715,8 @@
       box-sizing: border-box;
     }
 
-    /* =====================================================
-       REWARDS
-       ===================================================== */
-
     .dashboard-folder p {
       font-size: .60rem;
-
       color: #91a4c7;
     }
 
@@ -798,7 +734,8 @@
 
       border-radius: 5px !important;
 
-      border: 1px solid rgba(35, 80, 215, .62) !important;
+      border: 1px solid
+        rgba(35, 80, 215, .62) !important;
 
       background:
         rgba(3, 13, 42, .95) !important;
@@ -818,10 +755,6 @@
         0 0 8px
         rgba(0,180,255,.25);
     }
-
-    /* =====================================================
-       BUTTONS
-       ===================================================== */
 
     .dashboard-button {
       width: 100%;
@@ -855,10 +788,6 @@
 
       cursor: pointer;
     }
-
-    /* =====================================================
-       QUICK ACCESS
-       ===================================================== */
 
     .dashboard-content > h2 {
       margin: 12px 0 6px !important;
@@ -901,10 +830,6 @@
       font-size: .59rem;
     }
 
-    /* =====================================================
-       SIGN OUT
-       ===================================================== */
-
     #logoutBtn {
       margin-top: 6px;
 
@@ -923,10 +848,6 @@
         0 0 10px
         rgba(200,30,255,.30);
     }
-
-    /* =====================================================
-       FOOTER
-       ===================================================== */
 
     footer {
       width: 100%;
@@ -952,15 +873,14 @@
 
     footer a {
       margin: 0 4px;
-
       font-size: .52rem;
     }
 
-    /* =====================================================
-       MOBILE
-       ===================================================== */
-
     @media (max-width: 480px) {
+
+      .main-logo {
+        width: 185px;
+      }
 
       main {
         padding-left: 9px !important;
@@ -988,12 +908,12 @@
   <header>
     <div class="site-header">
 
-      <a href="index.html" class="pulse-link">
-        <span style="--i:0">P</span>
-        <span style="--i:1">U</span>
-        <span style="--i:2">L</span>
-        <span style="--i:3">S</span>
-        <span style="--i:4">E</span>
+      <a href="index.html">
+        <img
+          src="pulse-logo.png"
+          alt="PULSE Token"
+          class="main-logo"
+        >
       </a>
 
       <details class="site-menu">
@@ -1009,11 +929,7 @@
 
         <details>
           <summary class="pulse-folder">
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
             <span style="--i:0">M</span>
             <span style="--i:1">a</span>
             <span style="--i:2">i</span>
@@ -1030,11 +946,7 @@
 
         <details>
           <summary class="pulse-folder">
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
             <span style="--i:0">P</span>
             <span style="--i:1">U</span>
             <span style="--i:2">L</span>
@@ -1054,11 +966,7 @@
 
         <details>
           <summary class="pulse-folder">
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
             <span style="--i:0">A</span>
             <span style="--i:1">c</span>
             <span style="--i:2">c</span>
@@ -1077,11 +985,7 @@
 
         <details>
           <summary class="pulse-folder">
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
             <span style="--i:0">L</span>
             <span style="--i:1">e</span>
             <span style="--i:2">g</span>
@@ -1098,11 +1002,7 @@
 
         <details>
           <summary class="pulse-folder">
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
             <span style="--i:0">A</span>
             <span style="--i:1">d</span>
             <span style="--i:2">m</span>
