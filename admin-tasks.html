@@ -1,1 +1,102 @@
-f
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PULSE Token — Admin Tasks</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <h1>PULSE Token</h1>
+
+    <nav>
+      <a href="admin.html">Admin Panel</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <section class="page-header">
+      <h2>Task Management</h2>
+      <p>Create and manage tasks for PULSE users.</p>
+    </section>
+
+    <section class="card">
+
+      <h3>Create Task</h3>
+
+      <form id="task-form">
+
+        <label for="task-title">Task title</label>
+        <input
+          id="task-title"
+          name="title"
+          type="text"
+          required
+        >
+
+        <label for="task-description">Task description</label>
+        <textarea
+          id="task-description"
+          name="description"
+          rows="5"
+        ></textarea>
+
+        <label for="task-points">Points</label>
+        <input
+          id="task-points"
+          name="points"
+          type="number"
+          min="0"
+          step="1"
+          required
+        >
+
+        <label class="checkbox-row">
+          <input
+            id="task-completed"
+            name="completed"
+            type="checkbox"
+          >
+          Completed
+        </label>
+
+        <button type="submit">Create Task</button>
+
+        <p id="form-message" role="status"></p>
+
+      </form>
+
+    </section>
+
+    <section class="card">
+
+      <div class="section-heading">
+
+        <h3>Active Tasks</h3>
+
+        <button
+          id="refresh-tasks"
+          type="button"
+        >
+          Refresh
+        </button>
+
+      </div>
+
+      <div id="tasks-list">
+        <p>Loading tasks...</p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="admin-tasks.js"></script>
+
+</body>
+</html>
