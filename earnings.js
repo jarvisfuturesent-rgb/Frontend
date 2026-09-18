@@ -1,15 +1,27 @@
 // PULSE — Earnings & Balance
+// Controls earnings.html only.
 
 document.addEventListener("DOMContentLoaded", loadEarnings);
 
 async function loadEarnings() {
-    const container =
-        document.getElementById("earningsContent");
+    const balance = document.getElementById("balance");
+    const totalEarned = document.getElementById("totalEarned");
+    const pendingWithdrawal =
+        document.getElementById("pendingWithdrawal");
+    const availableBalance =
+        document.getElementById("availableBalance");
 
-    if (!container) return;
-
-    container.innerHTML =
-        "<p>Loading points and balance...</p>";
+    if (
+        !balance ||
+        !totalEarned ||
+        !pendingWithdrawal ||
+        !availableBalance
+    ) {
+        console.error(
+            "Earnings page elements are missing."
+        );
+        return;
+    }
 
     const user = await requireLogin();
 
@@ -19,7 +31,7 @@ async function loadEarnings() {
         const { data: profile, error } =
             await window.supabaseClient
                 .from("profiles")
-                .select("*")
+                .select("points")
                 .eq("id", user.id)
                 .maybeSingle();
 
@@ -27,37 +39,17 @@ async function loadEarnings() {
             throw error;
         }
 
-        const points =
-            profile?.points ??
-            profile?.balance ??
-            0;
+        const points = Number(profile?.points ?? 0);
 
-        container.innerHTML = `
-            <div class="panel">
-                <h2>Your Points</h2>
+        balance.textContent = `${points} Points`;
+        totalEarned.textContent =
+            `Total Earned: ${points} Points`;
 
-                <p>
-                    <strong>
-                        ${escapeHTML(points)}
-                    </strong>
-                </p>
+        pendingWithdrawal.textContent =
+            "Pending Withdrawal: 0 Points";
 
-                <p>
-                    Points are earned by completing
-                    eligible PULSE tasks and surveys.
-                </p>
-            </div>
-
-            <div class="panel">
-                <h3>Account</h3>
-
-                <p>
-                    ${escapeHTML(
-                        user.email || ""
-                    )}
-                </p>
-            </div>
-        `;
+        availableBalance.textContent =
+            `Available Balance: ${points} Points`;
 
     } catch (error) {
         console.error(
@@ -65,26 +57,16 @@ async function loadEarnings() {
             error
         );
 
-        container.innerHTML = `
-            <div class="panel">
-                <h3>Unable to Load Balance</h3>
-                <p>
-                    Please try again later.
-                </p>
-            </div>
-        `;
-    }
-}
+        balance.textContent =
+            "Unable to load balance.";
 
-function escapeHTML(value) {
-    if (value === null || value === undefined) {
-        return "";
-    }
+        totalEarned.textContent =
+            "Total Earned: Unable to load";
 
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        pendingWithdrawal.textContent =
+            "Pending Withdrawal: Unable to load";
+
+        availableBalance.textContent =
+            "Available Balance: Unable to load";
+    }
 }
