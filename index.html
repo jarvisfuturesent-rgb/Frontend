@@ -8,60 +8,100 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* PULSE color-wave */
-    .wave-text {
+    /* =========================================
+       PULSE LETTER EFFECT
+       ========================================= */
+
+    .pulse-text,
+    .pulse-link {
       display: inline-flex;
       align-items: center;
       white-space: nowrap;
     }
 
-    .wave-text span {
+    .pulse-text span,
+    .pulse-link span {
       display: inline-block;
-      animation: pulseColorWave 4s ease-in-out infinite;
+      animation: pulseLetter 3.6s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 0.08s);
     }
 
-    @keyframes pulseColorWave {
-      0%, 100% {
+    @keyframes pulseLetter {
+      0% {
         color: inherit;
         text-shadow: none;
-        transform: translateY(0);
+        transform: scale(1);
       }
 
-      25% {
-        color: #00d9ff;
+      12% {
+        color: #00f6ff;
         text-shadow:
-          0 0 5px rgba(0,217,255,.65),
-          0 0 12px rgba(0,217,255,.25);
-        transform: translateY(-1px);
+          0 0 4px #00f6ff,
+          0 0 10px rgba(0,246,255,.7);
+        transform: scale(1.08);
       }
 
-      50% {
-        color: #8b5cff;
+      24% {
+        color: #008cff;
         text-shadow:
-          0 0 5px rgba(139,92,255,.65),
-          0 0 12px rgba(139,92,255,.25);
-        transform: translateY(0);
+          0 0 5px #008cff,
+          0 0 12px rgba(0,140,255,.7);
+        transform: scale(1);
       }
 
-      75% {
+      36% {
+        color: #5c5cff;
+        text-shadow:
+          0 0 5px #5c5cff,
+          0 0 12px rgba(92,92,255,.7);
+        transform: scale(1.06);
+      }
+
+      48% {
+        color: #9b4dff;
+        text-shadow:
+          0 0 5px #9b4dff,
+          0 0 12px rgba(155,77,255,.7);
+        transform: scale(1);
+      }
+
+      60% {
+        color: #ff3bd4;
+        text-shadow:
+          0 0 5px #ff3bd4,
+          0 0 12px rgba(255,59,212,.7);
+        transform: scale(1.08);
+      }
+
+      72% {
+        color: #ff4f81;
+        text-shadow:
+          0 0 5px #ff4f81,
+          0 0 12px rgba(255,79,129,.7);
+        transform: scale(1);
+      }
+
+      84% {
         color: #00ffc8;
         text-shadow:
-          0 0 5px rgba(0,255,200,.65),
-          0 0 12px rgba(0,255,200,.25);
-        transform: translateY(1px);
+          0 0 5px #00ffc8,
+          0 0 12px rgba(0,255,200,.7);
+        transform: scale(1.06);
+      }
+
+      100% {
+        color: inherit;
+        text-shadow: none;
+        transform: scale(1);
       }
     }
 
-    /* Every PULSE link gets the wave */
-    .wave-link {
-      display: inline-flex;
-      align-items: center;
+    .pulse-link {
       text-decoration: none;
     }
 
-    .wave-link span {
-      display: inline-block;
-      animation: pulseColorWave 4s ease-in-out infinite;
+    .pulse-link:hover span {
+      animation-duration: 1.4s;
     }
 
     .menu-logo {
@@ -80,413 +120,574 @@
 
 <body>
 
-  <main class="app-shell">
+<main class="app-shell">
 
-    <!-- HEADER -->
-    <header class="hero">
+  <!-- HEADER -->
+  <header class="hero">
 
-      <img
-        src="pulse-logo.png"
-        alt="PULSE"
-        class="pulse-logo"
-      >
+    <img src="pulse-logo.png" alt="PULSE" class="pulse-logo">
 
-      <p class="tagline">
-        Complete •
-        <span class="wave-text">
-          <span>E</span><span>a</span><span>r</span><span>n</span>
-          <span> </span><span>•</span><span> </span>
-          <span>G</span><span>e</span><span>t</span>
-          <span> </span>
-          <span>R</span><span>e</span><span>w</span><span>a</span>
-          <span>r</span><span>d</span><span>e</span><span>d</span>
-        </span>
-      </p>
+    <p class="tagline">
+      Complete •
+      <span class="pulse-text">
+        <span style="--i:0">E</span>
+        <span style="--i:1">a</span>
+        <span style="--i:2">r</span>
+        <span style="--i:3">n</span>
+        <span style="--i:4"> </span>
+        <span style="--i:5">•</span>
+        <span style="--i:6"> </span>
+        <span style="--i:7">G</span>
+        <span style="--i:8">e</span>
+        <span style="--i:9">t</span>
+        <span style="--i:10"> </span>
+        <span style="--i:11">R</span>
+        <span style="--i:12">e</span>
+        <span style="--i:13">w</span>
+        <span style="--i:14">a</span>
+        <span style="--i:15">r</span>
+        <span style="--i:16">d</span>
+        <span style="--i:17">e</span>
+        <span style="--i:18">d</span>
+      </span>
+    </p>
 
-      <!-- MENU -->
-      <details class="menu">
+    <!-- MENU -->
+    <details class="menu">
+      <summary>☰ Menu</summary>
 
-        <summary>☰ Menu</summary>
+      <div class="menu-panel">
 
-        <div class="menu-panel">
+        <!-- MAIN -->
+        <details>
+          <summary>
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
 
-          <!-- MAIN -->
-          <details>
-            <summary>
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+            <span class="pulse-text">
+              <span style="--i:0">M</span>
+              <span style="--i:1">a</span>
+              <span style="--i:2">i</span>
+              <span style="--i:3">n</span>
+            </span>
+          </summary>
 
-              <span class="wave-text">
-                <span>M</span><span>a</span><span>i</span><span>n</span>
-              </span>
-            </summary>
+          <div>
 
-            <div>
-              <a class="wave-link" href="index.html">
-                <span>🏠</span><span> </span>
-                <span>H</span><span>o</span><span>m</span><span>e</span>
-              </a>
+            <a class="pulse-link" href="index.html">
+              <span style="--i:0">🏠</span>
+              <span style="--i:1"> </span>
+              <span style="--i:2">H</span><span style="--i:3">o</span>
+              <span style="--i:4">m</span><span style="--i:5">e</span>
+            </a>
 
-              <a class="wave-link" href="how-it-works.html">
-                <span>⚡</span><span> </span>
-                <span>H</span><span>o</span><span>w</span>
-                <span> </span>
-                <span>I</span><span>t</span>
-                <span> </span>
-                <span>W</span><span>o</span><span>r</span><span>k</span><span>s</span>
-              </a>
+            <a class="pulse-link" href="how-it-works.html">
+              <span style="--i:0">⚡</span><span style="--i:1"> </span>
+              <span style="--i:2">H</span><span style="--i:3">o</span>
+              <span style="--i:4">w</span><span style="--i:5"> </span>
+              <span style="--i:6">I</span><span style="--i:7">t</span>
+              <span style="--i:8"> </span>
+              <span style="--i:9">W</span><span style="--i:10">o</span>
+              <span style="--i:11">r</span><span style="--i:12">k</span>
+              <span style="--i:13">s</span>
+            </a>
 
-              <a class="wave-link" href="about.html">
-                <span>ℹ️</span><span> </span>
-                <span>A</span><span>b</span><span>o</span><span>u</span><span>t</span>
-                <span> </span>
-                <span>P</span><span>U</span><span>L</span><span>S</span><span>E</span>
-              </a>
+            <a class="pulse-link" href="about.html">
+              <span style="--i:0">ℹ️</span><span style="--i:1"> </span>
+              <span style="--i:2">A</span><span style="--i:3">b</span>
+              <span style="--i:4">o</span><span style="--i:5">u</span>
+              <span style="--i:6">t</span><span style="--i:7"> </span>
+              <span style="--i:8">P</span><span style="--i:9">U</span>
+              <span style="--i:10">L</span><span style="--i:11">S</span>
+              <span style="--i:12">E</span>
+            </a>
 
-              <a class="wave-link" href="contact.html">
-                <span>✉️</span><span> </span>
-                <span>C</span><span>o</span><span>n</span><span>t</span><span>a</span><span>c</span><span>t</span>
-              </a>
-            </div>
-          </details>
+            <a class="pulse-link" href="contact.html">
+              <span style="--i:0">✉️</span><span style="--i:1"> </span>
+              <span style="--i:2">C</span><span style="--i:3">o</span>
+              <span style="--i:4">n</span><span style="--i:5">t</span>
+              <span style="--i:6">a</span><span style="--i:7">c</span>
+              <span style="--i:8">t</span>
+            </a>
 
-          <!-- PULSE -->
-          <details>
-            <summary>
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-
-              <span class="wave-text">
-                <span>P</span><span>U</span><span>L</span><span>S</span><span>E</span>
-              </span>
-            </summary>
-
-            <div>
-              <a class="wave-link" href="tasks.html">
-                <span>⚡</span><span> </span>
-                <span>A</span><span>v</span><span>a</span><span>i</span><span>l</span><span>a</span><span>b</span><span>l</span><span>e</span>
-                <span> </span>
-                <span>T</span><span>a</span><span>s</span><span>k</span><span>s</span>
-              </a>
-
-              <a class="wave-link" href="surveys.html">
-                <span>📝</span><span> </span>
-                <span>S</span><span>u</span><span>r</span><span>v</span><span>e</span><span>y</span><span>s</span>
-              </a>
-
-              <a class="wave-link" href="submissions.html">
-                <span>📋</span><span> </span>
-                <span>M</span><span>y</span>
-                <span> </span>
-                <span>S</span><span>u</span><span>b</span><span>m</span><span>i</span><span>s</span><span>s</span><span>i</span><span>o</span><span>n</span><span>s</span>
-              </a>
-
-              <a class="wave-link" href="earnings.html">
-                <span>💰</span><span> </span>
-                <span>E</span><span>a</span><span>r</span><span>n</span><span>i</span><span>n</span><span>g</span><span>s</span>
-                <span> </span>
-                <span>&amp;</span>
-                <span> </span>
-                <span>B</span><span>a</span><span>l</span><span>a</span><span>n</span><span>c</span><span>e</span>
-              </a>
-
-              <a class="wave-link" href="notifications.html">
-                <span>🔔</span><span> </span>
-                <span>N</span><span>o</span><span>t</span><span>i</span><span>f</span><span>i</span><span>c</span><span>a</span><span>t</span><span>i</span><span>o</span><span>n</span><span>s</span>
-              </a>
-            </div>
-          </details>
-
-          <!-- ACCOUNT -->
-          <details>
-            <summary>
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-
-              <span class="wave-text">
-                <span>A</span><span>c</span><span>c</span><span>o</span>
-                <span>u</span><span>n</span><span>t</span>
-              </span>
-            </summary>
-
-            <div>
-              <a class="wave-link" href="auth.html">
-                <span>🔐</span><span> </span>
-                <span>L</span><span>o</span><span>g</span><span>i</span><span>n</span>
-                <span> </span>
-                <span>/</span>
-                <span> </span>
-                <span>S</span><span>i</span><span>g</span><span>n</span>
-                <span> </span>
-                <span>U</span><span>p</span>
-              </a>
-
-              <a class="wave-link" href="dashboard.html">
-                <span>👤</span><span> </span>
-                <span>D</span><span>a</span><span>s</span><span>h</span><span>b</span><span>o</span><span>a</span><span>r</span><span>d</span>
-              </a>
-
-              <a class="wave-link" href="profile.html">
-                <span>⚙️</span><span> </span>
-                <span>P</span><span>r</span><span>o</span><span>f</span><span>i</span><span>l</span><span>e</span>
-                <span> </span>
-                <span>&amp;</span>
-                <span> </span>
-                <span>A</span><span>c</span><span>c</span><span>o</span><span>u</span><span>n</span><span>t</span>
-              </a>
-
-              <a class="wave-link" href="reset-password.html">
-                <span>🔑</span><span> </span>
-                <span>R</span><span>e</span><span>s</span><span>e</span><span>t</span>
-                <span> </span>
-                <span>P</span><span>a</span><span>s</span><span>s</span><span>w</span><span>o</span><span>r</span><span>d</span>
-              </a>
-            </div>
-          </details>
-
-          <!-- LEGAL -->
-          <details>
-            <summary>
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-
-              <span class="wave-text">
-                <span>L</span><span>e</span><span>g</span><span>a</span><span>l</span>
-              </span>
-            </summary>
-
-            <div>
-              <a class="wave-link" href="terms.html">
-                <span>📜</span><span> </span>
-                <span>T</span><span>e</span><span>r</span><span>m</span><span>s</span>
-              </a>
-
-              <a class="wave-link" href="privacy.html">
-                <span>🔒</span><span> </span>
-                <span>P</span><span>r</span><span>i</span><span>v</span><span>a</span><span>c</span><span>y</span>
-                <span> </span>
-                <span>P</span><span>o</span><span>l</span><span>i</span><span>c</span><span>y</span>
-              </a>
-
-              <a class="wave-link" href="disclosures.html">
-                <span>⚖️</span><span> </span>
-                <span>D</span><span>i</span><span>s</span><span>c</span><span>l</span><span>o</span><span>s</span><span>u</span><span>r</span><span>e</span><span>s</span>
-              </a>
-            </div>
-          </details>
-
-          <!-- ADMINISTRATION -->
-          <details>
-            <summary>
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-
-              <span class="wave-text">
-                <span>A</span><span>d</span><span>m</span><span>i</span>
-                <span>n</span><span>i</span><span>s</span><span>t</span>
-                <span>r</span><span>a</span><span>t</span><span>i</span>
-                <span>o</span><span>n</span>
-              </span>
-            </summary>
-
-            <div>
-              <a class="wave-link" href="admin.html">
-                <span>⚙️</span><span> </span>
-                <span>A</span><span>d</span><span>m</span><span>i</span><span>n</span>
-                <span> </span>
-                <span>D</span><span>a</span><span>s</span><span>h</span><span>b</span><span>o</span><span>a</span><span>r</span><span>d</span>
-              </a>
-
-              <a class="wave-link" href="admin-tasks.html">
-                <span>📋</span><span> </span>
-                <span>T</span><span>a</span><span>s</span><span>k</span>
-                <span> </span>
-                <span>M</span><span>a</span><span>n</span><span>a</span><span>g</span><span>e</span><span>m</span><span>e</span><span>n</span><span>t</span>
-              </a>
-
-              <a class="wave-link" href="admin-businesses.html">
-                <span>🏢</span><span> </span>
-                <span>B</span><span>u</span><span>s</span><span>i</span><span>n</span><span>e</span><span>s</span><span>s</span>
-                <span> </span>
-                <span>M</span><span>a</span><span>n</span><span>a</span><span>g</span><span>e</span><span>m</span><span>e</span><span>n</span><span>t</span>
-              </a>
-
-              <a class="wave-link" href="admin-submissions.html">
-                <span>📝</span><span> </span>
-                <span>S</span><span>u</span><span>b</span><span>m</span><span>i</span><span>s</span><span>s</span><span>i</span><span>o</span><span>n</span>
-                <span> </span>
-                <span>R</span><span>e</span><span>v</span><span>i</span><span>e</span><span>w</span>
-              </a>
-
-              <a class="wave-link" href="admin-rewards.html">
-                <span>💰</span><span> </span>
-                <span>R</span><span>e</span><span>w</span><span>a</span><span>r</span><span>d</span>
-                <span> </span>
-                <span>R</span><span>e</span><span>q</span><span>u</span><span>e</span><span>s</span><span>t</span><span>s</span>
-              </a>
-
-              <a class="wave-link" href="admin-reports.html">
-                <span>📊</span><span> </span>
-                <span>R</span><span>e</span><span>p</span><span>o</span><span>r</span><span>t</span><span>s</span>
-                <span> </span>
-                <span>&amp;</span>
-                <span> </span>
-                <span>R</span><span>e</span><span>c</span><span>o</span><span>r</span><span>d</span><span>s</span>
-              </a>
-            </div>
-          </details>
-
-        </div>
-      </details>
-
-    </header>
+          </div>
+        </details>
 
 
-    <!-- HERO CONTENT -->
-    <section class="panel">
+        <!-- PULSE -->
+        <details>
+          <summary>
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
 
-      <h1>Welcome to the PULSE Ecosystem</h1>
+            <span class="pulse-text">
+              <span style="--i:0">P</span>
+              <span style="--i:1">U</span>
+              <span style="--i:2">L</span>
+              <span style="--i:3">S</span>
+              <span style="--i:4">E</span>
+            </span>
+          </summary>
 
-      <p>
-        Complete tasks, participate in surveys, and earn rewards through
-        the PULSE experience.
-      </p>
+          <div>
 
-    </section>
+            <a class="pulse-link" href="tasks.html">
+              <span style="--i:0">⚡</span><span style="--i:1"> </span>
+              <span style="--i:2">A</span><span style="--i:3">v</span>
+              <span style="--i:4">a</span><span style="--i:5">i</span>
+              <span style="--i:6">l</span><span style="--i:7">a</span>
+              <span style="--i:8">b</span><span style="--i:9">l</span>
+              <span style="--i:10">e</span><span style="--i:11"> </span>
+              <span style="--i:12">T</span><span style="--i:13">a</span>
+              <span style="--i:14">s</span><span style="--i:15">k</span>
+              <span style="--i:16">s</span>
+            </a>
+
+            <a class="pulse-link" href="surveys.html">
+              <span style="--i:0">📝</span><span style="--i:1"> </span>
+              <span style="--i:2">S</span><span style="--i:3">u</span>
+              <span style="--i:4">r</span><span style="--i:5">v</span>
+              <span style="--i:6">e</span><span style="--i:7">y</span>
+              <span style="--i:8">s</span>
+            </a>
+
+            <a class="pulse-link" href="submissions.html">
+              <span style="--i:0">📋</span><span style="--i:1"> </span>
+              <span style="--i:2">M</span><span style="--i:3">y</span>
+              <span style="--i:4"> </span>
+              <span style="--i:5">S</span><span style="--i:6">u</span>
+              <span style="--i:7">b</span><span style="--i:8">m</span>
+              <span style="--i:9">i</span><span style="--i:10">s</span>
+              <span style="--i:11">s</span><span style="--i:12">i</span>
+              <span style="--i:13">o</span><span style="--i:14">n</span>
+              <span style="--i:15">s</span>
+            </a>
+
+            <a class="pulse-link" href="earnings.html">
+              <span style="--i:0">💰</span><span style="--i:1"> </span>
+              <span style="--i:2">E</span><span style="--i:3">a</span>
+              <span style="--i:4">r</span><span style="--i:5">n</span>
+              <span style="--i:6">i</span><span style="--i:7">n</span>
+              <span style="--i:8">g</span><span style="--i:9">s</span>
+              <span style="--i:10"> </span><span style="--i:11">&amp;</span>
+              <span style="--i:12"> </span>
+              <span style="--i:13">B</span><span style="--i:14">a</span>
+              <span style="--i:15">l</span><span style="--i:16">a</span>
+              <span style="--i:17">n</span><span style="--i:18">c</span>
+              <span style="--i:19">e</span>
+            </a>
+
+            <a class="pulse-link" href="notifications.html">
+              <span style="--i:0">🔔</span><span style="--i:1"> </span>
+              <span style="--i:2">N</span><span style="--i:3">o</span>
+              <span style="--i:4">t</span><span style="--i:5">i</span>
+              <span style="--i:6">f</span><span style="--i:7">i</span>
+              <span style="--i:8">c</span><span style="--i:9">a</span>
+              <span style="--i:10">t</span><span style="--i:11">i</span>
+              <span style="--i:12">o</span><span style="--i:13">n</span>
+              <span style="--i:14">s</span>
+            </a>
+
+          </div>
+        </details>
 
 
-    <!-- FEATURES -->
-    <section class="panel">
+        <!-- ACCOUNT -->
+        <details>
+          <summary>
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
 
-      <h2>What You Can Do</h2>
+            <span class="pulse-text">
+              <span style="--i:0">A</span><span style="--i:1">c</span>
+              <span style="--i:2">c</span><span style="--i:3">o</span>
+              <span style="--i:4">u</span><span style="--i:5">n</span>
+              <span style="--i:6">t</span>
+            </span>
+          </summary>
 
-      <div class="features">
+          <div>
 
-        <div class="feature-card">
-          <h3>⚡ Complete Tasks</h3>
-          <p>
-            Browse available tasks and complete activities.
-          </p>
+            <a class="pulse-link" href="auth.html">
+              <span style="--i:0">🔐</span><span style="--i:1"> </span>
+              <span style="--i:2">L</span><span style="--i:3">o</span>
+              <span style="--i:4">g</span><span style="--i:5">i</span>
+              <span style="--i:6">n</span><span style="--i:7"> </span>
+              <span style="--i:8">/</span><span style="--i:9"> </span>
+              <span style="--i:10">S</span><span style="--i:11">i</span>
+              <span style="--i:12">g</span><span style="--i:13">n</span>
+              <span style="--i:14"> </span>
+              <span style="--i:15">U</span><span style="--i:16">p</span>
+            </a>
 
-          <a class="wave-link feature-link" href="tasks.html">
-            <span>V</span><span>i</span><span>e</span><span>w</span>
-            <span> </span>
-            <span>T</span><span>a</span><span>s</span><span>k</span><span>s</span>
-          </a>
-        </div>
+            <a class="pulse-link" href="dashboard.html">
+              <span style="--i:0">👤</span><span style="--i:1"> </span>
+              <span style="--i:2">D</span><span style="--i:3">a</span>
+              <span style="--i:4">s</span><span style="--i:5">h</span>
+              <span style="--i:6">b</span><span style="--i:7">o</span>
+              <span style="--i:8">a</span><span style="--i:9">r</span>
+              <span style="--i:10">d</span>
+            </a>
+
+            <a class="pulse-link" href="profile.html">
+              <span style="--i:0">⚙️</span><span style="--i:1"> </span>
+              <span style="--i:2">P</span><span style="--i:3">r</span>
+              <span style="--i:4">o</span><span style="--i:5">f</span>
+              <span style="--i:6">i</span><span style="--i:7">l</span>
+              <span style="--i:8">e</span><span style="--i:9"> </span>
+              <span style="--i:10">&amp;</span><span style="--i:11"> </span>
+              <span style="--i:12">A</span><span style="--i:13">c</span>
+              <span style="--i:14">c</span><span style="--i:15">o</span>
+              <span style="--i:16">u</span><span style="--i:17">n</span>
+              <span style="--i:18">t</span>
+            </a>
+
+            <a class="pulse-link" href="reset-password.html">
+              <span style="--i:0">🔑</span><span style="--i:1"> </span>
+              <span style="--i:2">R</span><span style="--i:3">e</span>
+              <span style="--i:4">s</span><span style="--i:5">e</span>
+              <span style="--i:6">t</span><span style="--i:7"> </span>
+              <span style="--i:8">P</span><span style="--i:9">a</span>
+              <span style="--i:10">s</span><span style="--i:11">s</span>
+              <span style="--i:12">w</span><span style="--i:13">o</span>
+              <span style="--i:14">r</span><span style="--i:15">d</span>
+            </a>
+
+          </div>
+        </details>
 
 
-        <div class="feature-card">
-          <h3>📝 Take Surveys</h3>
-          <p>
-            Share your feedback through PULSE surveys.
-          </p>
+        <!-- LEGAL -->
+        <details>
+          <summary>
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
 
-          <a class="wave-link feature-link" href="surveys.html">
-            <span>V</span><span>i</span><span>e</span><span>w</span>
-            <span> </span>
-            <span>S</span><span>u</span><span>r</span><span>v</span><span>e</span><span>y</span><span>s</span>
-          </a>
-        </div>
+            <span class="pulse-text">
+              <span style="--i:0">L</span><span style="--i:1">e</span>
+              <span style="--i:2">g</span><span style="--i:3">a</span>
+              <span style="--i:4">l</span>
+            </span>
+          </summary>
+
+          <div>
+
+            <a class="pulse-link" href="terms.html">
+              <span style="--i:0">📜</span><span style="--i:1"> </span>
+              <span style="--i:2">T</span><span style="--i:3">e</span>
+              <span style="--i:4">r</span><span style="--i:5">m</span>
+              <span style="--i:6">s</span>
+            </a>
+
+            <a class="pulse-link" href="privacy.html">
+              <span style="--i:0">🔒</span><span style="--i:1"> </span>
+              <span style="--i:2">P</span><span style="--i:3">r</span>
+              <span style="--i:4">i</span><span style="--i:5">v</span>
+              <span style="--i:6">a</span><span style="--i:7">c</span>
+              <span style="--i:8">y</span><span style="--i:9"> </span>
+              <span style="--i:10">P</span><span style="--i:11">o</span>
+              <span style="--i:12">l</span><span style="--i:13">i</span>
+              <span style="--i:14">c</span><span style="--i:15">y</span>
+            </a>
+
+            <a class="pulse-link" href="disclosures.html">
+              <span style="--i:0">⚖️</span><span style="--i:1"> </span>
+              <span style="--i:2">D</span><span style="--i:3">i</span>
+              <span style="--i:4">s</span><span style="--i:5">c</span>
+              <span style="--i:6">l</span><span style="--i:7">o</span>
+              <span style="--i:8">s</span><span style="--i:9">u</span>
+              <span style="--i:10">r</span><span style="--i:11">e</span>
+              <span style="--i:12">s</span>
+            </a>
+
+          </div>
+        </details>
 
 
-        <div class="feature-card">
-          <h3>💰 Earn Rewards</h3>
-          <p>
-            Track your completed work and available balance.
-          </p>
+        <!-- ADMINISTRATION -->
+        <details>
+          <summary>
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
 
-          <a class="wave-link feature-link" href="earnings.html">
-            <span>V</span><span>i</span><span>e</span><span>w</span>
-            <span> </span>
-            <span>E</span><span>a</span><span>r</span><span>n</span><span>i</span><span>n</span><span>g</span><span>s</span>
-          </a>
-        </div>
+            <span class="pulse-text">
+              <span style="--i:0">A</span><span style="--i:1">d</span>
+              <span style="--i:2">m</span><span style="--i:3">i</span>
+              <span style="--i:4">n</span><span style="--i:5">i</span>
+              <span style="--i:6">s</span><span style="--i:7">t</span>
+              <span style="--i:8">r</span><span style="--i:9">a</span>
+              <span style="--i:10">t</span><span style="--i:11">i</span>
+              <span style="--i:12">o</span><span style="--i:13">n</span>
+            </span>
+          </summary>
+
+          <div>
+
+            <a class="pulse-link" href="admin.html">
+              <span style="--i:0">⚙️</span><span style="--i:1"> </span>
+              <span style="--i:2">A</span><span style="--i:3">d</span>
+              <span style="--i:4">m</span><span style="--i:5">i</span>
+              <span style="--i:6">n</span><span style="--i:7"> </span>
+              <span style="--i:8">D</span><span style="--i:9">a</span>
+              <span style="--i:10">s</span><span style="--i:11">h</span>
+              <span style="--i:12">b</span><span style="--i:13">o</span>
+              <span style="--i:14">a</span><span style="--i:15">r</span>
+              <span style="--i:16">d</span>
+            </a>
+
+            <a class="pulse-link" href="admin-tasks.html">
+              <span style="--i:0">📋</span><span style="--i:1"> </span>
+              <span style="--i:2">T</span><span style="--i:3">a</span>
+              <span style="--i:4">s</span><span style="--i:5">k</span>
+              <span style="--i:6"> </span>
+              <span style="--i:7">M</span><span style="--i:8">a</span>
+              <span style="--i:9">n</span><span style="--i:10">a</span>
+              <span style="--i:11">g</span><span style="--i:12">e</span>
+              <span style="--i:13">m</span><span style="--i:14">e</span>
+              <span style="--i:15">n</span><span style="--i:16">t</span>
+            </a>
+
+            <a class="pulse-link" href="admin-businesses.html">
+              <span style="--i:0">🏢</span><span style="--i:1"> </span>
+              <span style="--i:2">B</span><span style="--i:3">u</span>
+              <span style="--i:4">s</span><span style="--i:5">i</span>
+              <span style="--i:6">n</span><span style="--i:7">e</span>
+              <span style="--i:8">s</span><span style="--i:9">s</span>
+              <span style="--i:10"> </span>
+              <span style="--i:11">M</span><span style="--i:12">a</span>
+              <span style="--i:13">n</span><span style="--i:14">a</span>
+              <span style="--i:15">g</span><span style="--i:16">e</span>
+              <span style="--i:17">m</span><span style="--i:18">e</span>
+              <span style="--i:19">n</span><span style="--i:20">t</span>
+            </a>
+
+            <a class="pulse-link" href="admin-submissions.html">
+              <span style="--i:0">📝</span><span style="--i:1"> </span>
+              <span style="--i:2">S</span><span style="--i:3">u</span>
+              <span style="--i:4">b</span><span style="--i:5">m</span>
+              <span style="--i:6">i</span><span style="--i:7">s</span>
+              <span style="--i:8">s</span><span style="--i:9">i</span>
+              <span style="--i:10">o</span><span style="--i:11">n</span>
+              <span style="--i:12"> </span>
+              <span style="--i:13">R</span><span style="--i:14">e</span>
+              <span style="--i:15">v</span><span style="--i:16">i</span>
+              <span style="--i:17">e</span><span style="--i:18">w</span>
+            </a>
+
+            <a class="pulse-link" href="admin-rewards.html">
+              <span style="--i:0">💰</span><span style="--i:1"> </span>
+              <span style="--i:2">R</span><span style="--i:3">e</span>
+              <span style="--i:4">w</span><span style="--i:5">a</span>
+              <span style="--i:6">r</span><span style="--i:7">d</span>
+              <span style="--i:8"> </span>
+              <span style="--i:9">R</span><span style="--i:10">e</span>
+              <span style="--i:11">q</span><span style="--i:12">u</span>
+              <span style="--i:13">e</span><span style="--i:14">s</span>
+              <span style="--i:15">t</span><span style="--i:16">s</span>
+            </a>
+
+            <a class="pulse-link" href="admin-reports.html">
+              <span style="--i:0">📊</span><span style="--i:1"> </span>
+              <span style="--i:2">R</span><span style="--i:3">e</span>
+              <span style="--i:4">p</span><span style="--i:5">o</span>
+              <span style="--i:6">r</span><span style="--i:7">t</span>
+              <span style="--i:8">s</span><span style="--i:9"> </span>
+              <span style="--i:10">&amp;</span><span style="--i:11"> </span>
+              <span style="--i:12">R</span><span style="--i:13">e</span>
+              <span style="--i:14">c</span><span style="--i:15">o</span>
+              <span style="--i:16">r</span><span style="--i:17">d</span>
+              <span style="--i:18">s</span>
+            </a>
+
+          </div>
+        </details>
+
+      </div>
+    </details>
+
+  </header>
+
+
+  <!-- WELCOME -->
+  <section class="panel">
+
+    <h1>Welcome to the PULSE Ecosystem</h1>
+
+    <p>
+      Complete tasks, participate in surveys, and earn rewards
+      through the PULSE experience.
+    </p>
+
+  </section>
+
+
+  <!-- FEATURES -->
+  <section class="panel">
+
+    <h2>What You Can Do</h2>
+
+    <div class="features">
+
+      <div class="feature-card">
+
+        <h3>⚡ Complete Tasks</h3>
+
+        <p>
+          Browse available tasks and complete activities.
+        </p>
+
+        <a class="pulse-link feature-link" href="tasks.html">
+          <span style="--i:0">V</span><span style="--i:1">i</span>
+          <span style="--i:2">e</span><span style="--i:3">w</span>
+          <span style="--i:4"> </span>
+          <span style="--i:5">T</span><span style="--i:6">a</span>
+          <span style="--i:7">s</span><span style="--i:8">k</span>
+          <span style="--i:9">s</span>
+        </a>
 
       </div>
 
-    </section>
 
+      <div class="feature-card">
 
-    <!-- HOW IT WORKS -->
-    <section class="panel">
+        <h3>📝 Take Surveys</h3>
 
-      <h2>How PULSE Works</h2>
+        <p>
+          Share your feedback through PULSE surveys.
+        </p>
 
-      <ol>
-        <li>Create your account.</li>
-        <li>Browse available tasks and surveys.</li>
-        <li>Complete the requested activity.</li>
-        <li>Submit your work.</li>
-        <li>Track your points and records.</li>
-      </ol>
-
-      <a class="wave-link feature-link" href="how-it-works.html">
-        <span>L</span><span>e</span><span>a</span><span>r</span><span>n</span>
-        <span> </span>
-        <span>H</span><span>o</span><span>w</span>
-        <span> </span>
-        <span>I</span><span>t</span>
-        <span> </span>
-        <span>W</span><span>o</span><span>r</span><span>k</span><span>s</span>
-      </a>
-
-    </section>
-
-
-    <!-- ACCOUNT CALLOUT -->
-    <section class="panel">
-
-      <h2>Ready to Get Started?</h2>
-
-      <p>
-        Create an account to access your dashboard and available activities.
-      </p>
-
-      <a class="wave-link feature-link" href="auth.html">
-        <span>L</span><span>o</span><span>g</span><span>i</span><span>n</span>
-        <span> </span>
-        <span>/</span>
-        <span> </span>
-        <span>S</span><span>i</span><span>g</span><span>n</span>
-        <span> </span>
-        <span>U</span><span>p</span>
-      </a>
-
-    </section>
-
-
-    <!-- FOOTER -->
-    <footer>
-
-      <p>
-        © 2026 PULSE
-      </p>
-
-      <div>
-
-        <a class="wave-link" href="terms.html">
-          <span>T</span><span>e</span><span>r</span><span>m</span><span>s</span>
-        </a>
-
-        <span> • </span>
-
-        <a class="wave-link" href="privacy.html">
-          <span>P</span><span>r</span><span>i</span><span>v</span><span>a</span><span>c</span><span>y</span>
-        </a>
-
-        <span> • </span>
-
-        <a class="wave-link" href="disclosures.html">
-          <span>D</span><span>i</span><span>s</span><span>c</span><span>l</span><span>o</span><span>s</span><span>u</span><span>r</span><span>e</span><span>s</span>
-        </a>
-
-        <span> • </span>
-
-        <a class="wave-link" href="contact.html">
-          <span>C</span><span>o</span><span>n</span><span>t</span><span>a</span><span>c</span><span>t</span>
+        <a class="pulse-link feature-link" href="surveys.html">
+          <span style="--i:0">V</span><span style="--i:1">i</span>
+          <span style="--i:2">e</span><span style="--i:3">w</span>
+          <span style="--i:4"> </span>
+          <span style="--i:5">S</span><span style="--i:6">u</span>
+          <span style="--i:7">r</span><span style="--i:8">v</span>
+          <span style="--i:9">e</span><span style="--i:10">y</span>
+          <span style="--i:11">s</span>
         </a>
 
       </div>
 
-    </footer>
 
-  </main>
+      <div class="feature-card">
+
+        <h3>💰 Earn Rewards</h3>
+
+        <p>
+          Track your completed work and available balance.
+        </p>
+
+        <a class="pulse-link feature-link" href="earnings.html">
+          <span style="--i:0">V</span><span style="--i:1">i</span>
+          <span style="--i:2">e</span><span style="--i:3">w</span>
+          <span style="--i:4"> </span>
+          <span style="--i:5">E</span><span style="--i:6">a</span>
+          <span style="--i:7">r</span><span style="--i:8">n</span>
+          <span style="--i:9">i</span><span style="--i:10">n</span>
+          <span style="--i:11">g</span><span style="--i:12">s</span>
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- HOW IT WORKS -->
+  <section class="panel">
+
+    <h2>How PULSE Works</h2>
+
+    <ol>
+      <li>Create your account.</li>
+      <li>Browse available tasks and surveys.</li>
+      <li>Complete the requested activity.</li>
+      <li>Submit your work.</li>
+      <li>Track your points and records.</li>
+    </ol>
+
+    <a class="pulse-link feature-link" href="how-it-works.html">
+      <span style="--i:0">L</span><span style="--i:1">e</span>
+      <span style="--i:2">a</span><span style="--i:3">r</span>
+      <span style="--i:4">n</span><span style="--i:5"> </span>
+      <span style="--i:6">H</span><span style="--i:7">o</span>
+      <span style="--i:8">w</span><span style="--i:9"> </span>
+      <span style="--i:10">I</span><span style="--i:11">t</span>
+      <span style="--i:12"> </span>
+      <span style="--i:13">W</span><span style="--i:14">o</span>
+      <span style="--i:15">r</span><span style="--i:16">k</span>
+      <span style="--i:17">s</span>
+    </a>
+
+  </section>
+
+
+  <!-- GET STARTED -->
+  <section class="panel">
+
+    <h2>Ready to Get Started?</h2>
+
+    <p>
+      Create an account to access your dashboard and available activities.
+    </p>
+
+    <a class="pulse-link feature-link" href="auth.html">
+      <span style="--i:0">L</span><span style="--i:1">o</span>
+      <span style="--i:2">g</span><span style="--i:3">i</span>
+      <span style="--i:4">n</span><span style="--i:5"> </span>
+      <span style="--i:6">/</span><span style="--i:7"> </span>
+      <span style="--i:8">S</span><span style="--i:9">i</span>
+      <span style="--i:10">g</span><span style="--i:11">n</span>
+      <span style="--i:12"> </span>
+      <span style="--i:13">U</span><span style="--i:14">p</span>
+    </a>
+
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer>
+
+    <p>© 2026 PULSE</p>
+
+    <div>
+
+      <a class="pulse-link" href="terms.html">
+        <span style="--i:0">T</span><span style="--i:1">e</span>
+        <span style="--i:2">r</span><span style="--i:3">m</span>
+        <span style="--i:4">s</span>
+      </a>
+
+      <span> • </span>
+
+      <a class="pulse-link" href="privacy.html">
+        <span style="--i:0">P</span><span style="--i:1">r</span>
+        <span style="--i:2">i</span><span style="--i:3">v</span>
+        <span style="--i:4">a</span><span style="--i:5">c</span>
+        <span style="--i:6">y</span>
+      </a>
+
+      <span> • </span>
+
+      <a class="pulse-link" href="disclosures.html">
+        <span style="--i:0">D</span><span style="--i:1">i</span>
+        <span style="--i:2">s</span><span style="--i:3">c</span>
+        <span style="--i:4">l</span><span style="--i:5">o</span>
+        <span style="--i:6">s</span><span style="--i:7">u</span>
+        <span style="--i:8">r</span><span style="--i:9">e</span>
+        <span style="--i:10">s</span>
+      </a>
+
+      <span> • </span>
+
+      <a class="pulse-link" href="contact.html">
+        <span style="--i:0">C</span><span style="--i:1">o</span>
+        <span style="--i:2">n</span><span style="--i:3">t</span>
+        <span style="--i:4">a</span><span style="--i:5">c</span>
+        <span style="--i:6">t</span>
+      </a>
+
+    </div>
+
+  </footer>
+
+</main>
 
 </body>
 </html>
