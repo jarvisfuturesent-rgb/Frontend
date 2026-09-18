@@ -9,24 +9,31 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* Dashboard-only styling.
-       Shared project styling remains in style.css. */
+    /* =========================================
+       PULSE DASHBOARD — FUTURISTIC UI
+       Shared style.css remains untouched.
+       ========================================= */
 
     .dashboard-hero {
       text-align: center;
-      padding: 20px 10px 10px;
+      padding: 24px 12px 16px;
+      position: relative;
     }
 
     .dashboard-hero h2 {
       margin-bottom: 10px;
-      font-size: 1.8rem;
+      font-size: 1.9rem;
+      letter-spacing: .5px;
     }
 
     .dashboard-hero p {
       line-height: 1.6;
+      opacity: .85;
     }
 
-    /* Folder-style menu */
+    /* =========================================
+       MENU
+       ========================================= */
 
     .menu-panel > details {
       margin: 6px 0;
@@ -76,49 +83,177 @@
       text-decoration: none;
     }
 
-    /* Balance */
+    /* =========================================
+       FUTURISTIC BALANCE
+       ========================================= */
 
     .balance-box {
+      position: relative;
+      overflow: hidden;
       text-align: center;
-      padding: 24px 16px;
-      border-radius: 18px;
-      border: 1px solid rgba(0, 200, 255, .35);
-      background: rgba(0, 20, 40, .28);
-      box-shadow: 0 0 20px rgba(0, 200, 255, .08);
-      animation: balancePulse 3s ease-in-out infinite;
+      padding: 30px 18px;
+      border-radius: 22px;
+
+      border: 1px solid rgba(0, 220, 255, .45);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(0, 35, 65, .72),
+          rgba(0, 10, 30, .55)
+        );
+
+      box-shadow:
+        0 0 25px rgba(0, 200, 255, .12),
+        inset 0 0 25px rgba(0, 200, 255, .05);
+
+      animation: balanceFloat 4s ease-in-out infinite;
+    }
+
+    .balance-box::before {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      top: -100px;
+      left: -80px;
+
+      background: rgba(0, 200, 255, .08);
+
+      filter: blur(20px);
+
+      animation: balanceOrb 6s ease-in-out infinite;
+    }
+
+    .balance-box::after {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      bottom: -100px;
+      right: -70px;
+
+      background: rgba(0, 200, 255, .07);
+
+      filter: blur(20px);
+
+      animation: balanceOrb 7s ease-in-out infinite reverse;
+    }
+
+    .balance-content {
+      position: relative;
+      z-index: 2;
     }
 
     .balance-title {
       display: block;
-      font-size: .95rem;
-      opacity: .8;
-      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: .72rem;
+      opacity: .7;
+      margin-bottom: 10px;
     }
 
     .balance-amount {
       display: block;
-      font-size: 2.2rem;
-      font-weight: 800;
-      margin-bottom: 7px;
+      font-size: 3rem;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 1px;
+
+      text-shadow:
+        0 0 8px rgba(0, 220, 255, .45),
+        0 0 22px rgba(0, 220, 255, .18);
+
+      animation: amountGlow 3s ease-in-out infinite;
+    }
+
+    .balance-unit {
+      display: block;
+      margin-top: 7px;
+      font-size: .9rem;
+      letter-spacing: 4px;
+      font-weight: 700;
+      opacity: .75;
     }
 
     .balance-status {
-      display: block;
-      font-size: .9rem;
-      opacity: .85;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 18px;
+      padding: 7px 12px;
+      border-radius: 999px;
+
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+
+      border: 1px solid rgba(0, 220, 255, .25);
+      background: rgba(0, 220, 255, .07);
     }
 
-    @keyframes balancePulse {
+    .balance-status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    @keyframes balanceFloat {
       0%, 100% {
-        transform: scale(1);
+        transform: translateY(0);
       }
 
       50% {
-        transform: scale(1.025);
+        transform: translateY(-3px);
       }
     }
 
-    /* Earnings */
+    @keyframes amountGlow {
+      0%, 100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .82;
+      }
+    }
+
+    @keyframes balanceOrb {
+      0%, 100% {
+        transform: translate(0, 0);
+      }
+
+      50% {
+        transform: translate(30px, 20px);
+      }
+    }
+
+    /* =========================================
+       EARNINGS
+       ========================================= */
+
+    .earnings-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 15px;
+    }
+
+    .earnings-title::before {
+      content: "";
+      width: 4px;
+      height: 22px;
+      border-radius: 5px;
+      background: currentColor;
+      box-shadow: 0 0 10px rgba(0, 220, 255, .35);
+    }
 
     .earnings-grid {
       display: grid;
@@ -127,35 +262,61 @@
     }
 
     .earning-box {
+      position: relative;
+      overflow: hidden;
       text-align: center;
-      padding: 14px 8px;
-      border-radius: 12px;
-      border: 1px solid rgba(0, 200, 255, .20);
-      background: rgba(0, 20, 40, .22);
+      padding: 18px 8px;
+      border-radius: 15px;
+
+      border: 1px solid rgba(0, 200, 255, .18);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(0, 30, 55, .45),
+          rgba(0, 15, 35, .28)
+        );
+
+      transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
+    }
+
+    .earning-box:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 220, 255, .4);
+      box-shadow: 0 0 18px rgba(0, 200, 255, .08);
     }
 
     .earning-box strong {
       display: block;
-      font-size: 1.15rem;
-      margin-bottom: 5px;
+      font-size: 1.3rem;
+      margin-bottom: 6px;
     }
 
     .earning-box span {
       display: block;
-      font-size: .8rem;
-      opacity: .8;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: .7;
     }
 
-    /* Dashboard folders */
+    /* =========================================
+       DASHBOARD FOLDERS
+       ========================================= */
 
     .dashboard-folder {
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
+      border: 1px solid rgba(0, 200, 255, .15);
+      background: rgba(0, 15, 30, .18);
     }
 
     .dashboard-folder > summary {
       cursor: pointer;
-      padding: 13px 12px;
+      padding: 15px 13px;
       font-weight: 700;
       list-style: none;
     }
@@ -174,16 +335,59 @@
       content: "▼ ";
     }
 
-    .dashboard-folder-content {
-      padding: 4px 8px 10px;
+    .dashboard-folder[open] > summary {
+      border-bottom: 1px solid rgba(0, 200, 255, .12);
+      background: rgba(0, 200, 255, .035);
     }
 
-    /* Submission files */
+    .dashboard-folder-content {
+      padding: 6px 9px 11px;
+    }
+
+    /* =========================================
+       TASKS
+       ========================================= */
+
+    .task-item {
+      position: relative;
+      padding: 15px;
+      margin: 7px 0;
+      border-radius: 12px;
+
+      border: 1px solid rgba(0, 200, 255, .14);
+      background: rgba(0, 20, 40, .20);
+
+      transition:
+        transform .2s ease,
+        border-color .2s ease;
+    }
+
+    .task-item:hover {
+      transform: translateX(2px);
+      border-color: rgba(0, 220, 255, .35);
+    }
+
+    .task-item strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .task-item span {
+      display: block;
+      font-size: .88rem;
+      line-height: 1.45;
+      opacity: .82;
+    }
+
+    /* =========================================
+       SUBMISSIONS
+       ========================================= */
 
     .submission-dropdown {
       margin: 7px 0;
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
+
       border: 1px solid rgba(0, 200, 255, .15);
       background: rgba(0, 20, 40, .18);
     }
@@ -191,7 +395,7 @@
     .submission-dropdown > summary {
       cursor: pointer;
       list-style: none;
-      padding: 12px;
+      padding: 13px;
       font-weight: 700;
     }
 
@@ -204,12 +408,13 @@
     }
 
     .submission-dropdown-content {
-      padding: 4px 12px 12px;
+      padding: 5px 13px 13px;
       line-height: 1.5;
     }
 
     .answers-dropdown {
       margin-top: 10px;
+      padding: 0 5px;
     }
 
     .answers-dropdown > summary {
@@ -218,29 +423,9 @@
       font-weight: 700;
     }
 
-    /* Task cards */
-
-    .task-item {
-      padding: 13px;
-      margin: 7px 0;
-      border-radius: 10px;
-      border: 1px solid rgba(0, 200, 255, .15);
-      background: rgba(0, 20, 40, .18);
-    }
-
-    .task-item strong {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .task-item span {
-      display: block;
-      font-size: .9rem;
-      line-height: 1.4;
-      opacity: .85;
-    }
-
-    /* Actions */
+    /* =========================================
+       ACTION BUTTONS
+       ========================================= */
 
     .dashboard-actions {
       display: flex;
@@ -250,18 +435,55 @@
 
     .dashboard-button {
       display: block;
-      padding: 13px 16px;
-      border-radius: 11px;
+      padding: 14px 16px;
+      border-radius: 12px;
       text-align: center;
       text-decoration: none;
       font-weight: 700;
-      border: 1px solid rgba(0, 200, 255, .30);
-      background: rgba(0, 200, 255, .08);
+
+      border: 1px solid rgba(0, 200, 255, .25);
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(0, 200, 255, .10),
+          rgba(0, 100, 180, .05)
+        );
+
+      transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
     }
 
-    @media (max-width: 420px) {
+    .dashboard-button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 220, 255, .45);
+      box-shadow: 0 0 18px rgba(0, 200, 255, .10);
+    }
+
+    /* =========================================
+       FOOTER
+       ========================================= */
+
+    .dashboard-footer {
+      text-align: center;
+      font-size: .85rem;
+      opacity: .8;
+      line-height: 1.7;
+    }
+
+    .dashboard-footer a {
+      text-decoration: none;
+    }
+
+    @media (max-width: 520px) {
       .earnings-grid {
         grid-template-columns: 1fr;
+      }
+
+      .balance-amount {
+        font-size: 2.7rem;
       }
     }
   </style>
@@ -284,7 +506,7 @@
         Complete • Earn • Get Rewarded
       </p>
 
-      <!-- MAIN MENU -->
+      <!-- SAME FOLDER-STYLE MENU -->
       <details class="menu">
 
         <summary>☰ Menu</summary>
@@ -381,32 +603,40 @@
       <h2>Welcome Back</h2>
 
       <p>
-        View your balance, activity, tasks, submissions,
-        and notifications in one place.
+        Your PULSE activity, tasks, submissions,
+        and account information are all in one place.
       </p>
 
     </section>
 
 
-    <!-- BALANCE -->
+    <!-- FUTURISTIC BALANCE -->
     <section class="panel">
 
       <div class="balance-box">
 
-        <span class="balance-title">
-          Current Balance
-        </span>
+        <div class="balance-content">
 
-        <span
-          id="balance"
-          class="balance-amount"
-        >
-          25 PLS
-        </span>
+          <span class="balance-title">
+            Current Balance
+          </span>
 
-        <span class="balance-status">
-          Balance Active
-        </span>
+          <span
+            id="balance"
+            class="balance-amount"
+          >
+            25
+          </span>
+
+          <span class="balance-unit">
+            PLS
+          </span>
+
+          <span class="balance-status">
+            Balance Active
+          </span>
+
+        </div>
 
       </div>
 
@@ -416,7 +646,9 @@
     <!-- EARNINGS -->
     <section class="panel">
 
-      <h2>Earnings</h2>
+      <h2 class="earnings-title">
+        Earnings
+      </h2>
 
       <div class="earnings-grid">
 
@@ -524,8 +756,12 @@
     </section>
 
 
-    <!-- ACTIONS -->
+    <!-- QUICK ACTIONS -->
     <section class="panel">
+
+      <h2 class="earnings-title">
+        Quick Access
+      </h2>
 
       <div class="dashboard-actions">
 
@@ -556,10 +792,9 @@
 
 
     <!-- FOOTER -->
-    <footer class="panel">
+    <footer class="panel dashboard-footer">
 
-      <p style="text-align:center; font-size:.9rem;">
-
+      <p>
         <a href="terms.html">Terms</a>
         •
         <a href="privacy.html">Privacy</a>
@@ -567,10 +802,9 @@
         <a href="disclosures.html">Disclosures</a>
         •
         <a href="contact.html">Contact</a>
-
       </p>
 
-      <p style="text-align:center; font-size:.9rem;">
+      <p>
         © PULSE
       </p>
 
@@ -579,8 +813,13 @@
   </main>
 
 
+  <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- CONFIG -->
   <script src="config.js"></script>
+
+  <!-- PULSE APP -->
   <script src="app.js"></script>
 
 </body>
