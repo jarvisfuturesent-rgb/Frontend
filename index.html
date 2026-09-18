@@ -3,189 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>PULSE</title>
 
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* Homepage-only layout styling.
-       Shared project styling remains in style.css. */
-
-    .home-hero {
-      text-align: center;
-      padding: 20px 10px 10px;
-    }
-
-    .home-hero h2 {
-      margin-bottom: 10px;
-      font-size: 1.8rem;
-    }
-
-    .home-hero p {
-      line-height: 1.6;
-    }
-
-    .home-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    .home-actions a {
-      text-decoration: none;
-    }
-
-    .home-button {
-      display: block;
-      padding: 14px 18px;
-      border-radius: 12px;
-      text-align: center;
-      font-weight: 700;
-      border: 1px solid rgba(0, 200, 255, .35);
-      background: rgba(0, 200, 255, .10);
-    }
-
-    .home-section-title {
-      text-align: center;
-      margin-bottom: 18px;
-    }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .feature-card {
-      padding: 16px;
-      border-radius: 14px;
-      border: 1px solid rgba(0, 200, 255, .20);
-      background: rgba(0, 20, 40, .25);
-    }
-
-    .feature-card strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 1rem;
-    }
-
-    .feature-card span {
-      display: block;
-      opacity: .85;
-      font-size: .9rem;
-      line-height: 1.4;
-    }
-
-    .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .step {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(0, 200, 255, .18);
-      background: rgba(0, 20, 40, .22);
-    }
-
-    .step-number {
-      min-width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      font-weight: 700;
-      background: rgba(0, 200, 255, .15);
-    }
-
-    .step-content strong {
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .step-content span {
-      opacity: .85;
-      font-size: .9rem;
-      line-height: 1.4;
-    }
-
-    .home-note {
-      text-align: center;
-      line-height: 1.6;
-    }
-
-    .home-footer {
-      text-align: center;
-      font-size: .9rem;
-    }
-
-    .home-footer a {
-      text-decoration: none;
-    }
-
-    /* =========================================
-       MENU
-       ========================================= */
-
-    .menu-panel > details {
-      margin: 6px 0;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .menu-panel > details > summary {
-      cursor: pointer;
-      padding: 11px 12px;
-      font-weight: 700;
-      list-style: none;
-      display: flex;
-      align-items: center;
-    }
-
-    .menu-panel > details > summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .menu-panel > details > summary::before {
-      content: "▶ ";
-      font-size: .75rem;
-      margin-right: 4px;
-    }
-
-    .menu-panel > details[open] > summary::before {
-      content: "▼ ";
-    }
-
-    .menu-logo {
-      width: 22px;
-      height: 22px;
-      object-fit: contain;
-      margin-right: 7px;
-      flex-shrink: 0;
-    }
-
-    .menu-panel > details > div {
-      padding: 2px 8px 8px;
-    }
-
-    .menu-panel > details > div a {
-      display: block;
-      padding: 9px 10px;
-      border-radius: 8px;
-      text-decoration: none;
-    }
-
-    /* =========================================
-       COLOR WAVE
-       ========================================= */
-
+    /* PULSE color-wave */
     .wave-text {
       display: inline-flex;
       align-items: center;
@@ -195,58 +18,6 @@
     .wave-text span {
       display: inline-block;
       animation: pulseColorWave 4s ease-in-out infinite;
-    }
-
-    .wave-text span:nth-child(1) {
-      animation-delay: 0s;
-    }
-
-    .wave-text span:nth-child(2) {
-      animation-delay: .08s;
-    }
-
-    .wave-text span:nth-child(3) {
-      animation-delay: .16s;
-    }
-
-    .wave-text span:nth-child(4) {
-      animation-delay: .24s;
-    }
-
-    .wave-text span:nth-child(5) {
-      animation-delay: .32s;
-    }
-
-    .wave-text span:nth-child(6) {
-      animation-delay: .40s;
-    }
-
-    .wave-text span:nth-child(7) {
-      animation-delay: .48s;
-    }
-
-    .wave-text span:nth-child(8) {
-      animation-delay: .56s;
-    }
-
-    .wave-text span:nth-child(9) {
-      animation-delay: .64s;
-    }
-
-    .wave-text span:nth-child(10) {
-      animation-delay: .72s;
-    }
-
-    .wave-text span:nth-child(11) {
-      animation-delay: .80s;
-    }
-
-    .wave-text span:nth-child(12) {
-      animation-delay: .88s;
-    }
-
-    .wave-text span:nth-child(13) {
-      animation-delay: .96s;
     }
 
     @keyframes pulseColorWave {
@@ -259,32 +30,50 @@
       25% {
         color: #00d9ff;
         text-shadow:
-          0 0 5px rgba(0, 217, 255, .65),
-          0 0 12px rgba(0, 217, 255, .25);
+          0 0 5px rgba(0,217,255,.65),
+          0 0 12px rgba(0,217,255,.25);
         transform: translateY(-1px);
       }
 
       50% {
         color: #8b5cff;
         text-shadow:
-          0 0 5px rgba(139, 92, 255, .65),
-          0 0 12px rgba(139, 92, 255, .25);
+          0 0 5px rgba(139,92,255,.65),
+          0 0 12px rgba(139,92,255,.25);
         transform: translateY(0);
       }
 
       75% {
         color: #00ffc8;
         text-shadow:
-          0 0 5px rgba(0, 255, 200, .65),
-          0 0 12px rgba(0, 255, 200, .25);
+          0 0 5px rgba(0,255,200,.65),
+          0 0 12px rgba(0,255,200,.25);
         transform: translateY(1px);
       }
     }
 
-    @media (max-width: 420px) {
-      .feature-grid {
-        grid-template-columns: 1fr;
-      }
+    /* Every PULSE link gets the wave */
+    .wave-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .wave-link span {
+      display: inline-block;
+      animation: pulseColorWave 4s ease-in-out infinite;
+    }
+
+    .menu-logo {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      margin-right: 7px;
+      flex-shrink: 0;
+    }
+
+    .feature-link {
+      margin-top: 12px;
     }
   </style>
 </head>
@@ -303,18 +92,18 @@
       >
 
       <p class="tagline">
-        Complete • <span class="wave-text">
+        Complete •
+        <span class="wave-text">
           <span>E</span><span>a</span><span>r</span><span>n</span>
-          <span> </span>
-          <span>•</span>
-          <span> </span>
+          <span> </span><span>•</span><span> </span>
           <span>G</span><span>e</span><span>t</span>
           <span> </span>
-          <span>R</span><span>e</span><span>w</span><span>a</span><span>r</span><span>d</span><span>e</span><span>d</span>
+          <span>R</span><span>e</span><span>w</span><span>a</span>
+          <span>r</span><span>d</span><span>e</span><span>d</span>
         </span>
       </p>
 
-      <!-- MAIN MENU -->
+      <!-- MENU -->
       <details class="menu">
 
         <summary>☰ Menu</summary>
@@ -325,16 +114,38 @@
           <details>
             <summary>
               <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+
               <span class="wave-text">
                 <span>M</span><span>a</span><span>i</span><span>n</span>
               </span>
             </summary>
 
             <div>
-              <a href="index.html">🏠 Home</a>
-              <a href="how-it-works.html">⚡ How It Works</a>
-              <a href="about.html">ℹ️ About PULSE</a>
-              <a href="contact.html">✉️ Contact</a>
+              <a class="wave-link" href="index.html">
+                <span>🏠</span><span> </span>
+                <span>H</span><span>o</span><span>m</span><span>e</span>
+              </a>
+
+              <a class="wave-link" href="how-it-works.html">
+                <span>⚡</span><span> </span>
+                <span>H</span><span>o</span><span>w</span>
+                <span> </span>
+                <span>I</span><span>t</span>
+                <span> </span>
+                <span>W</span><span>o</span><span>r</span><span>k</span><span>s</span>
+              </a>
+
+              <a class="wave-link" href="about.html">
+                <span>ℹ️</span><span> </span>
+                <span>A</span><span>b</span><span>o</span><span>u</span><span>t</span>
+                <span> </span>
+                <span>P</span><span>U</span><span>L</span><span>S</span><span>E</span>
+              </a>
+
+              <a class="wave-link" href="contact.html">
+                <span>✉️</span><span> </span>
+                <span>C</span><span>o</span><span>n</span><span>t</span><span>a</span><span>c</span><span>t</span>
+              </a>
             </div>
           </details>
 
@@ -342,17 +153,45 @@
           <details>
             <summary>
               <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+
               <span class="wave-text">
                 <span>P</span><span>U</span><span>L</span><span>S</span><span>E</span>
               </span>
             </summary>
 
             <div>
-              <a href="tasks.html">⚡ Available Tasks</a>
-              <a href="surveys.html">📝 Surveys</a>
-              <a href="submissions.html">📋 My Submissions</a>
-              <a href="earnings.html">💰 Earnings & Balance</a>
-              <a href="notifications.html">🔔 Notifications</a>
+              <a class="wave-link" href="tasks.html">
+                <span>⚡</span><span> </span>
+                <span>A</span><span>v</span><span>a</span><span>i</span><span>l</span><span>a</span><span>b</span><span>l</span><span>e</span>
+                <span> </span>
+                <span>T</span><span>a</span><span>s</span><span>k</span><span>s</span>
+              </a>
+
+              <a class="wave-link" href="surveys.html">
+                <span>📝</span><span> </span>
+                <span>S</span><span>u</span><span>r</span><span>v</span><span>e</span><span>y</span><span>s</span>
+              </a>
+
+              <a class="wave-link" href="submissions.html">
+                <span>📋</span><span> </span>
+                <span>M</span><span>y</span>
+                <span> </span>
+                <span>S</span><span>u</span><span>b</span><span>m</span><span>i</span><span>s</span><span>s</span><span>i</span><span>o</span><span>n</span><span>s</span>
+              </a>
+
+              <a class="wave-link" href="earnings.html">
+                <span>💰</span><span> </span>
+                <span>E</span><span>a</span><span>r</span><span>n</span><span>i</span><span>n</span><span>g</span><span>s</span>
+                <span> </span>
+                <span>&amp;</span>
+                <span> </span>
+                <span>B</span><span>a</span><span>l</span><span>a</span><span>n</span><span>c</span><span>e</span>
+              </a>
+
+              <a class="wave-link" href="notifications.html">
+                <span>🔔</span><span> </span>
+                <span>N</span><span>o</span><span>t</span><span>i</span><span>f</span><span>i</span><span>c</span><span>a</span><span>t</span><span>i</span><span>o</span><span>n</span><span>s</span>
+              </a>
             </div>
           </details>
 
@@ -360,6 +199,7 @@
           <details>
             <summary>
               <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+
               <span class="wave-text">
                 <span>A</span><span>c</span><span>c</span><span>o</span>
                 <span>u</span><span>n</span><span>t</span>
@@ -367,10 +207,37 @@
             </summary>
 
             <div>
-              <a href="auth.html">🔐 Login / Sign Up</a>
-              <a href="dashboard.html">👤 Dashboard</a>
-              <a href="profile.html">⚙️ Profile & Account</a>
-              <a href="reset-password.html">🔑 Reset Password</a>
+              <a class="wave-link" href="auth.html">
+                <span>🔐</span><span> </span>
+                <span>L</span><span>o</span><span>g</span><span>i</span><span>n</span>
+                <span> </span>
+                <span>/</span>
+                <span> </span>
+                <span>S</span><span>i</span><span>g</span><span>n</span>
+                <span> </span>
+                <span>U</span><span>p</span>
+              </a>
+
+              <a class="wave-link" href="dashboard.html">
+                <span>👤</span><span> </span>
+                <span>D</span><span>a</span><span>s</span><span>h</span><span>b</span><span>o</span><span>a</span><span>r</span><span>d</span>
+              </a>
+
+              <a class="wave-link" href="profile.html">
+                <span>⚙️</span><span> </span>
+                <span>P</span><span>r</span><span>o</span><span>f</span><span>i</span><span>l</span><span>e</span>
+                <span> </span>
+                <span>&amp;</span>
+                <span> </span>
+                <span>A</span><span>c</span><span>c</span><span>o</span><span>u</span><span>n</span><span>t</span>
+              </a>
+
+              <a class="wave-link" href="reset-password.html">
+                <span>🔑</span><span> </span>
+                <span>R</span><span>e</span><span>s</span><span>e</span><span>t</span>
+                <span> </span>
+                <span>P</span><span>a</span><span>s</span><span>s</span><span>w</span><span>o</span><span>r</span><span>d</span>
+              </a>
             </div>
           </details>
 
@@ -378,15 +245,29 @@
           <details>
             <summary>
               <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+
               <span class="wave-text">
                 <span>L</span><span>e</span><span>g</span><span>a</span><span>l</span>
               </span>
             </summary>
 
             <div>
-              <a href="terms.html">📜 Terms</a>
-              <a href="privacy.html">🔒 Privacy Policy</a>
-              <a href="disclosures.html">⚖️ Disclosures</a>
+              <a class="wave-link" href="terms.html">
+                <span>📜</span><span> </span>
+                <span>T</span><span>e</span><span>r</span><span>m</span><span>s</span>
+              </a>
+
+              <a class="wave-link" href="privacy.html">
+                <span>🔒</span><span> </span>
+                <span>P</span><span>r</span><span>i</span><span>v</span><span>a</span><span>c</span><span>y</span>
+                <span> </span>
+                <span>P</span><span>o</span><span>l</span><span>i</span><span>c</span><span>y</span>
+              </a>
+
+              <a class="wave-link" href="disclosures.html">
+                <span>⚖️</span><span> </span>
+                <span>D</span><span>i</span><span>s</span><span>c</span><span>l</span><span>o</span><span>s</span><span>u</span><span>r</span><span>e</span><span>s</span>
+              </a>
             </div>
           </details>
 
@@ -394,6 +275,7 @@
           <details>
             <summary>
               <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+
               <span class="wave-text">
                 <span>A</span><span>d</span><span>m</span><span>i</span>
                 <span>n</span><span>i</span><span>s</span><span>t</span>
@@ -403,102 +285,117 @@
             </summary>
 
             <div>
-              <a href="admin.html">⚙️ Admin Dashboard</a>
-              <a href="admin-tasks.html">📋 Task Management</a>
-              <a href="admin-businesses.html">🏢 Business Management</a>
-              <a href="admin-submissions.html">📝 Submission Review</a>
-              <a href="admin-rewards.html">💰 Reward Requests</a>
-              <a href="admin-reports.html">📊 Reports & Records</a>
+              <a class="wave-link" href="admin.html">
+                <span>⚙️</span><span> </span>
+                <span>A</span><span>d</span><span>m</span><span>i</span><span>n</span>
+                <span> </span>
+                <span>D</span><span>a</span><span>s</span><span>h</span><span>b</span><span>o</span><span>a</span><span>r</span><span>d</span>
+              </a>
+
+              <a class="wave-link" href="admin-tasks.html">
+                <span>📋</span><span> </span>
+                <span>T</span><span>a</span><span>s</span><span>k</span>
+                <span> </span>
+                <span>M</span><span>a</span><span>n</span><span>a</span><span>g</span><span>e</span><span>m</span><span>e</span><span>n</span><span>t</span>
+              </a>
+
+              <a class="wave-link" href="admin-businesses.html">
+                <span>🏢</span><span> </span>
+                <span>B</span><span>u</span><span>s</span><span>i</span><span>n</span><span>e</span><span>s</span><span>s</span>
+                <span> </span>
+                <span>M</span><span>a</span><span>n</span><span>a</span><span>g</span><span>e</span><span>m</span><span>e</span><span>n</span><span>t</span>
+              </a>
+
+              <a class="wave-link" href="admin-submissions.html">
+                <span>📝</span><span> </span>
+                <span>S</span><span>u</span><span>b</span><span>m</span><span>i</span><span>s</span><span>s</span><span>i</span><span>o</span><span>n</span>
+                <span> </span>
+                <span>R</span><span>e</span><span>v</span><span>i</span><span>e</span><span>w</span>
+              </a>
+
+              <a class="wave-link" href="admin-rewards.html">
+                <span>💰</span><span> </span>
+                <span>R</span><span>e</span><span>w</span><span>a</span><span>r</span><span>d</span>
+                <span> </span>
+                <span>R</span><span>e</span><span>q</span><span>u</span><span>e</span><span>s</span><span>t</span><span>s</span>
+              </a>
+
+              <a class="wave-link" href="admin-reports.html">
+                <span>📊</span><span> </span>
+                <span>R</span><span>e</span><span>p</span><span>o</span><span>r</span><span>t</span><span>s</span>
+                <span> </span>
+                <span>&amp;</span>
+                <span> </span>
+                <span>R</span><span>e</span><span>c</span><span>o</span><span>r</span><span>d</span><span>s</span>
+              </a>
             </div>
           </details>
 
         </div>
-
       </details>
 
     </header>
 
 
-    <!-- HERO -->
-    <section class="panel home-hero">
+    <!-- HERO CONTENT -->
+    <section class="panel">
 
-      <h2>Welcome to the PULSE Ecosystem</h2>
+      <h1>Welcome to the PULSE Ecosystem</h1>
 
       <p>
-        A simple place to complete tasks, participate in surveys,
-        track your activity, and keep your records organized.
+        Complete tasks, participate in surveys, and earn rewards through
+        the PULSE experience.
       </p>
 
-      <div class="home-actions">
-
-        <a
-          href="auth.html"
-          class="home-button"
-        >
-          🔐 Get Started
-        </a>
-
-        <a
-          href="how-it-works.html"
-          class="home-button"
-        >
-          ⚡ See How It Works
-        </a>
-
-      </div>
-
     </section>
 
 
-    <!-- WHAT PULSE DOES -->
+    <!-- FEATURES -->
     <section class="panel">
 
-      <h2 class="home-section-title">
-        What You Can Do
-      </h2>
+      <h2>What You Can Do</h2>
 
-      <div class="feature-grid">
+      <div class="features">
 
         <div class="feature-card">
-          <strong>⚡ Complete Tasks</strong>
-          <span>
-            Find available tasks and complete them from your account.
-          </span>
+          <h3>⚡ Complete Tasks</h3>
+          <p>
+            Browse available tasks and complete activities.
+          </p>
+
+          <a class="wave-link feature-link" href="tasks.html">
+            <span>V</span><span>i</span><span>e</span><span>w</span>
+            <span> </span>
+            <span>T</span><span>a</span><span>s</span><span>k</span><span>s</span>
+          </a>
         </div>
 
-        <div class="feature-card">
-          <strong>📝 Take Surveys</strong>
-          <span>
-            Participate in surveys and submit your responses.
-          </span>
-        </div>
 
         <div class="feature-card">
-          <strong>📋 Keep Records</strong>
-          <span>
-            Keep your submissions available for future review.
-          </span>
+          <h3>📝 Take Surveys</h3>
+          <p>
+            Share your feedback through PULSE surveys.
+          </p>
+
+          <a class="wave-link feature-link" href="surveys.html">
+            <span>V</span><span>i</span><span>e</span><span>w</span>
+            <span> </span>
+            <span>S</span><span>u</span><span>r</span><span>v</span><span>e</span><span>y</span><span>s</span>
+          </a>
         </div>
 
-        <div class="feature-card">
-          <strong>💰 Track Earnings</strong>
-          <span>
-            View your balance, earnings, and activity.
-          </span>
-        </div>
 
         <div class="feature-card">
-          <strong>🔔 Stay Updated</strong>
-          <span>
-            Receive notifications about your account and submissions.
-          </span>
-        </div>
+          <h3>💰 Earn Rewards</h3>
+          <p>
+            Track your completed work and available balance.
+          </p>
 
-        <div class="feature-card">
-          <strong>👤 Manage Your Account</strong>
-          <span>
-            Manage your profile and account information.
-          </span>
+          <a class="wave-link feature-link" href="earnings.html">
+            <span>V</span><span>i</span><span>e</span><span>w</span>
+            <span> </span>
+            <span>E</span><span>a</span><span>r</span><span>n</span><span>i</span><span>n</span><span>g</span><span>s</span>
+          </a>
         </div>
 
       </div>
@@ -506,143 +403,86 @@
     </section>
 
 
-    <!-- HOW IT WORKS PREVIEW -->
+    <!-- HOW IT WORKS -->
     <section class="panel">
 
-      <h2 class="home-section-title">
-        How PULSE Works
-      </h2>
+      <h2>How PULSE Works</h2>
 
-      <div class="steps">
+      <ol>
+        <li>Create your account.</li>
+        <li>Browse available tasks and surveys.</li>
+        <li>Complete the requested activity.</li>
+        <li>Submit your work.</li>
+        <li>Track your points and records.</li>
+      </ol>
 
-        <div class="step">
-
-          <div class="step-number">
-            1
-          </div>
-
-          <div class="step-content">
-
-            <strong>🔐 Create an Account</strong>
-
-            <span>
-              Sign up or sign in to access your PULSE account.
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="step">
-
-          <div class="step-number">
-            2
-          </div>
-
-          <div class="step-content">
-
-            <strong>⚡ Find a Task</strong>
-
-            <span>
-              Browse available tasks and surveys.
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="step">
-
-          <div class="step-number">
-            3
-          </div>
-
-          <div class="step-content">
-
-            <strong>📝 Complete & Submit</strong>
-
-            <span>
-              Complete the requested work and submit your response.
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="step">
-
-          <div class="step-number">
-            4
-          </div>
-
-          <div class="step-content">
-
-            <strong>📋 Track Your Activity</strong>
-
-            <span>
-              Review your submissions, notifications, and account activity.
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="home-actions">
-
-        <a
-          href="how-it-works.html"
-          class="home-button"
-        >
-          Learn More →
-        </a>
-
-      </div>
+      <a class="wave-link feature-link" href="how-it-works.html">
+        <span>L</span><span>e</span><span>a</span><span>r</span><span>n</span>
+        <span> </span>
+        <span>H</span><span>o</span><span>w</span>
+        <span> </span>
+        <span>I</span><span>t</span>
+        <span> </span>
+        <span>W</span><span>o</span><span>r</span><span>k</span><span>s</span>
+      </a>
 
     </section>
 
 
     <!-- ACCOUNT CALLOUT -->
-    <section class="panel home-note">
+    <section class="panel">
 
       <h2>Ready to Get Started?</h2>
 
       <p>
-        Create your account to access the PULSE platform
-        and begin exploring available tasks and surveys.
+        Create an account to access your dashboard and available activities.
       </p>
 
-      <div class="home-actions">
-
-        <a
-          href="auth.html"
-          class="home-button"
-        >
-          🚀 Create Account / Sign In
-        </a>
-
-      </div>
+      <a class="wave-link feature-link" href="auth.html">
+        <span>L</span><span>o</span><span>g</span><span>i</span><span>n</span>
+        <span> </span>
+        <span>/</span>
+        <span> </span>
+        <span>S</span><span>i</span><span>g</span><span>n</span>
+        <span> </span>
+        <span>U</span><span>p</span>
+      </a>
 
     </section>
 
 
     <!-- FOOTER -->
-    <footer class="panel home-footer">
+    <footer>
 
       <p>
-        <a href="terms.html">Terms</a>
-        •
-        <a href="privacy.html">Privacy</a>
-        •
-        <a href="disclosures.html">Disclosures</a>
-        •
-        <a href="contact.html">Contact</a>
+        © 2026 PULSE
       </p>
 
-      <p>
-        © PULSE
-      </p>
+      <div>
+
+        <a class="wave-link" href="terms.html">
+          <span>T</span><span>e</span><span>r</span><span>m</span><span>s</span>
+        </a>
+
+        <span> • </span>
+
+        <a class="wave-link" href="privacy.html">
+          <span>P</span><span>r</span><span>i</span><span>v</span><span>a</span><span>c</span><span>y</span>
+        </a>
+
+        <span> • </span>
+
+        <a class="wave-link" href="disclosures.html">
+          <span>D</span><span>i</span><span>s</span><span>c</span><span>l</span><span>o</span><span>s</span><span>u</span><span>r</span><span>e</span><span>s</span>
+        </a>
+
+        <span> • </span>
+
+        <a class="wave-link" href="contact.html">
+          <span>C</span><span>o</span><span>n</span><span>t</span><span>a</span><span>c</span><span>t</span>
+        </a>
+
+      </div>
 
     </footer>
 
