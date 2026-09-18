@@ -212,7 +212,7 @@ function renderSubmission(submission, task) {
           data-submission-action="approve"
           data-submission-id="${submission.id}"
         >
-          Approve
+          Approve & Award Points
         </button>
 
         <button
@@ -337,7 +337,11 @@ async function approveSubmission(submissionId) {
     return;
   }
 
-  if (!confirm("Approve this submission?")) {
+  if (
+    !confirm(
+      "Approve this submission and award its points?"
+    )
+  ) {
     return;
   }
 
@@ -351,20 +355,20 @@ async function approveSubmission(submissionId) {
 
     const { error } =
       await window.supabaseClient
-        .from("task_submissions")
-        .update({
-          status: "approved",
-          reviewed_at: new Date().toISOString()
-        })
-        .eq("id", Number(submissionId))
-        .eq("status", "pending");
+        .rpc(
+          "add_points_for_approved_submission",
+          {
+            p_submission_id:
+              Number(submissionId)
+          }
+        );
 
     if (error) {
       throw error;
     }
 
     alert(
-      "Submission approved."
+      "Submission approved and points awarded."
     );
 
     await loadAdminSubmissions();
@@ -376,7 +380,7 @@ async function approveSubmission(submissionId) {
     );
 
     alert(
-      "Unable to approve this submission."
+      "Unable to approve this submission or award points."
     );
   }
 }
