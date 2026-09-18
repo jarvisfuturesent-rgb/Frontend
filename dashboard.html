@@ -1,666 +1,1492 @@
-/* =========================================================
-   PULSE DASHBOARD — REFERENCE DESIGN ONLY
-   VISUAL CHANGES ONLY
-   ========================================================= */
-
-body {
-  background:
-    radial-gradient(
-      circle at 50% 12%,
-      rgba(35, 40, 255, .16),
-      transparent 30%
-    ),
-    radial-gradient(
-      circle at 15% 75%,
-      rgba(120, 0, 255, .13),
-      transparent 25%
-    ),
-    radial-gradient(
-      circle at 85% 65%,
-      rgba(0, 140, 255, .10),
-      transparent 25%
-    ),
-    #000 !important;
-
-  color: #f4f7ff !important;
-}
-
-/* Keep the main dashboard narrow like the reference */
-
-main {
-  width: 100%;
-  max-width: 470px;
-  margin: 0 auto;
-  padding: 18px 12px 40px !important;
-}
-
-/* Dashboard panel becomes transparent */
-
-.dashboard-panel {
-  width: 100%;
-  max-width: 450px;
-  margin: 0 auto;
-
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Main dashboard content */
-
-.dashboard-content {
-  width: 100%;
-  margin: 0 auto;
-}
-
-/* =========================================================
-   WELCOME
-   ========================================================= */
-
-.dashboard-welcome {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.dashboard-welcome h1 {
-  font-size: 1.35rem !important;
-  line-height: 1.1;
-  margin: 0 0 4px !important;
-  color: #ffffff !important;
-  text-shadow:
-    0 0 8px rgba(0, 180, 255, .65),
-    0 0 20px rgba(90, 60, 255, .35);
-}
-
-.dashboard-welcome p {
-  font-size: .72rem !important;
-  color: #8ea4c7 !important;
-  margin: 0 !important;
-}
-
-/* =========================================================
-   BALANCE
-   ========================================================= */
-
-.balance-box {
-  position: relative;
-  width: 100%;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PULSE Dashboard</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* =====================================================
+       PULSE DASHBOARD VISUAL DESIGN
+       ===================================================== */
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: #000 !important;
+    }
+
+    body {
+      color: #fff !important;
+      font-family: Arial, Helvetica, sans-serif;
+      overflow-x: hidden;
+
+      background:
+        radial-gradient(
+          ellipse at 50% 10%,
+          rgba(0, 70, 255, .20),
+          transparent 35%
+        ),
+        radial-gradient(
+          ellipse at 5% 65%,
+          rgba(90, 0, 255, .18),
+          transparent 30%
+        ),
+        radial-gradient(
+          ellipse at 95% 75%,
+          rgba(0, 70, 255, .15),
+          transparent 30%
+        ),
+        #000 !important;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+
+      background:
+        linear-gradient(
+          125deg,
+          transparent 0%,
+          rgba(0, 55, 255, .10) 42%,
+          transparent 55%
+        ),
+        linear-gradient(
+          215deg,
+          transparent 30%,
+          rgba(130, 0, 255, .10) 50%,
+          transparent 70%
+        );
+
+      animation: backgroundFlow 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes backgroundFlow {
+      0% {
+        transform: translateX(-4%);
+        opacity: .65;
+      }
+
+      100% {
+        transform: translateX(4%);
+        opacity: 1;
+      }
+    }
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
+    header {
+      width: 100%;
+      padding: 10px 12px;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, .88);
+      border-bottom: 1px solid rgba(0, 70, 255, .35);
+    }
+
+    .site-header {
+      width: 100%;
+      max-width: 450px;
+      margin: auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .site-header > .pulse-link {
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+    }
+
+    .site-menu {
+      position: relative;
+    }
+
+    .site-menu > summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 6px 9px;
+      border: 1px solid rgba(0, 120, 255, .45);
+      border-radius: 7px;
+      background: rgba(5, 15, 45, .8);
+      font-size: .72rem;
+    }
+
+    .site-menu > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .site-menu[open] {
+      position: relative;
+      z-index: 50;
+    }
+
+    .site-menu[open] > details {
+      display: block;
+    }
+
+    .site-menu > details {
+      margin-top: 5px;
+    }
+
+    .site-menu > details > summary {
+      cursor: pointer;
+    }
+
+    .site-menu .pulse-folder {
+      padding: 6px 4px;
+      font-size: .72rem;
+    }
+
+    .menu-pages {
+      margin-left: 26px;
+      padding-bottom: 5px;
+    }
+
+    .menu-pages a {
+      margin: 5px 0;
+      font-size: .68rem;
+      color: #c8d8ff !important;
+    }
+
+    .pulse-link,
+    .pulse-folder {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .pulse-link span,
+    .pulse-folder span {
+      display: inline-block;
+      animation: pulseLetter 3.6s ease-in-out infinite;
+      animation-delay: calc(var(--i) * .08s);
+    }
+
+    @keyframes pulseLetter {
+      0% {
+        color: inherit;
+        text-shadow: none;
+        transform: scale(1);
+      }
+
+      12% {
+        color: #00f6ff;
+        text-shadow:
+          0 0 4px #00f6ff,
+          0 0 10px rgba(0,246,255,.7);
+        transform: scale(1.08);
+      }
+
+      24% {
+        color: #008cff;
+        text-shadow:
+          0 0 5px #008cff,
+          0 0 12px rgba(0,140,255,.7);
+        transform: scale(1);
+      }
+
+      36% {
+        color: #5c5cff;
+        text-shadow:
+          0 0 5px #5c5cff,
+          0 0 12px rgba(92,92,255,.7);
+        transform: scale(1.06);
+      }
+
+      48% {
+        color: #9b4dff;
+        text-shadow:
+          0 0 5px #9b4dff,
+          0 0 12px rgba(155,77,255,.7);
+        transform: scale(1);
+      }
+
+      60% {
+        color: #ff3bd4;
+        text-shadow:
+          0 0 5px #ff3bd4,
+          0 0 12px rgba(255,59,212,.7);
+        transform: scale(1.08);
+      }
+
+      72% {
+        color: #ff4f81;
+        text-shadow:
+          0 0 5px #ff4f81,
+          0 0 12px rgba(255,79,129,.7);
+        transform: scale(1);
+      }
+
+      84% {
+        color: #00ffc8;
+        text-shadow:
+          0 0 5px #00ffc8,
+          0 0 12px rgba(0,255,200,.7);
+        transform: scale(1.06);
+      }
+
+      100% {
+        color: inherit;
+        text-shadow: none;
+        transform: scale(1);
+      }
+    }
+
+    .menu-logo {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      margin-right: 7px;
+      flex-shrink: 0;
+    }
+
+    /* LEVEL 3 — NO EFFECT */
+
+    .page-link {
+      display: block;
+      text-decoration: none;
+      animation: none !important;
+      text-shadow: none !important;
+      transform: none !important;
+    }
+
+    .page-link span {
+      animation: none !important;
+      color: inherit !important;
+      text-shadow: none !important;
+      transform: none !important;
+    }
+
+    /* =====================================================
+       MAIN
+       ===================================================== */
+
+    main {
+      width: 100%;
+      max-width: 450px;
+      margin: 0 auto;
+      padding: 12px 10px 30px;
+      box-sizing: border-box;
+    }
+
+    .dashboard-panel {
+      width: 100%;
+      margin: 0;
+      padding: 0 !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .dashboard-content {
+      width: 100%;
+    }
+
+    /* =====================================================
+       WELCOME
+       ===================================================== */
+
+    .dashboard-welcome {
+      padding: 12px 14px;
+      margin-bottom: 8px;
+
+      border: 1px solid rgba(38, 88, 255, .65);
+      border-radius: 8px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(10, 24, 70, .90),
+          rgba(2, 8, 30, .94)
+        );
+
+      box-shadow:
+        0 0 10px rgba(0, 70, 255, .20),
+        inset 0 0 18px rgba(20, 70, 255, .08);
+    }
+
+    .dashboard-welcome h1 {
+      margin: 0 0 4px !important;
+      font-size: 1.15rem !important;
+      line-height: 1.1;
+      color: #fff !important;
+      text-shadow:
+        0 0 8px rgba(0, 190, 255, .45);
+    }
+
+    .dashboard-welcome p {
+      margin: 0 !important;
+      font-size: .65rem !important;
+      color: #91a8d0 !important;
+    }
+
+    /* =====================================================
+       BALANCE
+       ===================================================== */
+
+    .balance-box {
+      position: relative;
+
+      width: 100%;
+      min-height: 92px;
+
+      padding: 12px 16px;
+      margin: 7px 0;
+
+      box-sizing: border-box;
+
+      overflow: hidden;
+
+      border: 1px solid #315cff !important;
+      border-radius: 8px;
+
+      background:
+        linear-gradient(
+          150deg,
+          rgba(11, 22, 73, .96),
+          rgba(3, 8, 32, .98)
+        ) !important;
+
+      box-shadow:
+        0 0 8px rgba(0, 65, 255, .45),
+        inset 0 0 22px rgba(40, 50, 190, .12) !important;
+    }
+
+    .balance-box::before {
+      content: "";
+
+      position: absolute;
+
+      width: 180%;
+      height: 45px;
+
+      left: -40%;
+      bottom: -5px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(0, 130, 255, .55),
+          rgba(170, 30, 255, .55),
+          rgba(0, 230, 255, .55),
+          transparent
+        );
+
+      filter: blur(9px);
+
+      transform: rotate(-7deg);
+
+      animation: balanceBeam 4s ease-in-out infinite;
+    }
+
+    @keyframes balanceBeam {
+      0% {
+        transform:
+          translateX(-18%)
+          rotate(-7deg);
+        opacity: .35;
+      }
+
+      50% {
+        transform:
+          translateX(18%)
+          rotate(-7deg);
+        opacity: .9;
+      }
+
+      100% {
+        transform:
+          translateX(-18%)
+          rotate(-7deg);
+        opacity: .35;
+      }
+    }
+
+    .balance-box::after {
+      content: "";
+
+      position: absolute;
+
+      left: 5%;
+      right: 5%;
+      bottom: 11px;
+
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          #00eaff,
+          #8b38ff,
+          #00eaff,
+          transparent
+        );
+
+      box-shadow:
+        0 0 7px #00aaff;
+
+      animation: balanceLine 2.5s ease-in-out infinite;
+    }
+
+    @keyframes balanceLine {
+      0%, 100% {
+        opacity: .3;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    .balance-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .balance-title {
+      display: block;
+
+      margin-bottom: 3px;
+
+      font-size: .54rem !important;
+
+      font-weight: 800;
+
+      letter-spacing: 2px;
+
+      text-transform: uppercase;
+
+      color: #8ca3ce !important;
+    }
+
+    .balance-amount {
+      display: inline-block;
+
+      font-size: 2.45rem !important;
+
+      line-height: .9 !important;
+
+      font-weight: 900 !important;
+
+      letter-spacing: -1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          #00f6ff,
+          #5c5cff,
+          #d946ff,
+          #00ffc8,
+          #00f6ff
+        );
+
+      background-size: 400% 100%;
+
+      -webkit-background-clip: text;
+      background-clip: text;
+
+      color: transparent !important;
+
+      animation:
+        balanceEnergy 4s linear infinite,
+        balancePulse 2.2s ease-in-out infinite;
+
+      filter:
+        drop-shadow(
+          0 0 8px
+          rgba(0, 246, 255, .65)
+        );
+    }
+
+    @keyframes balanceEnergy {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      100% {
+        background-position: 400% 50%;
+      }
+    }
+
+    @keyframes balancePulse {
+      0%, 100% {
+        transform: scale(1);
+
+        filter:
+          drop-shadow(
+            0 0 6px
+            rgba(0,246,255,.45)
+          );
+      }
+
+      45% {
+        transform: scale(1.04);
+
+        filter:
+          drop-shadow(
+            0 0 13px
+            rgba(0,246,255,.75)
+          )
+          drop-shadow(
+            0 0 20px
+            rgba(100,50,255,.35)
+          );
+      }
+
+      55% {
+        transform: scale(1.065);
+
+        filter:
+          drop-shadow(
+            0 0 18px
+            rgba(0,246,255,.95)
+          )
+          drop-shadow(
+            0 0 28px
+            rgba(155,77,255,.55)
+          );
+      }
+    }
+
+    .balance-unit {
+      display: block;
+
+      margin-top: 2px;
+
+      font-size: .54rem !important;
+
+      letter-spacing: 3px;
+
+      color: #8ba3ca !important;
+    }
+
+    .balance-status {
+      position: absolute;
+
+      right: 12px;
+      bottom: 9px;
+
+      font-size: .52rem !important;
+
+      color: #00eaff !important;
+
+      text-shadow:
+        0 0 7px
+        rgba(0,234,255,.75);
+    }
+
+    /* =====================================================
+       STATS
+       ===================================================== */
+
+    .dashboard-stats {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 6px;
+
+      margin: 7px 0;
+    }
+
+    .stat-card {
+      padding: 8px 5px !important;
+
+      min-width: 0;
+
+      border-radius: 7px !important;
+
+      border: 1px solid rgba(35, 78, 220, .60) !important;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(8, 20, 58, .94),
+          rgba(2, 8, 30, .96)
+        ) !important;
+
+      box-shadow:
+        inset 0 0 12px
+        rgba(30, 70, 180, .10);
+    }
+
+    .stat-label {
+      display: block;
+
+      font-size: .46rem !important;
+
+      letter-spacing: .8px;
+
+      color: #8197bc !important;
+    }
+
+    .stat-card strong {
+      display: block;
+
+      margin-top: 3px;
+
+      font-size: .61rem !important;
+
+      color: #e1eaff !important;
+    }
+
+    /* =====================================================
+       PROFILE
+       ===================================================== */
+
+    .profile-card {
+      padding: 9px 12px !important;
+      margin: 7px 0;
+
+      border-radius: 7px !important;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(8, 19, 58, .95),
+          rgba(2, 7, 29, .97)
+        ) !important;
+
+      border: 1px solid rgba(36, 77, 220, .60) !important;
+    }
+
+    .profile-card #profileName {
+      margin-top: 3px;
+
+      font-size: .75rem;
+
+      font-weight: 800;
+
+      color: #fff;
+    }
+
+    .profile-card #profile {
+      margin-top: 2px;
+
+      font-size: .58rem;
+
+      color: #8196ba;
+    }
+
+    /* =====================================================
+       DASHBOARD FOLDERS
+       ===================================================== */
+
+    .dashboard-folder {
+      width: 100%;
+
+      margin: 6px 0;
+
+      border-radius: 7px;
+
+      overflow: hidden;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(6, 18, 53, .96),
+          rgba(2, 7, 27, .98)
+        );
+
+      border: 1px solid rgba(30, 76, 220, .68);
+
+      box-shadow:
+        0 0 6px
+        rgba(0,70,255,.15),
+        inset 0 0 12px
+        rgba(25,60,180,.08);
+    }
+
+    .dashboard-folder > summary {
+      min-height: 39px;
+
+      padding: 0 11px;
+
+      display: flex;
+
+      align-items: center;
+
+      cursor: pointer;
+
+      list-style: none;
+
+      font-size: .70rem;
+
+      font-weight: 800;
+
+      color: #e8efff;
+
+      box-sizing: border-box;
+    }
 
-  min-height: 92px;
+    .dashboard-folder > summary::-webkit-details-marker {
+      display: none;
+    }
 
-  margin: 8px 0 10px;
+    .dashboard-folder > summary::after {
+      content: "›";
+
+      margin-left: auto;
+
+      font-size: 1.05rem;
 
-  padding: 13px 18px;
-
-  border-radius: 10px;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(15, 20, 75, .94),
-      rgba(3, 8, 35, .96)
-    ) !important;
+      color: #5b7cff;
 
-  border: 1px solid rgba(39, 77, 255, .85) !important;
+      transition:
+        transform .2s ease;
+    }
 
-  box-shadow:
-    0 0 8px rgba(0, 70, 255, .45),
-    inset 0 0 18px rgba(30, 40, 180, .20) !important;
+    .dashboard-folder[open]
+    > summary::after {
+      transform: rotate(90deg);
+    }
 
-  overflow: hidden;
-}
+    .folder-content {
+      padding: 0 8px 8px !important;
+    }
 
-/* flowing neon line */
+    /* =====================================================
+       LOADING / CONTENT BOXES
+       ===================================================== */
 
-.balance-box::after {
-  content: "";
+    #tasks,
+    #submissions,
+    #activity,
+    #redemptions,
+    #notifications {
+      width: 100%;
+      box-sizing: border-box;
+    }
 
-  position: absolute;
+    /* =====================================================
+       REWARDS
+       ===================================================== */
 
-  left: -10%;
-  right: -10%;
-  bottom: 12px;
+    .dashboard-folder p {
+      font-size: .60rem;
 
-  height: 2px;
+      color: #91a4c7;
+    }
 
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      #174cff,
-      #a52cff,
-      #00eaff,
-      transparent
-    );
+    .dashboard-folder input,
+    .dashboard-folder select {
+      width: 100% !important;
 
-  filter:
-    blur(1px)
-    drop-shadow(0 0 7px #315cff);
+      height: 31px;
 
-  animation: balanceWave 3.2s ease-in-out infinite;
-}
+      box-sizing: border-box;
 
-@keyframes balanceWave {
-  0%, 100% {
-    transform: translateX(-8%) scaleX(.85);
-    opacity: .55;
-  }
+      margin: 3px 0;
 
-  50% {
-    transform: translateX(8%) scaleX(1.05);
-    opacity: 1;
-  }
-}
+      padding: 0 9px;
 
-.balance-content {
-  position: relative;
-  z-index: 2;
-}
+      border-radius: 5px !important;
 
-.balance-title {
-  display: block;
+      border: 1px solid rgba(35, 80, 215, .62) !important;
 
-  font-size: .58rem !important;
+      background:
+        rgba(3, 13, 42, .95) !important;
 
-  font-weight: 800;
+      color: #dce8ff !important;
 
-  letter-spacing: 2px;
+      font-size: .58rem !important;
 
-  text-transform: uppercase;
+      outline: none;
+    }
 
-  color: #91a6cf !important;
-}
+    .dashboard-folder input:focus,
+    .dashboard-folder select:focus {
+      border-color: #00cfff !important;
 
-/* Balance number */
+      box-shadow:
+        0 0 8px
+        rgba(0,180,255,.25);
+    }
 
-.balance-amount {
-  display: inline-block;
+    /* =====================================================
+       BUTTONS
+       ===================================================== */
 
-  margin-top: 3px;
+    .dashboard-button {
+      width: 100%;
 
-  font-size: 2.35rem !important;
+      min-height: 31px;
 
-  line-height: .9 !important;
+      margin-top: 4px;
 
-  font-weight: 900 !important;
+      border: 1px solid
+        rgba(0,220,255,.75);
 
-  letter-spacing: -1px;
+      border-radius: 5px;
 
-  background:
-    linear-gradient(
-      90deg,
-      #00f6ff,
-      #6875ff,
-      #d72dff,
-      #00ffc8,
-      #00f6ff
-    );
+      background:
+        linear-gradient(
+          90deg,
+          #c928ff,
+          #6a4cff,
+          #00d9ff
+        );
 
-  background-size: 400% 100%;
+      color: #fff;
 
-  -webkit-background-clip: text;
-  background-clip: text;
+      font-size: .59rem;
 
-  color: transparent !important;
+      font-weight: 800;
 
-  animation:
-    referenceBalanceFlow 4s linear infinite,
-    referenceBalancePulse 2.3s ease-in-out infinite;
+      box-shadow:
+        0 0 8px
+        rgba(0,160,255,.35);
 
-  filter:
-    drop-shadow(0 0 7px rgba(0, 220, 255, .55));
-}
+      cursor: pointer;
+    }
 
-@keyframes referenceBalanceFlow {
-  0% {
-    background-position: 0% 50%;
-  }
+    /* =====================================================
+       QUICK ACCESS
+       ===================================================== */
 
-  100% {
-    background-position: 400% 50%;
-  }
-}
+    .dashboard-content > h2 {
+      margin: 12px 0 6px !important;
 
-@keyframes referenceBalancePulse {
-  0%, 100% {
-    transform: scale(1);
-    filter:
-      drop-shadow(0 0 6px rgba(0, 220, 255, .45));
-  }
+      font-size: .75rem !important;
 
-  50% {
-    transform: scale(1.045);
-    filter:
-      drop-shadow(0 0 14px rgba(0, 220, 255, .9))
-      drop-shadow(0 0 24px rgba(150, 40, 255, .55));
-  }
-}
+      color: #dce8ff !important;
+    }
 
-.balance-unit {
-  display: block;
+    .quick-access {
+      display: grid;
 
-  font-size: .58rem !important;
+      grid-template-columns:
+        repeat(2, 1fr);
 
-  letter-spacing: 3px;
+      gap: 6px;
 
-  color: #8ba0c7 !important;
-}
+      margin-bottom: 10px;
+    }
 
-.balance-status {
-  position: absolute;
+    .quick-access .pulse-link {
+      min-height: 32px;
 
-  right: 12px;
-  bottom: 12px;
+      justify-content: center;
 
-  font-size: .58rem !important;
+      box-sizing: border-box;
 
-  color: #00eaff !important;
+      padding: 6px;
 
-  text-shadow:
-    0 0 7px rgba(0, 234, 255, .7);
-}
+      border-radius: 6px;
 
-/* =========================================================
-   STAT CARDS
-   ========================================================= */
+      border: 1px solid
+        rgba(35,80,215,.55);
 
-.dashboard-stats {
-  display: grid;
+      background:
+        rgba(5,17,50,.90);
 
-  grid-template-columns:
-    repeat(3, 1fr);
+      color: #cbd9f5;
 
-  gap: 7px;
+      font-size: .59rem;
+    }
 
-  margin: 10px 0;
-}
+    /* =====================================================
+       SIGN OUT
+       ===================================================== */
 
-.stat-card {
-  min-width: 0;
+    #logoutBtn {
+      margin-top: 6px;
 
-  padding: 9px 7px !important;
+      background:
+        linear-gradient(
+          90deg,
+          #7b20ff,
+          #bd25ff,
+          #ff2cb7
+        );
 
-  border-radius: 8px !important;
+      border-color:
+        rgba(255,80,220,.75);
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(10, 19, 58, .96),
-      rgba(3, 8, 30, .96)
-    ) !important;
+      box-shadow:
+        0 0 10px
+        rgba(200,30,255,.30);
+    }
 
-  border: 1px solid rgba(34, 75, 220, .65) !important;
+    /* =====================================================
+       FOOTER
+       ===================================================== */
 
-  box-shadow:
-    inset 0 0 10px rgba(20, 50, 180, .12),
-    0 0 5px rgba(0, 70, 255, .18) !important;
-}
+    footer {
+      width: 100%;
 
-.stat-label {
-  display: block;
+      max-width: 450px;
 
-  font-size: .48rem !important;
+      margin: 0 auto;
 
-  letter-spacing: 1.1px;
+      padding: 12px 10px 25px;
 
-  color: #7f96bd !important;
+      box-sizing: border-box;
 
-  text-transform: uppercase;
-}
+      text-align: center;
 
-.stat-card strong {
-  display: block;
+      font-size: .52rem;
 
-  margin-top: 4px;
+      color: #53688e !important;
+    }
 
-  font-size: .68rem !important;
+    footer p {
+      margin: 5px 0 8px;
+    }
 
-  color: #dbe7ff !important;
-}
+    footer a {
+      margin: 0 4px;
 
-/* =========================================================
-   PROFILE
-   ========================================================= */
+      font-size: .52rem;
+    }
 
-.profile-card {
-  width: 100%;
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 480px) {
+
+      main {
+        padding-left: 9px !important;
+        padding-right: 9px !important;
+      }
+
+      .balance-amount {
+        font-size: 2.35rem !important;
+      }
+
+      .dashboard-stats {
+        gap: 5px;
+      }
+
+      .stat-card {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="site-header">
+
+      <a href="index.html" class="pulse-link">
+        <span style="--i:0">P</span>
+        <span style="--i:1">U</span>
+        <span style="--i:2">L</span>
+        <span style="--i:3">S</span>
+        <span style="--i:4">E</span>
+      </a>
+
+      <details class="site-menu">
+
+        <summary class="pulse-link">
+          <span style="--i:0">☰</span>
+          <span style="--i:1"> </span>
+          <span style="--i:2">M</span>
+          <span style="--i:3">e</span>
+          <span style="--i:4">n</span>
+          <span style="--i:5">u</span>
+        </summary>
+
+        <details>
+          <summary class="pulse-folder">
+            <img
+              src="pulse-logo.png"
+              alt="PULSE"
+              class="menu-logo"
+            >
+            <span style="--i:0">M</span>
+            <span style="--i:1">a</span>
+            <span style="--i:2">i</span>
+            <span style="--i:3">n</span>
+          </summary>
+
+          <div class="menu-pages">
+            <a class="page-link" href="index.html">🏠 Home</a>
+            <a class="page-link" href="how-it-works.html">ℹ️ How It Works</a>
+            <a class="page-link" href="about.html">📖 About PULSE</a>
+            <a class="page-link" href="contact.html">📧 Contact</a>
+          </div>
+        </details>
+
+        <details>
+          <summary class="pulse-folder">
+            <img
+              src="pulse-logo.png"
+              alt="PULSE"
+              class="menu-logo"
+            >
+            <span style="--i:0">P</span>
+            <span style="--i:1">U</span>
+            <span style="--i:2">L</span>
+            <span style="--i:3">S</span>
+            <span style="--i:4">E</span>
+          </summary>
+
+          <div class="menu-pages">
+            <a class="page-link" href="dashboard.html">📊 Dashboard</a>
+            <a class="page-link" href="tasks.html">⚡ Available Tasks</a>
+            <a class="page-link" href="surveys.html">📋 Surveys</a>
+            <a class="page-link" href="submissions.html">📝 My Submissions</a>
+            <a class="page-link" href="earnings.html">💰 Earnings &amp; Balance</a>
+            <a class="page-link" href="notifications.html">🔔 Notifications</a>
+          </div>
+        </details>
+
+        <details>
+          <summary class="pulse-folder">
+            <img
+              src="pulse-logo.png"
+              alt="PULSE"
+              class="menu-logo"
+            >
+            <span style="--i:0">A</span>
+            <span style="--i:1">c</span>
+            <span style="--i:2">c</span>
+            <span style="--i:3">o</span>
+            <span style="--i:4">u</span>
+            <span style="--i:5">n</span>
+            <span style="--i:6">t</span>
+          </summary>
+
+          <div class="menu-pages">
+            <a class="page-link" href="auth.html">🔐 Login / Sign Up</a>
+            <a class="page-link" href="profile.html">👤 Profile &amp; Account</a>
+            <a class="page-link" href="reset-password.html">🔑 Reset Password</a>
+          </div>
+        </details>
+
+        <details>
+          <summary class="pulse-folder">
+            <img
+              src="pulse-logo.png"
+              alt="PULSE"
+              class="menu-logo"
+            >
+            <span style="--i:0">L</span>
+            <span style="--i:1">e</span>
+            <span style="--i:2">g</span>
+            <span style="--i:3">a</span>
+            <span style="--i:4">l</span>
+          </summary>
+
+          <div class="menu-pages">
+            <a class="page-link" href="terms.html">📄 Terms</a>
+            <a class="page-link" href="privacy.html">🔒 Privacy Policy</a>
+            <a class="page-link" href="disclosures.html">📢 Disclosures</a>
+          </div>
+        </details>
+
+        <details>
+          <summary class="pulse-folder">
+            <img
+              src="pulse-logo.png"
+              alt="PULSE"
+              class="menu-logo"
+            >
+            <span style="--i:0">A</span>
+            <span style="--i:1">d</span>
+            <span style="--i:2">m</span>
+            <span style="--i:3">i</span>
+            <span style="--i:4">n</span>
+            <span style="--i:5">i</span>
+            <span style="--i:6">s</span>
+            <span style="--i:7">t</span>
+            <span style="--i:8">r</span>
+            <span style="--i:9">a</span>
+            <span style="--i:10">t</span>
+            <span style="--i:11">i</span>
+            <span style="--i:12">o</span>
+            <span style="--i:13">n</span>
+          </summary>
+
+          <div class="menu-pages">
+            <a class="page-link" href="admin.html">⚙ Admin Dashboard</a>
+            <a class="page-link" href="admin-tasks.html">⚡ Task Management</a>
+            <a class="page-link" href="admin-businesses.html">🏢 Business Management</a>
+            <a class="page-link" href="admin-submissions.html">📝 Submission Review</a>
+            <a class="page-link" href="admin-rewards.html">🎁 Reward Requests</a>
+            <a class="page-link" href="admin-reports.html">📊 Reports &amp; Records</a>
+          </div>
+        </details>
+
+      </details>
+
+    </div>
+  </header>
+
+
+  <main>
+
+    <section class="panel dashboard-panel">
+
+      <div class="dashboard-content">
+
+        <div class="dashboard-welcome">
+          <h1>Welcome to PULSE</h1>
+          <p>Complete tasks and earn rewards.</p>
+        </div>
+
+
+        <div class="balance-box">
+
+          <div class="balance-content">
+
+            <span class="balance-title">
+              Your PULSE Balance
+            </span>
+
+            <div
+              id="balance"
+              class="balance-amount"
+            >
+              25
+            </div>
 
-  padding: 10px 13px !important;
+            <span class="balance-unit">
+              POINTS
+            </span>
 
-  margin: 8px 0;
+            <div class="balance-status">
+              ⚡ Balance Active
+            </div>
 
-  border-radius: 8px !important;
+          </div>
 
-  background:
-    linear-gradient(
-      135deg,
-      rgba(8, 18, 54, .95),
-      rgba(3, 7, 28, .95)
-    ) !important;
+        </div>
 
-  border: 1px solid rgba(35, 70, 210, .62) !important;
-}
 
-.profile-card #profileName {
-  margin-top: 3px;
+        <div class="dashboard-stats">
 
-  font-size: .82rem;
+          <div class="stat-card">
+            <span class="stat-label">
+              Total Earned
+            </span>
 
-  font-weight: 700;
+            <strong id="totalEarned">
+              25 PLS
+            </strong>
+          </div>
 
-  color: #ffffff;
-}
+          <div class="stat-card">
+            <span class="stat-label">
+              Pending Withdrawal
+            </span>
 
-.profile-card #profile {
-  margin-top: 3px;
+            <strong id="pendingWithdrawal">
+              0 PLS
+            </strong>
+          </div>
 
-  font-size: .62rem;
+          <div class="stat-card">
+            <span class="stat-label">
+              Available Balance
+            </span>
 
-  color: #8498bd;
-}
+            <strong id="availableBalance">
+              25 PLS
+            </strong>
+          </div>
 
-/* =========================================================
-   DASHBOARD FOLDERS
-   ========================================================= */
+        </div>
 
-.dashboard-folder {
-  width: 100%;
 
-  margin: 7px 0;
+        <div class="profile-card">
 
-  border-radius: 8px;
+          <span class="stat-label">
+            ACCOUNT
+          </span>
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(5, 18, 55, .97),
-      rgba(2, 8, 29, .98)
-    );
+          <div id="profileName">
+            PULSE User
+          </div>
 
-  border: 1px solid rgba(24, 70, 210, .72);
+          <div id="profile">
+            Loading your profile...
+          </div>
 
-  box-shadow:
-    0 0 6px rgba(0, 60, 255, .16),
-    inset 0 0 14px rgba(25, 50, 180, .10);
+        </div>
 
-  overflow: hidden;
-}
 
-.dashboard-folder > summary {
-  min-height: 42px;
+        <details class="dashboard-folder">
 
-  display: flex;
+          <summary>
+            ⚡ Available Tasks
+          </summary>
 
-  align-items: center;
+          <div class="folder-content">
 
-  padding: 0 13px;
+            <div id="tasks">
+              Loading available tasks...
+            </div>
 
-  cursor: pointer;
+          </div>
 
-  font-size: .78rem;
+        </details>
 
-  font-weight: 800;
 
-  color: #e8f0ff;
+        <details class="dashboard-folder">
 
-  list-style: none;
+          <summary>
+            📋 My Submissions
+          </summary>
 
-  text-shadow:
-    0 0 7px rgba(70, 130, 255, .25);
-}
+          <div class="folder-content">
 
-.dashboard-folder > summary::-webkit-details-marker {
-  display: none;
-}
+            <div id="submissions">
+              Loading your submissions...
+            </div>
 
-.dashboard-folder > summary::after {
-  content: "›";
+          </div>
 
-  margin-left: auto;
+        </details>
 
-  font-size: 1.15rem;
 
-  color: #587cff;
+        <details class="dashboard-folder">
 
-  transition: transform .2s ease;
-}
+          <summary>
+            📊 Points Activity
+          </summary>
 
-.dashboard-folder[open] > summary::after {
-  transform: rotate(90deg);
-}
+          <div class="folder-content">
 
-.folder-content {
-  padding: 0 9px 10px !important;
-}
+            <div id="activity">
+              Loading activity...
+            </div>
 
-/* =========================================================
-   TASK / SUBMISSION / ACTIVITY CONTENT
-   ========================================================= */
+          </div>
 
-#tasks,
-#submissions,
-#activity,
-#redemptions,
-#notifications {
-  width: 100%;
-}
+        </details>
 
-#tasks > *,
-#submissions > *,
-#activity > *,
-#redemptions > *,
-#notifications > * {
-  margin-bottom: 6px;
-}
 
-/* =========================================================
-   REWARDS
-   ========================================================= */
+        <details class="dashboard-folder">
 
-.dashboard-folder input,
-.dashboard-folder select {
-  width: 100% !important;
+          <summary>
+            🎁 Rewards
+          </summary>
 
-  height: 32px;
+          <div class="folder-content">
 
-  margin: 4px 0;
+            <p>
+              Redeem your available PULSE points for a reward.
+            </p>
 
-  padding: 0 10px;
+            <input
+              id="redeemAmount"
+              type="number"
+              min="1"
+              placeholder="Points to redeem"
+            >
 
-  border-radius: 6px !important;
+            <select id="rewardType">
 
-  background:
-    rgba(4, 15, 48, .95) !important;
+              <option value="">
+                Select Reward Type
+              </option>
 
-  border: 1px solid rgba(32, 76, 210, .72) !important;
+              <option value="manual">
+                Manual Reward
+              </option>
 
-  color: #dce8ff !important;
+            </select>
 
-  font-size: .65rem;
-}
+            <input
+              id="redeemNote"
+              type="text"
+              placeholder="Optional note"
+            >
 
-.dashboard-folder input::placeholder {
-  color: #60769e;
-}
+            <button
+              id="redeem"
+              type="button"
+              class="dashboard-button"
+            >
+              Request Reward
+            </button>
 
-/* =========================================================
-   BUTTONS
-   ========================================================= */
+            <div id="redeemMsg"></div>
 
-.dashboard-button {
-  width: 100%;
+            <div id="redemptions">
+              Loading reward requests...
+            </div>
 
-  min-height: 32px;
+          </div>
 
-  margin-top: 5px;
+        </details>
 
-  border: 1px solid rgba(0, 210, 255, .7);
 
-  border-radius: 6px;
+        <details class="dashboard-folder">
 
-  background:
-    linear-gradient(
-      90deg,
-      #c629ff,
-      #674cff,
-      #00d9ff
-    );
+          <summary>
+            🔔 Notifications
+          </summary>
 
-  color: #ffffff;
+          <div class="folder-content">
 
-  font-size: .65rem;
+            <div id="notifications">
+              Loading notifications...
+            </div>
 
-  font-weight: 800;
+            <button
+              id="markNotificationsRead"
+              type="button"
+              class="dashboard-button"
+              onclick="markNotificationsRead()"
+            >
+              Mark Read
+            </button>
 
-  box-shadow:
-    0 0 9px rgba(0, 130, 255, .35);
+          </div>
 
-  cursor: pointer;
+        </details>
 
-  transition:
-    transform .15s ease,
-    box-shadow .15s ease;
-}
 
-.dashboard-button:hover {
-  transform: translateY(-1px);
+        <h2>
+          Quick Access
+        </h2>
 
-  box-shadow:
-    0 0 15px rgba(0, 200, 255, .55);
-}
+        <div class="quick-access">
 
-/* =========================================================
-   QUICK ACCESS
-   ========================================================= */
+          <a
+            class="pulse-link"
+            href="tasks.html"
+          >
+            ⚡ Tasks
+          </a>
 
-.quick-access {
-  display: grid;
+          <a
+            class="pulse-link"
+            href="surveys.html"
+          >
+            📋 Surveys
+          </a>
 
-  grid-template-columns:
-    repeat(2, 1fr);
+          <a
+            class="pulse-link"
+            href="submissions.html"
+          >
+            📝 Submissions
+          </a>
 
-  gap: 7px;
+          <a
+            class="pulse-link"
+            href="earnings.html"
+          >
+            💰 Earnings
+          </a>
 
-  margin: 8px 0 12px;
-}
+          <a
+            class="pulse-link"
+            href="notifications.html"
+          >
+            🔔 Notifications
+          </a>
 
-.quick-access .pulse-link {
-  min-height: 35px;
+          <a
+            class="pulse-link"
+            href="profile.html"
+          >
+            👤 Profile
+          </a>
 
-  justify-content: center;
+        </div>
 
-  padding: 7px;
 
-  border-radius: 7px;
+        <button
+          id="logoutBtn"
+          type="button"
+          class="dashboard-button"
+        >
+          Sign Out
+        </button>
 
-  background:
-    rgba(5, 17, 52, .92);
+      </div>
 
-  border: 1px solid rgba(32, 74, 210, .55);
+    </section>
 
-  font-size: .64rem;
+  </main>
 
-  color: #c9d8f5;
-}
 
-/* =========================================================
-   SIGN OUT
-   ========================================================= */
+  <footer>
 
-#logoutBtn {
-  margin-top: 8px;
+    <p>
+      © 2026 PULSE
+    </p>
 
-  background:
-    linear-gradient(
-      90deg,
-      #6f1fff,
-      #b625ff,
-      #ff2cba
-    );
+    <div>
 
-  border-color:
-    rgba(255, 70, 220, .75);
+      <a
+        class="pulse-link"
+        href="terms.html"
+      >
+        Terms
+      </a>
 
-  box-shadow:
-    0 0 10px rgba(210, 30, 255, .28);
-}
+      <a
+        class="pulse-link"
+        href="privacy.html"
+      >
+        Privacy
+      </a>
 
-/* =========================================================
-   HEADINGS
-   ========================================================= */
+      <a
+        class="pulse-link"
+        href="disclosures.html"
+      >
+        Disclosures
+      </a>
 
-.dashboard-content h2 {
-  margin: 13px 0 7px !important;
+      <a
+        class="pulse-link"
+        href="contact.html"
+      >
+        Contact
+      </a>
 
-  font-size: .82rem !important;
+    </div>
 
-  color: #dce7ff !important;
+  </footer>
 
-  letter-spacing: .3px;
-}
 
-/* =========================================================
-   FOOTER
-   ========================================================= */
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-footer {
-  width: 100%;
+  <script src="config.js"></script>
 
-  max-width: 450px;
+  <script src="app.js"></script>
 
-  margin: 0 auto;
+  <script>
+    const logoutBtn =
+      document.getElementById("logoutBtn");
 
-  padding: 12px 15px 30px;
+    if (
+      logoutBtn &&
+      typeof logout === "function"
+    ) {
+      logoutBtn.addEventListener(
+        "click",
+        logout
+      );
+    }
+  </script>
 
-  text-align: center;
-
-  color: #56698d !important;
-
-  font-size: .58rem;
-}
-
-footer a {
-  margin: 0 5px;
-
-  font-size: .58rem;
-}
-
-/* =========================================================
-   MOBILE MATCH
-   ========================================================= */
-
-@media (max-width: 480px) {
-
-  main {
-    max-width: 100%;
-
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-  }
-
-  .dashboard-stats {
-    gap: 5px;
-  }
-
-  .stat-card {
-    padding-left: 5px !important;
-    padding-right: 5px !important;
-  }
-
-  .balance-amount {
-    font-size: 2.3rem !important;
-  }
-
-}
-
-/* =========================================================
-   REDUCE EXTRA SPACING
-   ========================================================= */
-
-.dashboard-panel,
-.dashboard-content,
-.balance-box,
-.profile-card,
-.dashboard-folder {
-  box-sizing: border-box;
-}
+</body>
+</html>
