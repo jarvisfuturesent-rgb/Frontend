@@ -1,1 +1,424 @@
-d
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PULSE — Reports & Records</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .pulse-link {
+      display:inline-flex;
+      align-items:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+
+    .pulse-link span {
+      display:inline-block;
+      animation:pulseLetter 3.6s ease-in-out infinite;
+      animation-delay:calc(var(--i) * 0.08s);
+    }
+
+    @keyframes pulseLetter {
+      0% { color:inherit; text-shadow:none; transform:scale(1); }
+      12% { color:#00f6ff; text-shadow:0 0 4px #00f6ff,0 0 10px rgba(0,246,255,.7); transform:scale(1.08); }
+      24% { color:#008cff; text-shadow:0 0 5px #008cff,0 0 12px rgba(0,140,255,.7); transform:scale(1); }
+      36% { color:#5c5cff; text-shadow:0 0 5px #5c5cff,0 0 12px rgba(92,92,255,.7); transform:scale(1.06); }
+      48% { color:#9b4dff; text-shadow:0 0 5px #9b4dff,0 0 12px rgba(155,77,255,.7); transform:scale(1); }
+      60% { color:#ff3bd4; text-shadow:0 0 5px #ff3bd4,0 0 12px rgba(255,59,212,.7); transform:scale(1.08); }
+      72% { color:#ff4f81; text-shadow:0 0 5px #ff4f81,0 0 12px rgba(255,79,129,.7); transform:scale(1); }
+      84% { color:#00ffc8; text-shadow:0 0 5px #00ffc8,0 0 12px rgba(0,255,200,.7); transform:scale(1.06); }
+      100% { color:inherit; text-shadow:none; transform:scale(1); }
+    }
+
+    .menu-logo {
+      width:22px;
+      height:22px;
+      object-fit:contain;
+      margin-right:7px;
+      flex-shrink:0;
+    }
+
+    .reports-header {
+      text-align:center;
+      margin-bottom:20px;
+    }
+
+    .report-folder {
+      margin:15px 0;
+      border-radius:16px;
+      border:1px solid rgba(0,210,255,.18);
+      background:rgba(5,15,35,.38);
+      overflow:hidden;
+    }
+
+    .report-folder > summary {
+      cursor:pointer;
+      padding:17px;
+      font-weight:700;
+      list-style:none;
+      background:linear-gradient(
+        90deg,
+        rgba(0,220,255,.07),
+        rgba(140,70,255,.07)
+      );
+    }
+
+    .report-folder > summary::-webkit-details-marker {
+      display:none;
+    }
+
+    .report-folder > summary::after {
+      content:"＋";
+      float:right;
+      opacity:.7;
+    }
+
+    .report-folder[open] > summary::after {
+      content:"−";
+    }
+
+    .folder-content {
+      padding:17px;
+      border-top:1px solid rgba(0,210,255,.12);
+    }
+
+    .report-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:12px;
+    }
+
+    .report-card {
+      padding:18px;
+      text-align:center;
+      border-radius:16px;
+      border:1px solid rgba(0,210,255,.2);
+      background:rgba(10,20,45,.45);
+    }
+
+    .report-card strong {
+      display:block;
+      margin-top:7px;
+      font-size:1.5rem;
+    }
+
+    .report-label {
+      font-size:.78rem;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      opacity:.65;
+    }
+
+    .records-box {
+      overflow-x:auto;
+    }
+
+    .records-box table {
+      width:100%;
+      border-collapse:collapse;
+      min-width:600px;
+    }
+
+    .records-box th,
+    .records-box td {
+      padding:10px;
+      text-align:left;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+
+    .records-box th {
+      opacity:.75;
+    }
+
+    .quick-access {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      gap:10px;
+      margin-top:15px;
+    }
+
+    .quick-access a {
+      display:block;
+      padding:14px;
+      text-align:center;
+      border-radius:12px;
+      border:1px solid rgba(0,210,255,.18);
+      background:rgba(10,20,45,.4);
+    }
+
+    @media (max-width:600px) {
+      .report-grid,
+      .quick-access {
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<main class="app-shell">
+
+  <header class="hero">
+
+    <img src="pulse-logo.png" alt="PULSE" class="pulse-logo">
+
+    <p class="tagline">
+      Complete • Earn • Get Rewarded
+    </p>
+
+    <details class="menu">
+      <summary>☰ Menu</summary>
+
+      <div class="menu-panel">
+
+        <details>
+          <summary>
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+            Main
+          </summary>
+          <div>
+            <a class="pulse-link" href="index.html">🏠 Home</a>
+            <a class="pulse-link" href="how-it-works.html">⚡ How It Works</a>
+            <a class="pulse-link" href="about.html">ℹ️ About PULSE</a>
+            <a class="pulse-link" href="contact.html">✉️ Contact</a>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+            PULSE
+          </summary>
+          <div>
+            <a class="pulse-link" href="tasks.html">⚡ Available Tasks</a>
+            <a class="pulse-link" href="surveys.html">📝 Surveys</a>
+            <a class="pulse-link" href="submissions.html">📋 My Submissions</a>
+            <a class="pulse-link" href="earnings.html">💰 Earnings &amp; Balance</a>
+            <a class="pulse-link" href="notifications.html">🔔 Notifications</a>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+            Account
+          </summary>
+          <div>
+            <a class="pulse-link" href="auth.html">🔐 Login / Sign Up</a>
+            <a class="pulse-link" href="dashboard.html">👤 Dashboard</a>
+            <a class="pulse-link" href="profile.html">⚙️ Profile &amp; Account</a>
+            <a class="pulse-link" href="reset-password.html">🔑 Reset Password</a>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+            Legal
+          </summary>
+          <div>
+            <a class="pulse-link" href="terms.html">📜 Terms</a>
+            <a class="pulse-link" href="privacy.html">🔒 Privacy Policy</a>
+            <a class="pulse-link" href="disclosures.html">⚖️ Disclosures</a>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
+            Administration
+          </summary>
+          <div>
+            <a class="pulse-link" href="admin.html">⚙️ Admin Dashboard</a>
+            <a class="pulse-link" href="admin-tasks.html">📋 Task Management</a>
+            <a class="pulse-link" href="admin-businesses.html">🏢 Business Management</a>
+            <a class="pulse-link" href="admin-submissions.html">📝 Submission Review</a>
+            <a class="pulse-link" href="admin-rewards.html">💰 Reward Requests</a>
+            <a class="pulse-link" href="admin-reports.html">📊 Reports &amp; Records</a>
+          </div>
+        </details>
+
+      </div>
+    </details>
+
+  </header>
+
+  <section class="panel">
+
+    <div class="reports-header">
+      <h1>📊 Reports &amp; Records</h1>
+      <p>Review PULSE activity and maintain business records.</p>
+    </div>
+
+    <details class="report-folder" open>
+      <summary>📊 Overview</summary>
+
+      <div class="folder-content">
+
+        <div class="report-grid">
+
+          <div class="report-card">
+            <span class="report-label">Users</span>
+            <strong id="reportUsers">—</strong>
+          </div>
+
+          <div class="report-card">
+            <span class="report-label">Tasks</span>
+            <strong id="reportTasks">—</strong>
+          </div>
+
+          <div class="report-card">
+            <span class="report-label">Submissions</span>
+            <strong id="reportSubmissions">—</strong>
+          </div>
+
+          <div class="report-card">
+            <span class="report-label">Businesses</span>
+            <strong id="reportBusinesses">—</strong>
+          </div>
+
+          <div class="report-card">
+            <span class="report-label">Pending Reviews</span>
+            <strong id="reportPending">—</strong>
+          </div>
+
+          <div class="report-card">
+            <span class="report-label">Approved</span>
+            <strong id="reportApproved">—</strong>
+          </div>
+
+        </div>
+
+      </div>
+    </details>
+
+    <details class="report-folder">
+      <summary>📋 Submission Records</summary>
+
+      <div class="folder-content">
+
+        <div id="reportSubmissionsList" class="records-box">
+          Loading submission records...
+        </div>
+
+      </div>
+    </details>
+
+    <details class="report-folder">
+      <summary>🏢 Business Records</summary>
+
+      <div class="folder-content">
+
+        <div id="reportBusinessesList" class="records-box">
+          Loading business records...
+        </div>
+
+      </div>
+    </details>
+
+    <details class="report-folder">
+      <summary>💰 Reward Records</summary>
+
+      <div class="folder-content">
+
+        <div id="reportRewardsList" class="records-box">
+          Loading reward records...
+        </div>
+
+      </div>
+    </details>
+
+    <details class="report-folder">
+      <summary>📈 Activity Records</summary>
+
+      <div class="folder-content">
+
+        <div id="reportActivityList" class="records-box">
+          Loading activity records...
+        </div>
+
+      </div>
+    </details>
+
+    <details class="report-folder">
+      <summary>💾 Record Keeping</summary>
+
+      <div class="folder-content">
+
+        <p>
+          PULSE records can be reviewed from this administration
+          area for documentation and operational tracking.
+        </p>
+
+        <p>
+          Submission records should retain relevant task information,
+          answers, review status, dates, and reviewer notes when available.
+        </p>
+
+        <p>
+          Business records can be used to track organizations connected
+          with PULSE activities.
+        </p>
+
+      </div>
+    </details>
+
+    <section class="panel">
+
+      <h2>Quick Access</h2>
+
+      <div class="quick-access">
+
+        <a class="pulse-link" href="admin.html">
+          ⚙️ Admin Dashboard
+        </a>
+
+        <a class="pulse-link" href="admin-tasks.html">
+          📋 Tasks
+        </a>
+
+        <a class="pulse-link" href="admin-businesses.html">
+          🏢 Businesses
+        </a>
+
+        <a class="pulse-link" href="admin-submissions.html">
+          📝 Submissions
+        </a>
+
+        <a class="pulse-link" href="admin-rewards.html">
+          💰 Rewards
+        </a>
+
+      </div>
+
+    </section>
+
+  </section>
+
+  <footer>
+
+    <p>© 2026 PULSE</p>
+
+    <div>
+      <a class="pulse-link" href="terms.html">Terms</a>
+      <span> • </span>
+      <a class="pulse-link" href="privacy.html">Privacy</a>
+      <span> • </span>
+      <a class="pulse-link" href="disclosures.html">Disclosures</a>
+      <span> • </span>
+      <a class="pulse-link" href="contact.html">Contact</a>
+    </div>
+
+  </footer>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="admin.js"></script>
+
+</body>
+</html>
