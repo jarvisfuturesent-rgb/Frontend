@@ -295,6 +295,13 @@
       <span style="--i:14">d</span>
     </a>
 
+    <br><br>
+
+    <!-- SIGN OUT -->
+    <button id="logoutBtn" type="button">
+      Sign Out
+    </button>
+
   </section>
 
 
@@ -358,6 +365,18 @@
   </footer>
 
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+
+<script>
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", logout);
+  }
+</script>
 
 </body>
 </html>
