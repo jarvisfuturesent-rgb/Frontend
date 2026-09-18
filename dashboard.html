@@ -9,9 +9,95 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* =========================================
-       PULSE LETTER EFFECT
-       ========================================= */
+    /* =========================================================
+       BALANCE NUMBER — PULSING ENERGY EFFECT
+       ========================================================= */
+
+    .balance-amount {
+      display: inline-block;
+
+      position: relative;
+
+      font-size: clamp(
+        3rem,
+        17vw,
+        4.8rem
+      );
+
+      font-weight: 900;
+
+      line-height: .95;
+
+      letter-spacing: -2px;
+
+      background:
+        linear-gradient(
+          90deg,
+          #00f6ff,
+          #5c5cff,
+          #d946ff,
+          #00ffc8,
+          #00f6ff
+        );
+
+      background-size: 400% 100%;
+
+      -webkit-background-clip: text;
+      background-clip: text;
+
+      color: transparent;
+
+      animation:
+        balanceEnergy 4s linear infinite,
+        balancePulse 2.2s ease-in-out infinite;
+
+      filter:
+        drop-shadow(0 0 7px rgba(0,246,255,.35));
+    }
+
+    @keyframes balanceEnergy {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 200% 50%;
+      }
+
+      100% {
+        background-position: 400% 50%;
+      }
+    }
+
+    @keyframes balancePulse {
+      0%, 100% {
+        transform: scale(1);
+
+        filter:
+          drop-shadow(0 0 7px rgba(0,246,255,.35))
+          drop-shadow(0 0 0 rgba(155,77,255,0));
+      }
+
+      45% {
+        transform: scale(1.045);
+
+        filter:
+          drop-shadow(0 0 12px rgba(0,246,255,.65))
+          drop-shadow(0 0 22px rgba(92,92,255,.35));
+      }
+
+      55% {
+        transform: scale(1.065);
+
+        filter:
+          drop-shadow(0 0 18px rgba(0,246,255,.85))
+          drop-shadow(0 0 32px rgba(155,77,255,.55));
+      }
+    }
+
+    /* =========================================================
+       MENU
+       ========================================================= */
 
     .pulse-link,
     .pulse-folder {
@@ -98,14 +184,6 @@
       }
     }
 
-    .pulse-link:hover span {
-      animation-duration: 1.4s;
-    }
-
-    /* =========================================
-       MENU
-       ========================================= */
-
     .menu-logo {
       width: 24px;
       height: 24px;
@@ -114,7 +192,7 @@
       flex-shrink: 0;
     }
 
-    /* LEVEL 3 — NO PULSE EFFECT */
+    /* LEVEL 3 LINKS — NO PULSE */
 
     .page-link {
       display: block;
@@ -131,709 +209,103 @@
       transform: none !important;
     }
 
-    /* =========================================
-       DASHBOARD VISUAL SYSTEM
-       ========================================= */
+    /* =========================================================
+       MENU FOLDERS
+       ========================================================= */
 
-    .dashboard-panel {
-      position: relative;
-      overflow: hidden;
-
-      background:
-        radial-gradient(
-          circle at 15% 20%,
-          rgba(0,90,255,.12),
-          transparent 30%
-        ),
-        radial-gradient(
-          circle at 85% 75%,
-          rgba(150,0,255,.13),
-          transparent 30%
-        );
+    .site-menu details {
+      margin-bottom: 8px;
     }
 
-    .dashboard-panel::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-
-      background-image:
-        linear-gradient(
-          rgba(0,200,255,.035) 1px,
-          transparent 1px
-        ),
-        linear-gradient(
-          90deg,
-          rgba(0,200,255,.035) 1px,
-          transparent 1px
-        );
-
-      background-size: 28px 28px;
-      opacity: .5;
-    }
-
-    .dashboard-content {
-      position: relative;
-      z-index: 2;
-    }
-
-    /* =========================================
-       WELCOME
-       ========================================= */
-
-    .dashboard-welcome {
-      text-align: center;
-      margin-bottom: 18px;
-    }
-
-    .dashboard-welcome h1 {
-      margin: 0 0 6px;
-
-      font-size: clamp(
-        2rem,
-        8vw,
-        3rem
-      );
-
-      letter-spacing: .5px;
-
-      text-shadow:
-        0 0 8px rgba(0,220,255,.25),
-        0 0 18px rgba(80,80,255,.18);
-    }
-
-    .dashboard-welcome p {
-      margin: 0;
-      opacity: .72;
-    }
-
-    /* =========================================
-       BALANCE
-       ========================================= */
-
-    .balance-box {
-      position: relative;
-      overflow: hidden;
-
-      margin: 18px 0;
-      padding: 22px 18px;
-
-      border-radius: 15px;
-
-      border: 1px solid rgba(45,110,255,.7);
-
-      background:
-        linear-gradient(
-          145deg,
-          rgba(5,25,75,.9),
-          rgba(12,5,45,.92)
-        );
-
-      box-shadow:
-        0 0 8px rgba(0,110,255,.3),
-        0 0 25px rgba(0,60,255,.16),
-        inset 0 0 30px rgba(50,50,255,.09);
-    }
-
-    .balance-box::before {
-      content: "";
-
-      position: absolute;
-
-      width: 180px;
-      height: 70px;
-
-      left: -25px;
-      bottom: -30px;
-
-      border-radius: 50%;
-
-      background:
-        radial-gradient(
-          ellipse,
-          rgba(0,160,255,.45),
-          transparent 70%
-        );
-
-      filter: blur(12px);
-
-      animation: balanceGlow 5s ease-in-out infinite;
-    }
-
-    .balance-box::after {
-      content: "";
-
-      position: absolute;
-
-      width: 180px;
-      height: 70px;
-
-      right: -30px;
-      bottom: -20px;
-
-      border-radius: 50%;
-
-      background:
-        radial-gradient(
-          ellipse,
-          rgba(160,0,255,.45),
-          transparent 70%
-        );
-
-      filter: blur(12px);
-
-      animation:
-        balanceGlow 5s ease-in-out infinite reverse;
-    }
-
-    @keyframes balanceGlow {
-      0%,100% {
-        transform: translateX(-10px) scale(.9);
-        opacity: .45;
-      }
-
-      50% {
-        transform: translateX(25px) scale(1.15);
-        opacity: .8;
-      }
-    }
-
-    .balance-content {
-      position: relative;
-      z-index: 3;
-    }
-
-    .balance-title {
-      display: block;
-
-      margin-bottom: 4px;
-
-      font-size: .7rem;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-
-      opacity: .65;
-    }
-
-    .balance-amount {
-      display: inline-block;
-
-      font-size: clamp(
-        3rem,
-        17vw,
-        4.8rem
-      );
-
-      font-weight: 900;
-
-      line-height: .95;
-      letter-spacing: -2px;
-
-      background:
-        linear-gradient(
-          90deg,
-          #00f6ff,
-          #5c5cff,
-          #d946ff,
-          #00ffc8
-        );
-
-      background-size: 300% 100%;
-
-      -webkit-background-clip: text;
-      background-clip: text;
-
-      color: transparent;
-
-      animation:
-        balanceGradient 4s linear infinite;
-
-      filter:
-        drop-shadow(
-          0 0 8px rgba(0,246,255,.35)
-        );
-    }
-
-    @keyframes balanceGradient {
-      0% {
-        background-position: 0% 50%;
-      }
-
-      100% {
-        background-position: 300% 50%;
-      }
-    }
-
-    .balance-unit {
-      display: block;
-
-      margin-top: 5px;
-
-      font-size: .75rem;
-      letter-spacing: 4px;
-
-      opacity: .65;
-    }
-
-    .balance-status {
-      display: inline-block;
-
-      margin-top: 10px;
-
-      padding: 4px 11px;
-
-      border-radius: 999px;
-
-      font-size: .65rem;
-      letter-spacing: 1px;
-
-      border: 1px solid rgba(0,255,200,.4);
-
-      background: rgba(0,255,200,.035);
-
-      box-shadow:
-        0 0 10px rgba(0,255,200,.08);
-    }
-
-    /* =========================================
-       STAT CARDS
-       ========================================= */
-
-    .dashboard-stats {
-      display: grid;
-
-      grid-template-columns:
-        repeat(
-          auto-fit,
-          minmax(145px, 1fr)
-        );
-
-      gap: 8px;
-
-      margin: 12px 0;
-    }
-
-    .stat-card {
-      position: relative;
-      overflow: hidden;
-
-      padding: 13px;
-
-      min-height: 72px;
-
-      border-radius: 11px;
-
-      border: 1px solid rgba(40,100,255,.45);
-
-      background:
-        linear-gradient(
-          145deg,
-          rgba(8,25,65,.78),
-          rgba(15,5,45,.72)
-        );
-
-      box-shadow:
-        0 0 12px rgba(0,80,255,.08),
-        inset 0 0 15px rgba(70,50,255,.05);
-    }
-
-    .stat-card::before {
-      content: "";
-
-      position: absolute;
-
-      top: 0;
-      left: 12%;
-      right: 12%;
-
-      height: 1px;
-
-      background:
-        linear-gradient(
-          90deg,
-          transparent,
-          rgba(0,220,255,.7),
-          transparent
-        );
-    }
-
-    .stat-label {
-      display: block;
-
-      font-size: .62rem;
-
-      text-transform: uppercase;
-      letter-spacing: 1px;
-
-      opacity: .58;
-    }
-
-    .stat-card strong {
-      display: block;
-
-      margin-top: 5px;
-
-      font-size: 1.05rem;
-      font-weight: 800;
-    }
-
-    /* =========================================
-       PROFILE
-       ========================================= */
-
-    .profile-card {
-      position: relative;
-
-      padding: 14px;
-      margin: 12px 0;
-
-      border-radius: 12px;
-
-      border: 1px solid rgba(100,60,255,.38);
-
-      background:
-        linear-gradient(
-          145deg,
-          rgba(15,15,55,.7),
-          rgba(8,20,45,.7)
-        );
-
-      box-shadow:
-        0 0 14px rgba(80,50,255,.08);
-    }
-
-    #profileName {
-      margin-top: 5px;
-      font-weight: 800;
-    }
-
-    /* =========================================
-       DASHBOARD FOLDERS
-       ========================================= */
-
-    .dashboard-folder {
-      position: relative;
-
-      margin: 9px 0;
-
-      border-radius: 11px;
-
-      border: 1px solid rgba(35,100,255,.42);
-
-      background:
-        linear-gradient(
-          145deg,
-          rgba(5,20,55,.76),
-          rgba(12,7,42,.76)
-        );
-
-      overflow: hidden;
-
-      box-shadow:
-        0 0 12px rgba(0,80,255,.07),
-        inset 0 0 15px rgba(70,50,255,.035);
-    }
-
-    .dashboard-folder > summary {
+    .site-menu summary {
       cursor: pointer;
-
-      padding: 12px 13px;
-
-      font-weight: 700;
-      font-size: .88rem;
-
       list-style: none;
-
-      background:
-        linear-gradient(
-          90deg,
-          rgba(0,100,255,.09),
-          rgba(140,0,255,.08)
-        );
     }
 
-    .dashboard-folder > summary::-webkit-details-marker {
+    .site-menu summary::-webkit-details-marker {
       display: none;
     }
 
-    .dashboard-folder > summary::after {
-      content: "＋";
-
-      float: right;
-      opacity: .65;
+    .menu-pages {
+      margin-left: 20px;
+      margin-top: 6px;
     }
 
-    .dashboard-folder[open] > summary::after {
-      content: "−";
-    }
-
-    .folder-content {
-      padding: 12px;
-
-      border-top:
-        1px solid rgba(30,100,255,.18);
-    }
-
-    /* =========================================
-       QUICK ACCESS
-       ========================================= */
-
-    .quick-access {
-      display: grid;
-
-      grid-template-columns:
-        repeat(
-          auto-fit,
-          minmax(125px, 1fr)
-        );
-
-      gap: 8px;
-
-      margin-top: 10px;
-    }
-
-    .quick-access a {
-      display: block;
-
-      padding: 11px 8px;
-
-      text-align: center;
-
-      border-radius: 10px;
-
-      border: 1px solid rgba(40,100,255,.35);
-
-      background:
-        rgba(8,20,50,.6);
-
-      font-size: .82rem;
-
-      box-shadow:
-        inset 0 0 12px rgba(0,100,255,.035);
-    }
-
-    /* =========================================
-       REWARD CONTROLS
-       ========================================= */
-
-    #redeemAmount,
-    #rewardType,
-    #redeemNote {
-      width: 100%;
-
-      box-sizing: border-box;
-
-      margin: 4px 0;
-
-      padding: 10px;
-
-      border-radius: 8px;
-
-      border: 1px solid rgba(45,100,255,.35);
-
-      background:
-        rgba(3,12,32,.75);
-
-      color: inherit;
-    }
-
-    .dashboard-button {
-      width: 100%;
-
-      margin-top: 7px;
-
-      padding: 10px;
-
-      border-radius: 8px;
-
-      border: 1px solid rgba(0,220,255,.55);
-
-      background:
-        linear-gradient(
-          90deg,
-          rgba(120,20,255,.75),
-          rgba(0,180,255,.75)
-        );
-
-      color: white;
-
-      font-weight: 700;
-
-      cursor: pointer;
-
-      box-shadow:
-        0 0 14px rgba(0,150,255,.12);
-    }
-
-    /* =========================================
-       MOBILE
-       ========================================= */
-
-    @media (max-width: 600px) {
-
-      .dashboard-stats {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .quick-access {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .balance-box {
-        padding: 22px 14px;
-      }
-
-      .stat-card {
-        min-height: 68px;
-      }
-    }
-
-    @media (max-width: 390px) {
-
-      .dashboard-stats {
-        grid-template-columns: 1fr;
-      }
-
-      .quick-access {
-        grid-template-columns: 1fr;
-      }
+    .menu-pages a {
+      margin: 7px 0;
     }
   </style>
 </head>
 
 <body>
 
-<main class="app-shell">
-
-  <!-- =======================================
+  <!-- =======================================================
        HEADER
-       ======================================= -->
+       ======================================================= -->
 
-  <header class="hero">
+  <header>
+    <div class="site-header">
+      <a href="index.html" class="pulse-link">
+        <span style="--i:0">P</span>
+        <span style="--i:1">U</span>
+        <span style="--i:2">L</span>
+        <span style="--i:3">S</span>
+        <span style="--i:4">E</span>
+      </a>
 
-    <img
-      src="pulse-logo.png"
-      alt="PULSE"
-      class="pulse-logo"
-    >
-
-    <p class="tagline">
-      Complete • Earn • Get Rewarded
-    </p>
-
-
-    <!-- =====================================
-         MENU
-         ===================================== -->
-
-    <details class="menu">
-
-      <summary>☰ Menu</summary>
-
-      <div class="menu-panel">
+      <details class="site-menu">
+        <summary class="pulse-link">
+          <span style="--i:0">☰</span>
+          <span style="--i:1"> </span>
+          <span style="--i:2">M</span>
+          <span style="--i:3">e</span>
+          <span style="--i:4">n</span>
+          <span style="--i:5">u</span>
+        </summary>
 
         <!-- MAIN -->
-
         <details>
-
           <summary class="pulse-folder">
-
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
-
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
             <span style="--i:0">M</span>
             <span style="--i:1">a</span>
             <span style="--i:2">i</span>
             <span style="--i:3">n</span>
-
           </summary>
 
-          <div>
-
-            <a class="page-link" href="index.html">
-              🏠 Home
-            </a>
-
-            <a class="page-link" href="how-it-works.html">
-              ⚡ How It Works
-            </a>
-
-            <a class="page-link" href="about.html">
-              ℹ️ About PULSE
-            </a>
-
-            <a class="page-link" href="contact.html">
-              ✉️ Contact
-            </a>
-
+          <div class="menu-pages">
+            <a class="page-link" href="index.html">🏠 Home</a>
+            <a class="page-link" href="how-it-works.html">ℹ️ How It Works</a>
+            <a class="page-link" href="about.html">📖 About PULSE</a>
+            <a class="page-link" href="contact.html">📧 Contact</a>
           </div>
-
         </details>
 
-
         <!-- PULSE -->
-
         <details>
-
           <summary class="pulse-folder">
-
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
-
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
             <span style="--i:0">P</span>
             <span style="--i:1">U</span>
             <span style="--i:2">L</span>
             <span style="--i:3">S</span>
             <span style="--i:4">E</span>
-
           </summary>
 
-          <div>
-
-            <a class="page-link" href="tasks.html">
-              ⚡ Available Tasks
-            </a>
-
-            <a class="page-link" href="surveys.html">
-              📝 Surveys
-            </a>
-
-            <a class="page-link" href="submissions.html">
-              📋 My Submissions
-            </a>
-
-            <a class="page-link" href="earnings.html">
-              💰 Earnings &amp; Balance
-            </a>
-
-            <a class="page-link" href="notifications.html">
-              🔔 Notifications
-            </a>
-
+          <div class="menu-pages">
+            <a class="page-link" href="dashboard.html">📊 Dashboard</a>
+            <a class="page-link" href="tasks.html">⚡ Available Tasks</a>
+            <a class="page-link" href="surveys.html">📋 Surveys</a>
+            <a class="page-link" href="submissions.html">📝 My Submissions</a>
+            <a class="page-link" href="earnings.html">💰 Earnings &amp; Balance</a>
+            <a class="page-link" href="notifications.html">🔔 Notifications</a>
           </div>
-
         </details>
 
-
         <!-- ACCOUNT -->
-
         <details>
-
           <summary class="pulse-folder">
-
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
-
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
             <span style="--i:0">A</span>
             <span style="--i:1">c</span>
             <span style="--i:2">c</span>
@@ -841,83 +313,37 @@
             <span style="--i:4">u</span>
             <span style="--i:5">n</span>
             <span style="--i:6">t</span>
-
           </summary>
 
-          <div>
-
-            <a class="page-link" href="auth.html">
-              🔐 Login / Sign Up
-            </a>
-
-            <a class="page-link" href="dashboard.html">
-              👤 Dashboard
-            </a>
-
-            <a class="page-link" href="profile.html">
-              ⚙️ Profile &amp; Account
-            </a>
-
-            <a class="page-link" href="reset-password.html">
-              🔑 Reset Password
-            </a>
-
+          <div class="menu-pages">
+            <a class="page-link" href="profile.html">👤 Profile &amp; Account</a>
+            <a class="page-link" href="auth.html">🔐 Login / Sign Up</a>
+            <a class="page-link" href="reset-password.html">🔑 Reset Password</a>
           </div>
-
         </details>
 
-
         <!-- LEGAL -->
-
         <details>
-
           <summary class="pulse-folder">
-
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
-
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
             <span style="--i:0">L</span>
             <span style="--i:1">e</span>
             <span style="--i:2">g</span>
             <span style="--i:3">a</span>
             <span style="--i:4">l</span>
-
           </summary>
 
-          <div>
-
-            <a class="page-link" href="terms.html">
-              📜 Terms
-            </a>
-
-            <a class="page-link" href="privacy.html">
-              🔒 Privacy Policy
-            </a>
-
-            <a class="page-link" href="disclosures.html">
-              ⚖️ Disclosures
-            </a>
-
+          <div class="menu-pages">
+            <a class="page-link" href="terms.html">📄 Terms</a>
+            <a class="page-link" href="privacy.html">🔒 Privacy Policy</a>
+            <a class="page-link" href="disclosures.html">📢 Disclosures</a>
           </div>
-
         </details>
 
-
         <!-- ADMINISTRATION -->
-
         <details>
-
           <summary class="pulse-folder">
-
-            <img
-              src="pulse-logo.png"
-              alt="PULSE"
-              class="menu-logo"
-            >
-
+            <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
             <span style="--i:0">A</span>
             <span style="--i:1">d</span>
             <span style="--i:2">m</span>
@@ -932,499 +358,405 @@
             <span style="--i:11">i</span>
             <span style="--i:12">o</span>
             <span style="--i:13">n</span>
-
           </summary>
 
-          <div>
+          <div class="menu-pages">
+            <a class="page-link" href="admin.html">⚙ Admin Dashboard</a>
+            <a class="page-link" href="admin-tasks.html">⚡ Task Management</a>
+            <a class="page-link" href="admin-businesses.html">🏢 Business Management</a>
+            <a class="page-link" href="admin-submissions.html">📝 Submission Review</a>
+            <a class="page-link" href="admin-rewards.html">🎁 Reward Requests</a>
+            <a class="page-link" href="admin-reports.html">📊 Reports &amp; Records</a>
+          </div>
+        </details>
+      </details>
+    </div>
+  </header>
 
-            <a class="page-link" href="admin.html">
-              ⚙️ Admin Dashboard
-            </a>
 
-            <a class="page-link" href="admin-tasks.html">
-              📋 Task Management
-            </a>
+  <!-- =======================================================
+       DASHBOARD
+       ======================================================= -->
 
-            <a class="page-link" href="admin-businesses.html">
-              🏢 Business Management
-            </a>
+  <main>
 
-            <a class="page-link" href="admin-submissions.html">
-              📝 Submission Review
-            </a>
+    <section class="panel dashboard-panel">
 
-            <a class="page-link" href="admin-rewards.html">
-              💰 Reward Requests
-            </a>
+      <div class="dashboard-content">
 
-            <a class="page-link" href="admin-reports.html">
-              📊 Reports &amp; Records
-            </a>
+        <div class="dashboard-welcome">
+          <h1>Welcome to PULSE</h1>
+          <p>Your PULSE control center.</p>
+        </div>
+
+
+        <!-- BALANCE -->
+
+        <div class="balance-box">
+
+          <div class="balance-content">
+
+            <span class="balance-title">
+              Your PULSE Balance
+            </span>
+
+            <div id="balance" class="balance-amount">
+              25
+            </div>
+
+            <span class="balance-unit">
+              PLS
+            </span>
+
+            <div class="balance-status">
+              ● Balance Active
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- STATS -->
+
+        <div class="dashboard-stats">
+
+          <div class="stat-card">
+            <span class="stat-label">
+              Total Earned
+            </span>
+
+            <strong id="totalEarned">
+              25 PLS
+            </strong>
+          </div>
+
+
+          <div class="stat-card">
+            <span class="stat-label">
+              Pending Withdrawal
+            </span>
+
+            <strong id="pendingWithdrawal">
+              0 PLS
+            </strong>
+          </div>
+
+
+          <div class="stat-card">
+            <span class="stat-label">
+              Available Balance
+            </span>
+
+            <strong id="availableBalance">
+              25 PLS
+            </strong>
+          </div>
+
+        </div>
+
+
+        <!-- PROFILE -->
+
+        <div class="profile-card">
+
+          <span class="stat-label">
+            ACCOUNT
+          </span>
+
+          <div id="profileName">
+            PULSE User
+          </div>
+
+          <div id="profile">
+            Loading your profile...
+          </div>
+
+        </div>
+
+
+        <!-- AVAILABLE TASKS -->
+
+        <details class="dashboard-folder">
+
+          <summary>
+            ⚡ Available Tasks
+          </summary>
+
+          <div class="folder-content">
+
+            <div id="tasks">
+              Loading available tasks...
+            </div>
 
           </div>
 
         </details>
 
-      </div>
 
-    </details>
+        <!-- MY SUBMISSIONS -->
 
-  </header>
+        <details class="dashboard-folder">
 
+          <summary>
+            📋 My Submissions
+          </summary>
 
-  <!-- =======================================
-       DASHBOARD
-       ======================================= -->
+          <div class="folder-content">
 
-  <section class="panel dashboard-panel">
+            <div id="submissions">
+              Loading your submissions...
+            </div>
 
-    <div class="dashboard-content">
+          </div>
 
-
-      <!-- WELCOME -->
-
-      <div class="dashboard-welcome">
-
-        <h1>Welcome to PULSE</h1>
-
-        <p>
-          Your PULSE control center.
-        </p>
-
-      </div>
+        </details>
 
 
-      <!-- BALANCE -->
+        <!-- POINTS ACTIVITY -->
 
-      <div class="balance-box">
+        <details class="dashboard-folder">
 
-        <div class="balance-content">
+          <summary>
+            📊 Points Activity
+          </summary>
 
-          <span class="balance-title">
-            Your PULSE Balance
-          </span>
+          <div class="folder-content">
 
-          <div
-            id="balance"
-            class="balance-amount"
+            <div id="activity">
+              Loading activity...
+            </div>
+
+          </div>
+
+        </details>
+
+
+        <!-- REWARDS -->
+
+        <details class="dashboard-folder">
+
+          <summary>
+            🎁 Rewards
+          </summary>
+
+          <div class="folder-content">
+
+            <p>
+              Redeem your available PULSE points for a reward.
+            </p>
+
+            <input
+              id="redeemAmount"
+              type="number"
+              min="1"
+              placeholder="Points to redeem"
+            >
+
+            <select id="rewardType">
+
+              <option value="">
+                Select Reward Type
+              </option>
+
+              <option value="manual">
+                Manual Reward
+              </option>
+
+            </select>
+
+            <input
+              id="redeemNote"
+              type="text"
+              placeholder="Optional note"
+            >
+
+            <button
+              id="redeem"
+              type="button"
+              class="dashboard-button"
+            >
+              Request Reward
+            </button>
+
+            <div id="redeemMsg"></div>
+
+            <div id="redemptions">
+              Loading reward requests...
+            </div>
+
+          </div>
+
+        </details>
+
+
+        <!-- NOTIFICATIONS -->
+
+        <details class="dashboard-folder">
+
+          <summary>
+            🔔 Notifications
+          </summary>
+
+          <div class="folder-content">
+
+            <div id="notifications">
+              Loading notifications...
+            </div>
+
+            <button
+              id="markNotificationsRead"
+              type="button"
+              class="dashboard-button"
+              onclick="markNotificationsRead()"
+            >
+              Mark Read
+            </button>
+
+          </div>
+
+        </details>
+
+
+        <!-- QUICK ACCESS -->
+
+        <h2>
+          Quick Access
+        </h2>
+
+        <div class="quick-access">
+
+          <a
+            class="pulse-link"
+            href="tasks.html"
           >
-            25
-          </div>
+            ⚡ Tasks
+          </a>
 
-          <span class="balance-unit">
-            PLS
-          </span>
+          <a
+            class="pulse-link"
+            href="surveys.html"
+          >
+            📋 Surveys
+          </a>
 
-          <div class="balance-status">
-            ● Balance Active
-          </div>
+          <a
+            class="pulse-link"
+            href="submissions.html"
+          >
+            📝 Submissions
+          </a>
+
+          <a
+            class="pulse-link"
+            href="earnings.html"
+          >
+            💰 Earnings
+          </a>
+
+          <a
+            class="pulse-link"
+            href="notifications.html"
+          >
+            🔔 Notifications
+          </a>
+
+          <a
+            class="pulse-link"
+            href="profile.html"
+          >
+            👤 Profile
+          </a>
 
         </div>
+
+
+        <!-- SIGN OUT -->
+
+        <button
+          id="logoutBtn"
+          type="button"
+          class="dashboard-button"
+        >
+          Sign Out
+        </button>
 
       </div>
 
+    </section>
 
-      <!-- STATS -->
+  </main>
 
-      <div class="dashboard-stats">
 
-        <div class="stat-card">
-
-          <span class="stat-label">
-            Total Earned
-          </span>
-
-          <strong id="totalEarned">
-            25 PLS
-          </strong>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <span class="stat-label">
-            Pending Withdrawal
-          </span>
-
-          <strong id="pendingWithdrawal">
-            0 PLS
-          </strong>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <span class="stat-label">
-            Available Balance
-          </span>
-
-          <strong id="availableBalance">
-            25 PLS
-          </strong>
-
-        </div>
-
-      </div>
-
-
-      <!-- PROFILE -->
-
-      <div class="profile-card">
-
-        <span class="stat-label">
-          ACCOUNT
-        </span>
-
-        <div id="profileName">
-          PULSE User
-        </div>
-
-        <div id="profile">
-          Loading your profile...
-        </div>
-
-      </div>
-
-
-      <!-- AVAILABLE TASKS -->
-
-      <details class="dashboard-folder">
-
-        <summary>
-          ⚡ Available Tasks
-        </summary>
-
-        <div class="folder-content">
-
-          <div id="tasks">
-            Loading available tasks...
-          </div>
-
-        </div>
-
-      </details>
-
-
-      <!-- MY SUBMISSIONS -->
-
-      <details class="dashboard-folder">
-
-        <summary>
-          📋 My Submissions
-        </summary>
-
-        <div class="folder-content">
-
-          <div id="submissions">
-            Loading your submissions...
-          </div>
-
-        </div>
-
-      </details>
-
-
-      <!-- POINTS ACTIVITY -->
-
-      <details class="dashboard-folder">
-
-        <summary>
-          📊 Points Activity
-        </summary>
-
-        <div class="folder-content">
-
-          <div id="activity">
-            Loading activity...
-          </div>
-
-        </div>
-
-      </details>
-
-
-      <!-- REWARDS -->
-
-      <details class="dashboard-folder">
-
-        <summary>
-          🎁 Rewards
-        </summary>
-
-        <div class="folder-content">
-
-          <p>
-            Redeem your available PULSE points for a reward.
-          </p>
-
-          <input
-            id="redeemAmount"
-            type="number"
-            min="1"
-            placeholder="Points to redeem"
-          >
-
-          <select id="rewardType">
-
-            <option value="">
-              Select Reward Type
-            </option>
-
-            <option value="manual">
-              Manual Reward
-            </option>
-
-          </select>
-
-          <input
-            id="redeemNote"
-            type="text"
-            placeholder="Optional note"
-          >
-
-          <button
-            id="redeem"
-            type="button"
-            class="dashboard-button"
-          >
-            Request Reward
-          </button>
-
-          <div id="redeemMsg"></div>
-
-          <div id="redemptions">
-            Loading reward requests...
-          </div>
-
-        </div>
-
-      </details>
-
-
-      <!-- NOTIFICATIONS -->
-
-      <details class="dashboard-folder">
-
-        <summary>
-          🔔 Notifications
-        </summary>
-
-        <div class="folder-content">
-
-          <div id="notifications">
-            Loading notifications...
-          </div>
-
-          <button
-            id="markNotificationsRead"
-            type="button"
-            class="dashboard-button"
-            onclick="markNotificationsRead()"
-          >
-            Mark Read
-          </button>
-
-        </div>
-
-      </details>
-
-
-      <!-- QUICK ACCESS -->
-
-      <h2>
-        Quick Access
-      </h2>
-
-      <div class="quick-access">
-
-        <a class="pulse-link" href="tasks.html">
-          <span style="--i:0">⚡</span>
-          <span style="--i:1"> </span>
-          <span style="--i:2">T</span>
-          <span style="--i:3">a</span>
-          <span style="--i:4">s</span>
-          <span style="--i:5">k</span>
-          <span style="--i:6">s</span>
-        </a>
-
-        <a class="pulse-link" href="surveys.html">
-          <span style="--i:0">📝</span>
-          <span style="--i:1"> </span>
-          <span style="--i:2">S</span>
-          <span style="--i:3">u</span>
-          <span style="--i:4">r</span>
-          <span style="--i:5">v</span>
-          <span style="--i:6">e</span>
-          <span style="--i:7">y</span>
-          <span style="--i:8">s</span>
-        </a>
-
-        <a class="pulse-link" href="submissions.html">
-          <span style="--i:0">📋</span>
-          <span style="--i:1"> </span>
-          <span style="--i:2">S</span>
-          <span style="--i:3">u</span>
-          <span style="--i:4">b</span>
-          <span style="--i:5">m</span>
-          <span style="--i:6">i</span>
-          <span style="--i:7">s</span>
-          <span style="--i:8">s</span>
-          <span style="--i:9">i</span>
-          <span style="--i:10">o</span>
-          <span style="--i:11">n</span>
-          <span style="--i:12">s</span>
-        </a>
-
-        <a class="pulse-link" href="earnings.html">
-          <span style="--i:0">💰</span>
-          <span style="--i:1"> </span>
-          <span style="--i:2">E</span>
-          <span style="--i:3">a</span>
-          <span style="--i:4">r</span>
-          <span style="--i:5">n</span>
-          <span style="--i:6">i</span>
-          <span style="--i:7">n</span>
-          <span style="--i:8">g</span>
-          <span style="--i:9">s</span>
-        </a>
-
-        <a class="pulse-link" href="notifications.html">
-          <span style="--i:0">🔔</span>
-          <span style="--i:1"> </span>
-          <span style="--i:2">N</span>
-          <span style="--i:3">o</span>
-          <span style="--i:4">t</span>
-          <span style="--i:5">i</span>
-          <span style="--i:6">f</span>
-          <span style="--i:7">i</span>
-          <span style="--i:8">c</span>
-          <span style="--i:9">a</span>
-          <span style="--i:10">t</span>
-          <span style="--i:11">i</span>
-          <span style="--i:12">o</span>
-          <span style="--i:13">n</span>
-          <span style="--i:14">s</span>
-        </a>
-
-        <a class="pulse-link" href="profile.html">
-          <span style="--i:0">⚙️</span>
-          <span style="--i:1"> </span>
-          <span style="--i:2">P</span>
-          <span style="--i:3">r</span>
-          <span style="--i:4">o</span>
-          <span style="--i:5">f</span>
-          <span style="--i:6">i</span>
-          <span style="--i:7">l</span>
-          <span style="--i:8">e</span>
-        </a>
-
-      </div>
-
-
-      <!-- SIGN OUT -->
-
-      <button
-        id="logoutBtn"
-        type="button"
-        class="dashboard-button"
-      >
-        Sign Out
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <!-- =======================================
+  <!-- =======================================================
        FOOTER
-       ======================================= -->
+       ======================================================= -->
 
   <footer>
 
-    <p>© 2026 PULSE</p>
+    <p>
+      © 2026 PULSE
+    </p>
 
     <div>
 
-      <a class="pulse-link" href="terms.html">
-        <span style="--i:0">T</span>
-        <span style="--i:1">e</span>
-        <span style="--i:2">r</span>
-        <span style="--i:3">m</span>
-        <span style="--i:4">s</span>
+      <a
+        class="pulse-link"
+        href="terms.html"
+      >
+        Terms
       </a>
 
-      <span> • </span>
-
-      <a class="pulse-link" href="privacy.html">
-        <span style="--i:0">P</span>
-        <span style="--i:1">r</span>
-        <span style="--i:2">i</span>
-        <span style="--i:3">v</span>
-        <span style="--i:4">a</span>
-        <span style="--i:5">c</span>
-        <span style="--i:6">y</span>
+      <a
+        class="pulse-link"
+        href="privacy.html"
+      >
+        Privacy
       </a>
 
-      <span> • </span>
-
-      <a class="pulse-link" href="disclosures.html">
-        <span style="--i:0">D</span>
-        <span style="--i:1">i</span>
-        <span style="--i:2">s</span>
-        <span style="--i:3">c</span>
-        <span style="--i:4">l</span>
-        <span style="--i:5">o</span>
-        <span style="--i:6">s</span>
-        <span style="--i:7">u</span>
-        <span style="--i:8">r</span>
-        <span style="--i:9">e</span>
-        <span style="--i:10">s</span>
+      <a
+        class="pulse-link"
+        href="disclosures.html"
+      >
+        Disclosures
       </a>
 
-      <span> • </span>
-
-      <a class="pulse-link" href="contact.html">
-        <span style="--i:0">C</span>
-        <span style="--i:1">o</span>
-        <span style="--i:2">n</span>
-        <span style="--i:3">t</span>
-        <span style="--i:4">a</span>
-        <span style="--i:5">c</span>
-        <span style="--i:6">t</span>
+      <a
+        class="pulse-link"
+        href="contact.html"
+      >
+        Contact
       </a>
 
     </div>
 
   </footer>
 
-</main>
 
+  <!-- =======================================================
+       SCRIPTS
+       ======================================================= -->
 
-<!-- =======================================
-     SUPABASE + APP
-     ======================================= -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
 
-<script src="config.js"></script>
+  <script src="app.js"></script>
 
-<script src="app.js"></script>
+  <script>
+    const logoutBtn =
+      document.getElementById("logoutBtn");
 
-
-<!-- =======================================
-     LOGOUT BUTTON
-     ======================================= -->
-
-<script>
-  const logoutBtn = document.getElementById("logoutBtn");
-
-  if (logoutBtn && typeof logout === "function") {
-    logoutBtn.addEventListener("click", logout);
-  }
-</script>
+    if (
+      logoutBtn &&
+      typeof logout === "function"
+    ) {
+      logoutBtn.addEventListener(
+        "click",
+        logout
+      );
+    }
+  </script>
 
 </body>
 </html>
