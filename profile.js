@@ -1,17 +1,23 @@
 // PULSE — Profile & Account
+// Controls profile.html only.
 
 document.addEventListener(
     "DOMContentLoaded",
     loadProfile
 );
 
-async function loadProfile() {
-    const container =
-        document.getElementById(
-            "profileContent"
-        );
 
-    if (!container) return;
+async function loadProfile() {
+
+    const container =
+        document.getElementById("profile");
+
+    if (!container) {
+        console.error(
+            "profile element not found."
+        );
+        return;
+    }
 
     container.innerHTML =
         "<p>Loading profile...</p>";
@@ -21,10 +27,13 @@ async function loadProfile() {
     if (!user) return;
 
     try {
+
         const { data: profile, error } =
             await window.supabaseClient
                 .from("profiles")
-                .select("*")
+                .select(
+                    "id, name, points, role, created_at"
+                )
                 .eq("id", user.id)
                 .maybeSingle();
 
@@ -35,7 +44,11 @@ async function loadProfile() {
         const name =
             profile?.name || "";
 
+        const points =
+            Number(profile?.points ?? 0);
+
         container.innerHTML = `
+
             <form id="profileForm">
 
                 <label for="profileName">
@@ -46,20 +59,27 @@ async function loadProfile() {
                     type="text"
                     id="profileName"
                     value="${escapeHTML(name)}"
+                    maxlength="100"
                     autocomplete="name"
                 >
 
-                <label>
+                <label for="profileEmail">
                     Email
                 </label>
 
                 <input
                     type="email"
+                    id="profileEmail"
                     value="${escapeHTML(
                         user.email || ""
                     )}"
                     disabled
                 >
+
+                <p>
+                    <strong>Points:</strong>
+                    ${points}
+                </p>
 
                 <button type="submit">
                     Save Profile
@@ -77,23 +97,35 @@ async function loadProfile() {
             >
                 Sign Out
             </button>
+
         `;
 
-        document
-            .getElementById("profileForm")
-            .addEventListener(
+        const form =
+            document.getElementById(
+                "profileForm"
+            );
+
+        const signOutButton =
+            document.getElementById(
+                "signOutButton"
+            );
+
+        if (form) {
+            form.addEventListener(
                 "submit",
                 saveProfile
             );
+        }
 
-        document
-            .getElementById("signOutButton")
-            .addEventListener(
+        if (signOutButton) {
+            signOutButton.addEventListener(
                 "click",
                 signOut
             );
+        }
 
     } catch (error) {
+
         console.error(
             "Profile loading error:",
             error
@@ -101,6 +133,7 @@ async function loadProfile() {
 
         container.innerHTML = `
             <div class="panel">
+
                 <h3>
                     Unable to Load Profile
                 </h3>
@@ -108,6 +141,7 @@ async function loadProfile() {
                 <p>
                     Please try again later.
                 </p>
+
             </div>
         `;
     }
@@ -115,18 +149,34 @@ async function loadProfile() {
 
 
 async function saveProfile(event) {
+
     event.preventDefault();
 
-    const name =
-        document
-            .getElementById("profileName")
-            .value
-            .trim();
+    const nameInput =
+        document.getElementById(
+            "profileName"
+        );
 
     const message =
         document.getElementById(
             "profileMessage"
         );
+
+    if (!nameInput || !message) {
+        console.error(
+            "Profile form elements are missing."
+        );
+        return;
+    }
+
+    const name =
+        nameInput.value.trim();
+
+    if (name.length > 100) {
+        message.textContent =
+            "Name must be 100 characters or less.";
+        return;
+    }
 
     message.textContent =
         "Saving...";
@@ -137,13 +187,14 @@ async function saveProfile(event) {
     if (!user) return;
 
     try {
+
         const { error } =
             await window.supabaseClient
                 .from("profiles")
-                .upsert({
-                    id: user.id,
+                .update({
                     name: name
-                });
+                })
+                .eq("id", user.id);
 
         if (error) {
             throw error;
@@ -153,19 +204,24 @@ async function saveProfile(event) {
             "Profile saved successfully.";
 
     } catch (error) {
+
         console.error(
             "Profile save error:",
             error
         );
 
         message.textContent =
-            error.message;
+            "Unable to save profile. Please try again.";
     }
 }
 
 
 function escapeHTML(value) {
-    if (value === null || value === undefined) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
         return "";
     }
 
