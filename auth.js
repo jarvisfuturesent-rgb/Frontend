@@ -1,11 +1,16 @@
 // PULSE — Login / Sign Up
 // Controls auth.html only.
 
+
 document.addEventListener(
     "DOMContentLoaded",
     showAuthForm
 );
 
+
+// ==============================
+// SHOW LOGIN FORM
+// ==============================
 
 function showAuthForm() {
 
@@ -96,6 +101,10 @@ function showAuthForm() {
 }
 
 
+// ==============================
+// LOGIN
+// ==============================
+
 async function loginUser(event) {
 
     event.preventDefault();
@@ -109,6 +118,11 @@ async function loginUser(event) {
     const message =
         document.getElementById(
             "auth-message"
+        );
+
+    const loginButton =
+        document.getElementById(
+            "login-button"
         );
 
     if (
@@ -131,6 +145,10 @@ async function loginUser(event) {
     message.textContent =
         "Logging in...";
 
+    if (loginButton) {
+        loginButton.disabled = true;
+    }
+
     try {
 
         if (!window.supabaseClient) {
@@ -139,7 +157,15 @@ async function loginUser(event) {
             );
         }
 
-        const { error } =
+
+        // ==========================
+        // SIGN IN
+        // ==========================
+
+        const {
+            data,
+            error
+        } =
             await window.supabaseClient.auth
                 .signInWithPassword({
                     email,
@@ -150,11 +176,78 @@ async function loginUser(event) {
             throw error;
         }
 
+
+        // ==========================
+        // VERIFY SESSION
+        // ==========================
+
+        const {
+            data: sessionData,
+            error: sessionError
+        } =
+            await window.supabaseClient.auth
+                .getSession();
+
+        if (sessionError) {
+            throw sessionError;
+        }
+
+        const session =
+            sessionData?.session;
+
+
+        if (!session) {
+
+            throw new Error(
+                "Login succeeded, but no active session was found."
+            );
+        }
+
+
+        // ==========================
+        // VERIFY USER
+        // ==========================
+
+        const {
+            data: userData,
+            error: userError
+        } =
+            await window.supabaseClient.auth
+                .getUser();
+
+        if (userError) {
+            throw userError;
+        }
+
+        const user =
+            userData?.user;
+
+
+        if (!user) {
+
+            throw new Error(
+                "Login succeeded, but the account could not be verified."
+            );
+        }
+
+
+        console.log(
+            "PULSE: Login session verified.",
+            user.id
+        );
+
+
         message.textContent =
-            "Login successful.";
+            "Login verified. Loading PULSE...";
+
+
+        // ==========================
+        // GO TO DASHBOARD
+        // ==========================
 
         window.location.href =
             "dashboard.html";
+
 
     } catch (error) {
 
@@ -166,9 +259,17 @@ async function loginUser(event) {
         message.textContent =
             error.message ||
             "Unable to log in. Please try again.";
+
+        if (loginButton) {
+            loginButton.disabled = false;
+        }
     }
 }
 
+
+// ==============================
+// CREATE ACCOUNT
+// ==============================
 
 async function createAccount() {
 
@@ -227,7 +328,11 @@ async function createAccount() {
             );
         }
 
-        const { data, error } =
+
+        const {
+            data,
+            error
+        } =
             await window.supabaseClient.auth
                 .signUp({
                     email,
@@ -237,6 +342,7 @@ async function createAccount() {
         if (error) {
             throw error;
         }
+
 
         if (data?.session) {
 
@@ -249,8 +355,10 @@ async function createAccount() {
             return;
         }
 
+
         message.textContent =
             "Account created. Check your email to confirm your account.";
+
 
     } catch (error) {
 
