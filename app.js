@@ -66,26 +66,38 @@ async function isAdmin(userId) {
 
 // Show Administration only to admins
 async function updateAdminMenu() {
-    const adminMenu = Array.from(
-        document.querySelectorAll("details")
-    ).find((details) =>
-        details.querySelector('a[href="admin.html"]')
-    );
 
-    if (!adminMenu) {
+    // Find the Administration folder specifically.
+    // Do NOT hide the main ☰ menu.
+    const adminLink =
+        document.querySelector(
+            'a[href="admin.html"]'
+        );
+
+    if (!adminLink) {
+        return;
+    }
+
+    const adminFolder =
+        adminLink.closest("details");
+
+    if (!adminFolder) {
         return;
     }
 
     const user = await getCurrentUser();
 
+    // Hide Administration for logged-out users
     if (!user) {
-        adminMenu.hidden = true;
+        adminFolder.hidden = true;
         return;
     }
 
+    // Check the user's actual profile role
     const admin = await isAdmin(user.id);
 
-    adminMenu.hidden = !admin;
+    // Only hide the Administration folder
+    adminFolder.hidden = !admin;
 }
 
 
@@ -110,6 +122,9 @@ async function signOut() {
 
 
 // Run shared page checks after the page loads
-document.addEventListener("DOMContentLoaded", () => {
-    updateAdminMenu();
-});
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+        updateAdminMenu();
+    }
+);
