@@ -1,6 +1,6 @@
 // PULSE — Shared App Functions
 
-// Create the Supabase client and make it available to all PULSE JS files
+// Create the Supabase client
 window.supabaseClient = window.supabase.createClient(
     window.SUPABASE_URL,
     window.SUPABASE_ANON_KEY
@@ -13,11 +13,7 @@ async function getCurrentUser() {
         await window.supabaseClient.auth.getUser();
 
     if (error) {
-        console.error(
-            "Error getting current user:",
-            error
-        );
-
+        console.error("Error getting current user:", error);
         return null;
     }
 
@@ -52,11 +48,7 @@ async function isAdmin(userId) {
             .maybeSingle();
 
     if (error) {
-        console.error(
-            "Error checking admin role:",
-            error
-        );
-
+        console.error("Error checking admin role:", error);
         return false;
     }
 
@@ -64,34 +56,45 @@ async function isAdmin(userId) {
 }
 
 
-// Hide Administration immediately.
-// It will only be shown after admin status is confirmed.
-function hideAdminMenuImmediately() {
-    const adminLink =
-        document.querySelector(
-            'a[href="admin.html"]'
-        );
+// Find the Administration folder
+function getAdminFolder() {
+    const details = document.querySelectorAll("details");
 
-    if (!adminLink) {
-        return null;
+    for (const folder of details) {
+        const summary = folder.querySelector("summary");
+
+        if (!summary) {
+            continue;
+        }
+
+        const text = summary.textContent
+            .replace(/\s+/g, " ")
+            .trim();
+
+        if (text.includes("Administration")) {
+            return folder;
+        }
     }
 
-    const adminFolder =
-        adminLink.closest("details");
+    return null;
+}
 
-    if (!adminFolder) {
-        return null;
+
+// Hide Administration immediately
+function hideAdminMenu() {
+    const adminFolder = getAdminFolder();
+
+    if (adminFolder) {
+        adminFolder.hidden = true;
     }
-
-    adminFolder.hidden = true;
 
     return adminFolder;
 }
 
 
-// Show Administration only after admin status is confirmed
+// Show Administration only to confirmed admins
 async function updateAdminMenu() {
-    const adminFolder = hideAdminMenuImmediately();
+    const adminFolder = hideAdminMenu();
 
     if (!adminFolder) {
         return;
@@ -117,11 +120,7 @@ async function signOut() {
         await window.supabaseClient.auth.signOut();
 
     if (error) {
-        console.error(
-            "Sign out error:",
-            error
-        );
-
+        console.error("Sign out error:", error);
         return false;
     }
 
