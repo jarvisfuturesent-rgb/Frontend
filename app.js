@@ -1,5 +1,8 @@
 // PULSE — Shared App Functions
 
+console.log("PULSE APP.JS IS RUNNING");
+
+
 // ==============================
 // SUPABASE CLIENT
 // ==============================
@@ -26,6 +29,7 @@ async function getCurrentUser() {
       "PULSE: Unable to get current user:",
       error
     );
+
     return null;
   }
 
@@ -54,11 +58,12 @@ async function isAdmin(userId) {
       "PULSE: Unable to check admin role:",
       error
     );
+
     return false;
   }
 
   console.log(
-    "PULSE: Profile role:",
+    "PULSE: PROFILE ROLE:",
     profile?.role
   );
 
@@ -80,6 +85,11 @@ function getAdminFolder() {
       ".menu-panel details"
     );
 
+  console.log(
+    "PULSE MENU FOLDERS FOUND:",
+    folders.length
+  );
+
   for (const folder of folders) {
     const summary =
       folder.querySelector(":scope > summary");
@@ -91,20 +101,35 @@ function getAdminFolder() {
     const text =
       summary.textContent
         .replace(/\s+/g, " ")
-        .trim()
-        .toLowerCase();
+        .trim();
 
-    if (text === "administration") {
+    console.log(
+      "PULSE FOLDER:",
+      text
+    );
+
+    if (
+      text.toLowerCase() ===
+      "administration"
+    ) {
+      console.log(
+        "PULSE: ADMINISTRATION FOLDER FOUND"
+      );
+
       return folder;
     }
   }
+
+  console.log(
+    "PULSE: ADMINISTRATION FOLDER NOT FOUND"
+  );
 
   return null;
 }
 
 
 // ==============================
-// HIDE ENTIRE ADMINISTRATION FOLDER
+// HIDE ADMINISTRATION
 // ==============================
 
 function hideAdminMenu() {
@@ -116,12 +141,17 @@ function hideAdminMenu() {
   }
 
   folder.hidden = true;
+  folder.style.display = "none";
   folder.removeAttribute("open");
+
+  console.log(
+    "PULSE: ADMINISTRATION HIDDEN"
+  );
 }
 
 
 // ==============================
-// SHOW ENTIRE ADMINISTRATION FOLDER
+// SHOW ADMINISTRATION
 // ==============================
 
 function showAdminMenu() {
@@ -133,15 +163,21 @@ function showAdminMenu() {
   }
 
   folder.hidden = false;
+  folder.style.display = "";
+
+  console.log(
+    "PULSE: ADMINISTRATION SHOWN"
+  );
 }
 
 
 // ==============================
-// VERIFY ADMIN AND SET MENU
+// VERIFY USER AND SET MENU
 // ==============================
 
 async function updateAdminMenu() {
-  // Hide the entire folder immediately.
+
+  // Hide it immediately.
   hideAdminMenu();
 
   const user =
@@ -149,43 +185,61 @@ async function updateAdminMenu() {
 
   if (!user) {
     console.log(
-      "PULSE: No logged-in user. Administration hidden."
+      "PULSE: NO LOGGED-IN USER"
     );
+
     return;
   }
+
+  console.log(
+    "PULSE: USER:",
+    user.id
+  );
 
   const admin =
     await isAdmin(user.id);
 
   if (admin) {
+
+    console.log(
+      "PULSE: ADMIN VERIFIED"
+    );
+
     showAdminMenu();
 
-    console.log(
-      "PULSE: Admin verified. Administration shown."
-    );
   } else {
-    hideAdminMenu();
 
     console.log(
-      "PULSE: Regular user. Administration hidden."
+      "PULSE: REGULAR USER"
     );
+
+    hideAdminMenu();
   }
 }
 
 
 // ==============================
-// START ADMIN VERIFICATION
+// START ADMIN CHECK
 // ==============================
 
 function startAdminMenuCheck() {
-  // Hide Administration immediately.
-  hideAdminMenu();
 
-  // Then verify the logged-in user's role.
+  console.log(
+    "PULSE: STARTING ADMIN MENU CHECK"
+  );
+
+  // Check immediately.
   updateAdminMenu();
 
+  // Watch authentication changes.
   window.supabaseClient.auth.onAuthStateChange(
     (event) => {
+
+      console.log(
+        "PULSE AUTH EVENT:",
+        event
+      );
+
       if (
         event === "INITIAL_SESSION" ||
         event === "SIGNED_IN" ||
@@ -251,6 +305,12 @@ async function signOut() {
 document.addEventListener(
   "DOMContentLoaded",
   () => {
+
+    console.log(
+      "PULSE: DOM READY"
+    );
+
     startAdminMenuCheck();
+
   }
 );
