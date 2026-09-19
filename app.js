@@ -1,7 +1,5 @@
 // PULSE — Shared App Functions
 
-console.log("PULSE app.js loaded");
-
 
 // Create the Supabase client
 window.supabaseClient = window.supabase.createClient(
@@ -12,14 +10,17 @@ window.supabaseClient = window.supabase.createClient(
 
 // Get the currently logged-in user
 async function getCurrentUser() {
+
     const { data, error } =
         await window.supabaseClient.auth.getUser();
 
     if (error) {
+
         console.error(
             "Error getting current user:",
             error
         );
+
         return null;
     }
 
@@ -29,10 +30,15 @@ async function getCurrentUser() {
 
 // Check if someone is logged in
 async function requireLogin() {
-    const user = await getCurrentUser();
+
+    const user =
+        await getCurrentUser();
 
     if (!user) {
-        window.location.href = "auth.html";
+
+        window.location.href =
+            "auth.html";
+
         return null;
     }
 
@@ -42,6 +48,7 @@ async function requireLogin() {
 
 // Check whether the current user is an admin
 async function isAdmin(userId) {
+
     if (!userId) {
         return false;
     }
@@ -54,6 +61,7 @@ async function isAdmin(userId) {
             .maybeSingle();
 
     if (error) {
+
         console.error(
             "Error checking admin role:",
             error
@@ -63,16 +71,21 @@ async function isAdmin(userId) {
     }
 
     console.log(
-        "Admin profile:",
+        "PULSE admin profile:",
         profile
     );
 
-    return profile?.role === "admin";
+    return (
+        String(profile?.role || "")
+            .trim()
+            .toLowerCase() === "admin"
+    );
 }
 
 
 // Find the Administration folder
 function getAdminFolder() {
+
     const details =
         document.querySelectorAll("details");
 
@@ -88,35 +101,37 @@ function getAdminFolder() {
         const text =
             summary.textContent
                 .replace(/\s+/g, " ")
-                .trim();
+                .trim()
+                .toLowerCase();
 
-        if (text.includes("Administration")) {
-
-            console.log(
-                "Administration folder found:",
-                folder
-            );
+        if (
+            text.includes("administration")
+        ) {
 
             return folder;
         }
     }
 
-    console.log(
-        "Administration folder NOT found"
-    );
-
     return null;
 }
 
 
-// Hide Administration immediately
+// Hide Administration by default
 function hideAdminMenu() {
 
     const adminFolder =
         getAdminFolder();
 
     if (adminFolder) {
-        adminFolder.hidden = true;
+
+        adminFolder.setAttribute(
+            "hidden",
+            ""
+        );
+
+        adminFolder.removeAttribute(
+            "open"
+        );
     }
 
     return adminFolder;
@@ -126,17 +141,13 @@ function hideAdminMenu() {
 // Show Administration only to confirmed admins
 async function updateAdminMenu() {
 
-    console.log(
-        "updateAdminMenu() started"
-    );
-
     const adminFolder =
         hideAdminMenu();
 
     if (!adminFolder) {
 
-        console.log(
-            "Stopping: Administration folder not found."
+        console.warn(
+            "PULSE: Administration folder was not found."
         );
 
         return;
@@ -145,43 +156,53 @@ async function updateAdminMenu() {
     const user =
         await getCurrentUser();
 
-    console.log(
-        "Current user:",
-        user
-    );
-
     if (!user) {
-
-        console.log(
-            "No logged-in user."
-        );
-
         return;
     }
 
     const admin =
         await isAdmin(user.id);
 
-    console.log(
-        "Is current user admin:",
-        admin
-    );
-
     if (admin) {
 
-        adminFolder.hidden = false;
-
-        console.log(
-            "Administration menu SHOWN."
+        // Remove the HTML hidden attribute.
+        // This allows the admin menu to appear
+        // even when the HTML starts with <details hidden>.
+        adminFolder.removeAttribute(
+            "hidden"
         );
 
-    } else {
+        adminFolder.style.display = "";
 
         console.log(
-            "Administration menu remains hidden."
+            "PULSE: Administration menu shown for admin."
         );
     }
 }
+
+
+// Run when the page loads
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        updateAdminMenu();
+    }
+);
+
+
+// Re-check when authentication changes
+window.supabaseClient.auth.onAuthStateChange(
+    () => {
+
+        setTimeout(
+            () => {
+                updateAdminMenu();
+            },
+            0
+        );
+    }
+);
 
 
 // Sign out
@@ -205,17 +226,3 @@ async function signOut() {
 
     return true;
 }
-
-
-// Run shared page checks after the page loads
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        console.log(
-            "DOMContentLoaded — checking admin menu"
-        );
-
-        updateAdminMenu();
-    }
-);
