@@ -17,9 +17,7 @@ async function loadEarnings() {
         !pendingWithdrawal ||
         !availableBalance
     ) {
-        console.error(
-            "Earnings page elements are missing."
-        );
+        console.error("Earnings page elements are missing.");
         return;
     }
 
@@ -28,34 +26,52 @@ async function loadEarnings() {
     if (!user) return;
 
     try {
-        const { data: profile, error } =
+        // Get user's points balance
+        const { data: profile, error: profileError } =
             await window.supabaseClient
                 .from("profiles")
                 .select("points")
                 .eq("id", user.id)
                 .maybeSingle();
 
-        if (error) {
-            throw error;
+        if (profileError) {
+            throw profileError;
         }
 
         const points = Number(profile?.points ?? 0);
 
+        // Get user's pending withdrawal requests
+        const { data: withdrawals, error: withdrawalError } =
+            await window.supabaseClient
+                .from("redemption_requests")
+                .select("points_requested, status")
+                .eq("user_id", user.id)
+                .eq("status", "pending");
+
+        if (withdrawalError) {
+            throw withdrawalError;
+        }
+
+        // Add all pending withdrawal requests together.
+        const pendingPLS = (withdrawals || []).reduce(
+            (total, withdrawal) =>
+                total + Number(withdrawal.points_requested ?? 0),
+            0
+        );
+
         balance.textContent = `${points} Points`;
+
         totalEarned.textContent =
             `Total Earned: ${points} Points`;
 
         pendingWithdrawal.textContent =
-            "Pending Withdrawal: 0 Points";
+            `Pending Withdrawal: ${pendingPLS} PLS`;
 
         availableBalance.textContent =
             `Available Balance: ${points} Points`;
 
     } catch (error) {
-        console.error(
-            "Earnings loading error:",
-            error
-        );
+        console.error("Earnings loading error:", error);
 
         balance.textContent =
             "Unable to load balance.";
