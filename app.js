@@ -64,22 +64,34 @@ async function isAdmin(userId) {
 }
 
 
-// Show Administration only to admins
-async function updateAdminMenu() {
-
-    // Find the Administration folder specifically.
-    // Do NOT hide the main ☰ menu.
+// Hide Administration immediately.
+// It will only be shown after admin status is confirmed.
+function hideAdminMenuImmediately() {
     const adminLink =
         document.querySelector(
             'a[href="admin.html"]'
         );
 
     if (!adminLink) {
-        return;
+        return null;
     }
 
     const adminFolder =
         adminLink.closest("details");
+
+    if (!adminFolder) {
+        return null;
+    }
+
+    adminFolder.hidden = true;
+
+    return adminFolder;
+}
+
+
+// Show Administration only after admin status is confirmed
+async function updateAdminMenu() {
+    const adminFolder = hideAdminMenuImmediately();
 
     if (!adminFolder) {
         return;
@@ -87,17 +99,15 @@ async function updateAdminMenu() {
 
     const user = await getCurrentUser();
 
-    // Hide Administration for logged-out users
     if (!user) {
-        adminFolder.hidden = true;
         return;
     }
 
-    // Check the user's actual profile role
     const admin = await isAdmin(user.id);
 
-    // Only hide the Administration folder
-    adminFolder.hidden = !admin;
+    if (admin) {
+        adminFolder.hidden = false;
+    }
 }
 
 
