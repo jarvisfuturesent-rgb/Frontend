@@ -139,9 +139,7 @@ async function loadProfile() {
                 </h3>
 
                 <p>
-                    ${escapeHTML(
-                        getErrorMessage(error)
-                    )}
+                    Please try again later.
                 </p>
 
             </div>
@@ -186,48 +184,20 @@ async function saveProfile(event) {
     const user =
         await getCurrentUser();
 
-    if (!user) {
-        message.textContent =
-            "No signed-in user was found.";
-        return;
-    }
+    if (!user) return;
 
     try {
 
-        console.log(
-            "Attempting profile update:",
-            {
-                userId: user.id,
-                name: name
-            }
-        );
-
-        const { data, error } =
+        const { error } =
             await window.supabaseClient
                 .from("profiles")
                 .update({
                     name: name
                 })
-                .eq("id", user.id)
-                .select("id, name, points, role")
-                .maybeSingle();
-
-        console.log(
-            "Profile update response:",
-            {
-                data: data,
-                error: error
-            }
-        );
+                .eq("id", user.id);
 
         if (error) {
             throw error;
-        }
-
-        if (!data) {
-            throw new Error(
-                "Profile update returned no row. Check the profiles UPDATE policy and user ID."
-            );
         }
 
         message.textContent =
@@ -236,58 +206,13 @@ async function saveProfile(event) {
     } catch (error) {
 
         console.error(
-            "PROFILE SAVE ERROR:",
+            "Profile save error:",
             error
         );
 
-        const errorMessage =
-            getErrorMessage(error);
-
-        message.innerHTML = `
-            <strong>Profile save error:</strong>
-            ${escapeHTML(errorMessage)}
-        `;
+        message.textContent =
+            "Unable to save profile. Please try again.";
     }
-}
-
-
-function getErrorMessage(error) {
-
-    if (!error) {
-        return "Unknown error.";
-    }
-
-    const parts = [];
-
-    if (error.message) {
-        parts.push(
-            `Message: ${error.message}`
-        );
-    }
-
-    if (error.code) {
-        parts.push(
-            `Code: ${error.code}`
-        );
-    }
-
-    if (error.details) {
-        parts.push(
-            `Details: ${error.details}`
-        );
-    }
-
-    if (error.hint) {
-        parts.push(
-            `Hint: ${error.hint}`
-        );
-    }
-
-    if (parts.length === 0) {
-        return String(error);
-    }
-
-    return parts.join(" | ");
 }
 
 
