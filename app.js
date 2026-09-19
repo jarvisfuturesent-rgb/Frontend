@@ -1,15 +1,10 @@
 // PULSE — Shared App Functions
 
-
-// ==============================
-// SUPABASE CLIENT
-// ==============================
-
 window.supabaseClient =
-    window.supabase.createClient(
-        window.SUPABASE_URL,
-        window.SUPABASE_ANON_KEY
-    );
+  window.supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+  );
 
 
 // ==============================
@@ -17,25 +12,18 @@ window.supabaseClient =
 // ==============================
 
 async function getCurrentUser() {
+  const { data, error } =
+    await window.supabaseClient.auth.getUser();
 
-    const {
-        data,
-        error
-    } =
-        await window.supabaseClient.auth
-            .getUser();
+  if (error) {
+    console.error(
+      "PULSE: Unable to get current user:",
+      error
+    );
+    return null;
+  }
 
-    if (error) {
-
-        console.error(
-            "PULSE: Unable to get current user:",
-            error
-        );
-
-        return null;
-    }
-
-    return data.user || null;
+  return data.user || null;
 }
 
 
@@ -44,226 +32,130 @@ async function getCurrentUser() {
 // ==============================
 
 async function isAdmin(userId) {
+  if (!userId) {
+    return false;
+  }
 
-    if (!userId) {
-        return false;
-    }
+  const { data: profile, error } =
+    await window.supabaseClient
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .maybeSingle();
 
-    const {
-        data: profile,
-        error
-    } =
-        await window.supabaseClient
-            .from("profiles")
-            .select("role")
-            .eq("id", userId)
-            .maybeSingle();
-
-    if (error) {
-
-        console.error(
-            "PULSE: Unable to check admin role:",
-            error
-        );
-
-        return false;
-    }
-
-    console.log(
-        "PULSE: Profile:",
-        profile
+  if (error) {
+    console.error(
+      "PULSE: Unable to check admin role:",
+      error
     );
+    return false;
+  }
 
-    return (
-        String(profile?.role || "")
-            .trim()
-            .toLowerCase() === "admin"
-    );
+  return (
+    String(profile?.role || "")
+      .trim()
+      .toLowerCase() === "admin"
+  );
 }
 
 
 // ==============================
-// FIND ADMINISTRATION MENU
+// GET ADMINISTRATION FOLDER
 // ==============================
 
 function getAdminFolder() {
-
-    const folders =
-        document.querySelectorAll(
-            "details"
-        );
-
-    for (const folder of folders) {
-
-        const summary =
-            folder.querySelector(
-                "summary"
-            );
-
-        if (!summary) {
-            continue;
-        }
-
-        const text =
-            summary.textContent
-                .replace(/\s+/g, " ")
-                .trim()
-                .toLowerCase();
-
-        if (
-            text.includes(
-                "administration"
-            )
-        ) {
-
-            return folder;
-        }
-    }
-
-    return null;
+  return document.getElementById(
+    "adminMenuFolder"
+  );
 }
 
 
 // ==============================
-// HIDE ADMIN MENU
+// HIDE ADMINISTRATION FOLDER
 // ==============================
 
 function hideAdminMenu() {
+  const adminFolder =
+    getAdminFolder();
 
-    const adminFolder =
-        getAdminFolder();
+  if (!adminFolder) {
+    return;
+  }
 
-    if (!adminFolder) {
-        return;
-    }
-
-    adminFolder.style.display =
-        "none";
-
-    adminFolder.removeAttribute(
-        "open"
-    );
+  adminFolder.hidden = true;
+  adminFolder.removeAttribute("open");
 }
 
 
 // ==============================
-// SHOW ADMIN MENU
+// SHOW ADMINISTRATION FOLDER
 // ==============================
 
 function showAdminMenu() {
+  const adminFolder =
+    getAdminFolder();
 
-    const adminFolder =
-        getAdminFolder();
+  if (!adminFolder) {
+    return;
+  }
 
-    if (!adminFolder) {
-        return;
-    }
-
-    // Remove any HTML hidden attribute.
-    adminFolder.removeAttribute(
-        "hidden"
-    );
-
-    // Show the folder.
-    adminFolder.style.display =
-        "";
-
-    console.log(
-        "PULSE: Administration menu shown."
-    );
+  adminFolder.hidden = false;
 }
 
 
 // ==============================
-// UPDATE ADMIN MENU
+// UPDATE ADMINISTRATION MENU
 // ==============================
 
 async function updateAdminMenu() {
+  // Hide the entire folder first.
+  hideAdminMenu();
 
-    // Always start hidden.
-    hideAdminMenu();
+  const user =
+    await getCurrentUser();
 
+  if (!user) {
+    return;
+  }
 
-    // Get the already-authenticated user.
-    const user =
-        await getCurrentUser();
+  const admin =
+    await isAdmin(user.id);
 
-    if (!user) {
-
-        console.log(
-            "PULSE: No logged-in user. Administration hidden."
-        );
-
-        return;
-    }
-
-
+  if (admin) {
+    showAdminMenu();
     console.log(
-        "PULSE: Logged-in user:",
-        user.id
+      "PULSE: Administration folder shown."
     );
-
-
-    // Check the user's profile role.
-    const admin =
-        await isAdmin(user.id);
-
-
-    if (admin) {
-
-        showAdminMenu();
-
-        console.log(
-            "PULSE: Admin account confirmed."
-        );
-
-    } else {
-
-        hideAdminMenu();
-
-        console.log(
-            "PULSE: Regular account. Administration hidden."
-        );
-    }
+  } else {
+    hideAdminMenu();
+    console.log(
+      "PULSE: Administration folder hidden."
+    );
+  }
 }
 
 
 // ==============================
-// WAIT FOR SUPABASE SESSION
+// AUTH SESSION CHECK
 // ==============================
 
 function startAdminMenuCheck() {
+  updateAdminMenu();
 
-    // Check the current session immediately.
-    updateAdminMenu();
-
-
-    // Also listen for the initial/current
-    // Supabase authentication session.
-    window.supabaseClient.auth.onAuthStateChange(
-        (event, session) => {
-
-            console.log(
-                "PULSE: Auth event:",
-                event
-            );
-
-            if (
-                event === "INITIAL_SESSION" ||
-                event === "SIGNED_IN" ||
-                event === "SIGNED_OUT" ||
-                event === "TOKEN_REFRESHED"
-            ) {
-
-                setTimeout(
-                    () => {
-                        updateAdminMenu();
-                    },
-                    0
-                );
-            }
-        }
-    );
+  window.supabaseClient.auth.onAuthStateChange(
+    (event) => {
+      if (
+        event === "INITIAL_SESSION" ||
+        event === "SIGNED_IN" ||
+        event === "SIGNED_OUT" ||
+        event === "TOKEN_REFRESHED"
+      ) {
+        setTimeout(() => {
+          updateAdminMenu();
+        }, 0);
+      }
+    }
+  );
 }
 
 
@@ -272,19 +164,17 @@ function startAdminMenuCheck() {
 // ==============================
 
 async function requireLogin() {
+  const user =
+    await getCurrentUser();
 
-    const user =
-        await getCurrentUser();
+  if (!user) {
+    window.location.href =
+      "auth.html";
 
-    if (!user) {
+    return null;
+  }
 
-        window.location.href =
-            "auth.html";
-
-        return null;
-    }
-
-    return user;
+  return user;
 }
 
 
@@ -293,27 +183,22 @@ async function requireLogin() {
 // ==============================
 
 async function signOut() {
+  const { error } =
+    await window.supabaseClient.auth.signOut();
 
-    const {
-        error
-    } =
-        await window.supabaseClient.auth
-            .signOut();
+  if (error) {
+    console.error(
+      "PULSE: Sign out error:",
+      error
+    );
 
-    if (error) {
+    return false;
+  }
 
-        console.error(
-            "PULSE: Sign out error:",
-            error
-        );
+  window.location.href =
+    "auth.html";
 
-        return false;
-    }
-
-    window.location.href =
-        "auth.html";
-
-    return true;
+  return true;
 }
 
 
@@ -322,10 +207,8 @@ async function signOut() {
 // ==============================
 
 document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        startAdminMenuCheck();
-
-    }
+  "DOMContentLoaded",
+  () => {
+    startAdminMenuCheck();
+  }
 );
