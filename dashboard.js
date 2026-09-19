@@ -19,6 +19,16 @@ document.addEventListener("DOMContentLoaded", () => {
       markNotificationsRead
     );
   }
+
+  const redeemBtn =
+    document.getElementById("redeem");
+
+  if (redeemBtn) {
+    redeemBtn.addEventListener(
+      "click",
+      handleRewardRequest
+    );
+  }
 });
 
 
@@ -70,10 +80,6 @@ async function loadDashboard() {
       );
     }
 
-
-    // -----------------------------
-    // LOAD DATABASE DATA
-    // -----------------------------
 
     const [
       profileResult,
@@ -214,9 +220,7 @@ async function loadDashboard() {
       notificationsResult.data || [];
 
 
-    // -----------------------------
     // PROFILE
-    // -----------------------------
 
     const name =
       userProfile?.name ||
@@ -247,9 +251,7 @@ async function loadDashboard() {
     }
 
 
-    // -----------------------------
     // POINTS
-    // -----------------------------
 
     let totalEarnedValue = 0;
 
@@ -287,18 +289,15 @@ async function loadDashboard() {
         points.toLocaleString();
     }
 
-
     if (totalEarned) {
       totalEarned.textContent =
         totalEarnedValue.toLocaleString();
     }
 
-
     if (pendingWithdrawal) {
       pendingWithdrawal.textContent =
         pendingPoints.toLocaleString();
     }
-
 
     if (availableBalance) {
       availableBalance.textContent =
@@ -306,9 +305,7 @@ async function loadDashboard() {
     }
 
 
-    // -----------------------------
     // TASKS
-    // -----------------------------
 
     if (tasks) {
 
@@ -348,9 +345,7 @@ async function loadDashboard() {
     }
 
 
-    // -----------------------------
     // SUBMISSIONS
-    // -----------------------------
 
     if (submissions) {
 
@@ -398,9 +393,7 @@ async function loadDashboard() {
     }
 
 
-    // -----------------------------
     // POINTS ACTIVITY
-    // -----------------------------
 
     if (activity) {
 
@@ -446,9 +439,7 @@ async function loadDashboard() {
     }
 
 
-    // -----------------------------
     // REWARD REQUESTS
-    // -----------------------------
 
     if (redemptions) {
 
@@ -499,6 +490,19 @@ async function loadDashboard() {
                   : ""
               }
 
+              ${
+                request.admin_note
+                  ? `
+                    <p>
+                      <strong>Admin Note:</strong>
+                      ${escapeHTML(
+                        request.admin_note
+                      )}
+                    </p>
+                  `
+                  : ""
+              }
+
               <p>
                 <strong>Date:</strong>
                 ${formatDate(
@@ -512,9 +516,7 @@ async function loadDashboard() {
     }
 
 
-    // -----------------------------
     // NOTIFICATIONS
-    // -----------------------------
 
     if (notifications) {
 
@@ -563,6 +565,152 @@ async function loadDashboard() {
     showDashboardError(
       "Unable to load your dashboard. Please try again."
     );
+  }
+}
+
+
+// -----------------------------
+// REWARD REQUEST
+// -----------------------------
+
+async function handleRewardRequest() {
+
+  const button =
+    document.getElementById("redeem");
+
+  const amountInput =
+    document.getElementById("redeemAmount");
+
+  const rewardTypeInput =
+    document.getElementById("rewardType");
+
+  const noteInput =
+    document.getElementById("redeemNote");
+
+  const message =
+    document.getElementById("redeemMsg");
+
+
+  if (!amountInput ||
+      !rewardTypeInput ||
+      !message) {
+    return;
+  }
+
+
+  const points =
+    Number(amountInput.value);
+
+  const rewardType =
+    rewardTypeInput.value;
+
+  const note =
+    noteInput
+      ? noteInput.value.trim()
+      : "";
+
+
+  if (!Number.isInteger(points) || points <= 0) {
+
+    message.textContent =
+      "Enter a valid number of points.";
+
+    return;
+  }
+
+
+  if (!rewardType) {
+
+    message.textContent =
+      "Select a reward type.";
+
+    return;
+  }
+
+
+  try {
+
+    const user =
+      await requireLogin();
+
+    if (!user) {
+      return;
+    }
+
+
+    if (!window.supabaseClient) {
+      throw new Error(
+        "Supabase client is not available."
+      );
+    }
+
+
+    if (button) {
+      button.disabled = true;
+      button.textContent =
+        "Submitting...";
+    }
+
+    message.textContent =
+      "Submitting reward request...";
+
+
+    const { data, error } =
+      await window.supabaseClient.rpc(
+        "create_redemption_request",
+        {
+          p_points: points,
+          p_reward_type: rewardType,
+          p_user_note: note || null
+        }
+      );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    console.log(
+      "PULSE reward request created:",
+      data
+    );
+
+
+    message.textContent =
+      "Reward request submitted successfully.";
+
+
+    amountInput.value = "";
+    rewardTypeInput.value = "";
+
+    if (noteInput) {
+      noteInput.value = "";
+    }
+
+
+    await loadDashboard();
+
+
+  } catch (error) {
+
+    console.error(
+      "Reward request error:",
+      error
+    );
+
+
+    message.textContent =
+      "Unable to submit reward request: " +
+      (error.message || "Unknown error");
+
+  } finally {
+
+    if (button) {
+      button.disabled = false;
+      button.textContent =
+        "Request Reward";
+    }
   }
 }
 
