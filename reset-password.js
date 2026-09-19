@@ -236,7 +236,9 @@ async function sendResetEmail(event) {
             error
         );
 
+        // TEMPORARY ERROR DETECTOR
         message.textContent =
+            error.message ||
             "Unable to send the reset link. Please try again.";
     }
 }
