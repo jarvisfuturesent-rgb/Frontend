@@ -125,36 +125,73 @@ function getAdminFolder() {
 
 
 // ==============================
-// UPDATE ADMIN MENU
+// HIDE ADMIN MENU
 // ==============================
 
-async function updateAdminMenu() {
+function hideAdminMenu() {
 
     const adminFolder =
         getAdminFolder();
 
     if (!adminFolder) {
-
-        console.log(
-            "PULSE: No Administration menu on this page."
-        );
-
         return;
     }
 
-
-    // Hide while checking account
     adminFolder.style.display =
         "none";
 
+    adminFolder.removeAttribute(
+        "open"
+    );
+}
 
+
+// ==============================
+// SHOW ADMIN MENU
+// ==============================
+
+function showAdminMenu() {
+
+    const adminFolder =
+        getAdminFolder();
+
+    if (!adminFolder) {
+        return;
+    }
+
+    // Remove any HTML hidden attribute.
+    adminFolder.removeAttribute(
+        "hidden"
+    );
+
+    // Show the folder.
+    adminFolder.style.display =
+        "";
+
+    console.log(
+        "PULSE: Administration menu shown."
+    );
+}
+
+
+// ==============================
+// UPDATE ADMIN MENU
+// ==============================
+
+async function updateAdminMenu() {
+
+    // Always start hidden.
+    hideAdminMenu();
+
+
+    // Get the already-authenticated user.
     const user =
         await getCurrentUser();
 
     if (!user) {
 
         console.log(
-            "PULSE: No logged-in user."
+            "PULSE: No logged-in user. Administration hidden."
         );
 
         return;
@@ -167,25 +204,66 @@ async function updateAdminMenu() {
     );
 
 
+    // Check the user's profile role.
     const admin =
         await isAdmin(user.id);
 
 
     if (admin) {
 
-        adminFolder.style.display =
-            "";
+        showAdminMenu();
 
         console.log(
-            "PULSE: Admin account confirmed. Administration shown."
+            "PULSE: Admin account confirmed."
         );
 
     } else {
+
+        hideAdminMenu();
 
         console.log(
             "PULSE: Regular account. Administration hidden."
         );
     }
+}
+
+
+// ==============================
+// WAIT FOR SUPABASE SESSION
+// ==============================
+
+function startAdminMenuCheck() {
+
+    // Check the current session immediately.
+    updateAdminMenu();
+
+
+    // Also listen for the initial/current
+    // Supabase authentication session.
+    window.supabaseClient.auth.onAuthStateChange(
+        (event, session) => {
+
+            console.log(
+                "PULSE: Auth event:",
+                event
+            );
+
+            if (
+                event === "INITIAL_SESSION" ||
+                event === "SIGNED_IN" ||
+                event === "SIGNED_OUT" ||
+                event === "TOKEN_REFRESHED"
+            ) {
+
+                setTimeout(
+                    () => {
+                        updateAdminMenu();
+                    },
+                    0
+                );
+            }
+        }
+    );
 }
 
 
@@ -247,7 +325,7 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        updateAdminMenu();
+        startAdminMenuCheck();
 
     }
 );
