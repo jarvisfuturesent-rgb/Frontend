@@ -1,10 +1,16 @@
 // PULSE — Shared App Functions
 
-window.supabaseClient =
-  window.supabase.createClient(
-    window.SUPABASE_URL,
-    window.SUPABASE_ANON_KEY
-  );
+// ==============================
+// SUPABASE CLIENT
+// ==============================
+
+if (!window.supabaseClient) {
+  window.supabaseClient =
+    window.supabase.createClient(
+      window.SUPABASE_URL,
+      window.SUPABASE_ANON_KEY
+    );
+}
 
 
 // ==============================
@@ -51,6 +57,11 @@ async function isAdmin(userId) {
     return false;
   }
 
+  console.log(
+    "PULSE: Profile role:",
+    profile?.role
+  );
+
   return (
     String(profile?.role || "")
       .trim()
@@ -60,61 +71,86 @@ async function isAdmin(userId) {
 
 
 // ==============================
-// GET ADMINISTRATION FOLDER
+// FIND ADMINISTRATION FOLDER
 // ==============================
 
 function getAdminFolder() {
-  return document.getElementById(
-    "adminMenuFolder"
-  );
+  const folders =
+    document.querySelectorAll(
+      ".menu-panel details"
+    );
+
+  for (const folder of folders) {
+    const summary =
+      folder.querySelector(":scope > summary");
+
+    if (!summary) {
+      continue;
+    }
+
+    const text =
+      summary.textContent
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+
+    if (text === "administration") {
+      return folder;
+    }
+  }
+
+  return null;
 }
 
 
 // ==============================
-// HIDE ADMINISTRATION FOLDER
+// HIDE ENTIRE ADMINISTRATION FOLDER
 // ==============================
 
 function hideAdminMenu() {
-  const adminFolder =
+  const folder =
     getAdminFolder();
 
-  if (!adminFolder) {
+  if (!folder) {
     return;
   }
 
-  adminFolder.hidden = true;
-  adminFolder.removeAttribute("open");
+  folder.hidden = true;
+  folder.removeAttribute("open");
 }
 
 
 // ==============================
-// SHOW ADMINISTRATION FOLDER
+// SHOW ENTIRE ADMINISTRATION FOLDER
 // ==============================
 
 function showAdminMenu() {
-  const adminFolder =
+  const folder =
     getAdminFolder();
 
-  if (!adminFolder) {
+  if (!folder) {
     return;
   }
 
-  adminFolder.hidden = false;
+  folder.hidden = false;
 }
 
 
 // ==============================
-// UPDATE ADMINISTRATION MENU
+// VERIFY ADMIN AND SET MENU
 // ==============================
 
 async function updateAdminMenu() {
-  // Hide the entire folder first.
+  // Hide the entire folder immediately.
   hideAdminMenu();
 
   const user =
     await getCurrentUser();
 
   if (!user) {
+    console.log(
+      "PULSE: No logged-in user. Administration hidden."
+    );
     return;
   }
 
@@ -123,23 +159,29 @@ async function updateAdminMenu() {
 
   if (admin) {
     showAdminMenu();
+
     console.log(
-      "PULSE: Administration folder shown."
+      "PULSE: Admin verified. Administration shown."
     );
   } else {
     hideAdminMenu();
+
     console.log(
-      "PULSE: Administration folder hidden."
+      "PULSE: Regular user. Administration hidden."
     );
   }
 }
 
 
 // ==============================
-// AUTH SESSION CHECK
+// START ADMIN VERIFICATION
 // ==============================
 
 function startAdminMenuCheck() {
+  // Hide Administration immediately.
+  hideAdminMenu();
+
+  // Then verify the logged-in user's role.
   updateAdminMenu();
 
   window.supabaseClient.auth.onAuthStateChange(
