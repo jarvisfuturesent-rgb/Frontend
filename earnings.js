@@ -26,7 +26,7 @@ async function loadEarnings() {
     if (!user) return;
 
     try {
-        // Get user's points balance
+        // Get current points balance
         const { data: profile, error: profileError } =
             await window.supabaseClient
                 .from("profiles")
@@ -40,30 +40,32 @@ async function loadEarnings() {
 
         const points = Number(profile?.points ?? 0);
 
-        // Get user's pending withdrawal requests
-        const { data: withdrawals, error: withdrawalError } =
+        // Get pending withdrawal requests
+        const { data: requests, error: requestError } =
             await window.supabaseClient
                 .from("redemption_requests")
-                .select("points_requested, status")
+                .select("points_requested")
                 .eq("user_id", user.id)
                 .eq("status", "pending");
 
-        if (withdrawalError) {
-            throw withdrawalError;
+        if (requestError) {
+            throw requestError;
         }
 
-        // Add all pending withdrawal requests together.
-        const pendingPLS = (withdrawals || []).reduce(
-            (total, withdrawal) =>
-                total + Number(withdrawal.points_requested ?? 0),
+        // Add all pending requests together.
+        const pendingPLS = (requests || []).reduce(
+            (total, request) =>
+                total + Number(request.points_requested || 0),
             0
         );
 
+        // Display balance
         balance.textContent = `${points} Points`;
 
         totalEarned.textContent =
             `Total Earned: ${points} Points`;
 
+        // Display actual pending withdrawal
         pendingWithdrawal.textContent =
             `Pending Withdrawal: ${pendingPLS} PLS`;
 
@@ -73,8 +75,7 @@ async function loadEarnings() {
     } catch (error) {
         console.error("Earnings loading error:", error);
 
-        balance.textContent =
-            "Unable to load balance.";
+        balance.textContent = "Unable to load balance.";
 
         totalEarned.textContent =
             "Total Earned: Unable to load";
