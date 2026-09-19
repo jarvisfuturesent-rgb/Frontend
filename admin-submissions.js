@@ -1,17 +1,17 @@
-// PULSE — Admin Business Management
-// Controls admin-businesses.html only.
+// PULSE — Admin Submission Review
+// Controls admin-submissions.html only.
 
-document.addEventListener("DOMContentLoaded", initAdminBusinesses);
+document.addEventListener("DOMContentLoaded", loadAdminSubmissions);
 
-async function initAdminBusinesses() {
-  const container = document.getElementById("adminBusinesses");
+async function loadAdminSubmissions() {
+  const container = document.getElementById("adminSubmissions");
 
   if (!container) {
-    console.error("PULSE: #adminBusinesses was not found.");
+    console.error("PULSE: #adminSubmissions was not found.");
     return;
   }
 
-  container.innerHTML = "<p>Loading businesses...</p>";
+  container.innerHTML = "<p>Loading submissions...</p>";
 
   try {
     const supabase = getSupabaseClient();
@@ -19,36 +19,33 @@ async function initAdminBusinesses() {
     const user = await getLoggedInUser(supabase);
 
     if (!user) {
-      showAccessDenied(container, "Please log in first.");
+      showMessage(container, "Access Denied", "Please log in first.");
       return;
     }
 
     const isAdmin = await checkAdmin(supabase, user.id);
 
     if (!isAdmin) {
-      showAccessDenied(container, "Admin access required.");
+      showMessage(container, "Access Denied", "Admin access required.");
       return;
     }
 
-    await loadBusinesses(supabase, container);
+    await loadSubmissions(supabase, container);
 
   } catch (error) {
-    console.error("PULSE Admin Business Error:", error);
+    console.error("PULSE Submission Review Error:", error);
 
     container.innerHTML = `
       <div class="panel">
-        <h3>Unable to Load Businesses</h3>
-        <p>There was a problem loading the business records.</p>
-        <p>Please refresh the page and try again.</p>
+        <h3>Unable to Load Submissions</h3>
+        <p>There was a problem loading the submission records.</p>
+        <p>${escapeHTML(error.message || "Unknown error")}</p>
+        <button onclick="location.reload()">Refresh</button>
       </div>
     `;
   }
 }
 
-
-// ==============================
-// SUPABASE
-// ==============================
 
 function getSupabaseClient() {
   if (!window.supabaseClient) {
@@ -60,10 +57,6 @@ function getSupabaseClient() {
   return window.supabaseClient;
 }
 
-
-// ==============================
-// AUTHENTICATION
-// ==============================
 
 async function getLoggedInUser(supabase) {
   const {
@@ -78,10 +71,6 @@ async function getLoggedInUser(supabase) {
   return user || null;
 }
 
-
-// ==============================
-// ADMIN CHECK
-// ==============================
 
 async function checkAdmin(supabase, userId) {
   const {
@@ -101,141 +90,366 @@ async function checkAdmin(supabase, userId) {
 }
 
 
-// ==============================
-// LOAD BUSINESSES
-// ==============================
+async function loadSubmissions(supabase, container) {
 
-async function loadBusinesses(supabase, container) {
-  const {
-    data: businesses,
-    error
-  } = await supabase
-    .from("businesses")
-    .select(`
-      id,
-      name,
-      description,
-      website,
-      status,
-      created_at
-    `)
-    .order("created_at", {
-      ascending: false
-    });
+  const [
+    { data: submissions, error: submissionError },
+    { data: tasks, error: taskError }
+  ] = await Promise.all([
 
-  if (error) {
-    throw error;
+    supabase
+      .from("task_submissions")
+      .select(`
+        id,
+        user_id,
+        task_id,
+        survey_answers,
+        status,
+        reviewer_note,
+        submitted_at,
+        reviewed_at
+      `)
+      .order("submitted_at", {
+        ascending: false
+      }),
+
+    supabase
+      .from("tasks")
+      .select(`
+        id,
+        title,
+        points
+      `)
+  ]);
+
+  if (submissionError) {
+    throw submissionError;
   }
 
-  if (!businesses || businesses.length === 0) {
+  if (taskError) {
+    throw taskError;
+  }
+
+  const taskMap = {};
+
+  (tasks || []).forEach(task => {
+    taskMap[task.id] = task;
+  });
+
+  if (!submissions || submissions.length === 0) {
     container.innerHTML = `
       <div class="panel">
-        <h3>Business Records</h3>
-        <p>No businesses found.</p>
+        <h3>Submission Records</h3>
+        <p>No submissions found.</p>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = businesses
-    .map(renderBusiness)
-    .join("");
+  container.innerHTML = `
+    <div class="panel">
+      <h3>Submission Records</h3>
+      <p>${submissions.length} submission(s) found.</p>
+    </div>
+
+    ${submissions
+      .map(submission =>
+        renderSubmission(
+          submission,
+          taskMap[submission.task_id]
+        )
+      )
+      .join("")}
+  `;
 }
 
 
-// ==============================
-// RENDER BUSINESS
-// ==============================
+function renderSubmission(submission, task) {
 
-function renderBusiness(business) {
-  const website = normalizeWebsite(business.website);
+  const status = String(
+    submission.status || "pending"
+  ).toLowerCase();
+
+  const taskTitle =
+    task?.title ||
+    `Task #${submission.task_id}`;
+
+  const points =
+    task?.points ?? 0;
 
   return `
-    <div class="business-card">
+    <div class="panel submission-card">
 
       <h3>
-        ${escapeHTML(business.name)}
+        ${escapeHTML(taskTitle)}
       </h3>
 
-      ${
-        business.description
-          ? `
-            <p>
-              ${escapeHTML(business.description)}
-            </p>
-          `
-          : ""
-      }
+      <p>
+        <strong>Submission ID:</strong>
+        ${submission.id}
+      </p>
+
+      <p>
+        <strong>User ID:</strong>
+        ${escapeHTML(submission.user_id)}
+      </p>
+
+      <p>
+        <strong>Points:</strong>
+        ${points}
+      </p>
 
       <p>
         <strong>Status:</strong>
-        ${escapeHTML(business.status || "pending")}
+        ${escapeHTML(status)}
+      </p>
+
+      <p>
+        <strong>Submitted:</strong>
+        ${formatDate(submission.submitted_at)}
       </p>
 
       ${
-        website
+        submission.reviewed_at
           ? `
             <p>
-              <a
-                href="${escapeHTML(website)}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Visit Website
-              </a>
+              <strong>Reviewed:</strong>
+              ${formatDate(submission.reviewed_at)}
             </p>
           `
           : ""
       }
 
-      <p>
-        <strong>Created:</strong>
-        ${formatDate(business.created_at)}
-      </p>
+      ${
+        submission.reviewer_note
+          ? `
+            <p>
+              <strong>Reviewer Note:</strong>
+              ${escapeHTML(submission.reviewer_note)}
+            </p>
+          `
+          : ""
+      }
+
+      <div class="submission-answers">
+        <h4>Survey Answers</h4>
+        ${renderAnswers(submission.survey_answers)}
+      </div>
+
+      ${
+        status === "pending"
+          ? `
+            <div class="submission-actions">
+
+              <button
+                type="button"
+                onclick="approveSubmission(${submission.id})"
+              >
+                Approve
+              </button>
+
+              <button
+                type="button"
+                onclick="rejectSubmission(${submission.id})"
+              >
+                Reject
+              </button>
+
+            </div>
+          `
+          : ""
+      }
 
     </div>
   `;
 }
 
 
-// ==============================
-// WEBSITE VALIDATION
-// ==============================
+function renderAnswers(answers) {
 
-function normalizeWebsite(value) {
-  const raw = String(value || "").trim();
+  if (!answers) {
+    return "<p>No answers recorded.</p>";
+  }
 
-  if (!raw) {
+  let parsed = answers;
+
+  if (typeof answers === "string") {
+    try {
+      parsed = JSON.parse(answers);
+    } catch {
+      return `
+        <pre>${escapeHTML(answers)}</pre>
+      `;
+    }
+  }
+
+  if (
+    typeof parsed !== "object" ||
+    parsed === null
+  ) {
+    return `
+      <p>${escapeHTML(String(parsed))}</p>
+    `;
+  }
+
+  const entries = Object.entries(parsed);
+
+  if (entries.length === 0) {
+    return "<p>No answers recorded.</p>";
+  }
+
+  return `
+    <div class="answers-list">
+      ${entries
+        .map(([question, answer]) => `
+          <div class="answer-item">
+
+            <p>
+              <strong>
+                ${escapeHTML(question)}
+              </strong>
+            </p>
+
+            <p>
+              ${escapeHTML(formatAnswer(answer))}
+            </p>
+
+          </div>
+        `)
+        .join("")}
+    </div>
+  `;
+}
+
+
+function formatAnswer(value) {
+
+  if (value === null || value === undefined) {
     return "";
   }
 
+  if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+
+  if (typeof value === "object") {
+    return JSON.stringify(value);
+  }
+
+  return String(value);
+}
+
+
+async function approveSubmission(submissionId) {
+
+  if (!confirm(
+    "Approve this submission and award its points?"
+  )) {
+    return;
+  }
+
   try {
-    const url = new URL(
-      /^https?:\/\//i.test(raw)
-        ? raw
-        : `https://${raw}`
+
+    const supabase = getSupabaseClient();
+
+    const {
+      error
+    } = await supabase.rpc(
+      "add_points_for_approved_submission",
+      {
+        p_submission_id: Number(submissionId)
+      }
     );
 
-    if (
-      url.protocol !== "http:" &&
-      url.protocol !== "https:"
-    ) {
-      return "";
+    if (error) {
+      throw error;
     }
 
-    return url.href;
+    alert("Submission approved and points processed.");
 
-  } catch {
-    return "";
+    location.reload();
+
+  } catch (error) {
+
+    console.error(
+      "PULSE Approve Submission Error:",
+      error
+    );
+
+    alert(
+      "Unable to approve submission: " +
+      (error.message || "Unknown error")
+    );
   }
 }
 
 
-// ==============================
-// DATE FORMAT
-// ==============================
+async function rejectSubmission(submissionId) {
+
+  const note = prompt(
+    "Enter a reason for rejecting this submission:"
+  );
+
+  if (note === null) {
+    return;
+  }
+
+  try {
+
+    const supabase = getSupabaseClient();
+
+    const {
+      error
+    } = await supabase
+      .from("task_submissions")
+      .update({
+        status: "rejected",
+        reviewer_note: note.trim(),
+        reviewed_at: new Date().toISOString()
+      })
+      .eq("id", Number(submissionId));
+
+    if (error) {
+      throw error;
+    }
+
+    alert("Submission rejected.");
+
+    location.reload();
+
+  } catch (error) {
+
+    console.error(
+      "PULSE Reject Submission Error:",
+      error
+    );
+
+    alert(
+      "Unable to reject submission: " +
+      (error.message || "Unknown error")
+    );
+  }
+}
+
+
+function showMessage(container, title, message) {
+
+  container.innerHTML = `
+    <div class="panel">
+      <h3>${escapeHTML(title)}</h3>
+      <p>${escapeHTML(message)}</p>
+      <p>
+        <a href="dashboard.html">
+          Return to Dashboard
+        </a>
+      </p>
+    </div>
+  `;
+}
+
 
 function formatDate(value) {
+
   if (!value) {
     return "Unknown";
   }
@@ -250,30 +464,8 @@ function formatDate(value) {
 }
 
 
-// ==============================
-// ACCESS DENIED
-// ==============================
-
-function showAccessDenied(container, message) {
-  container.innerHTML = `
-    <div class="panel">
-      <h3>Access Denied</h3>
-      <p>${escapeHTML(message)}</p>
-      <p>
-        <a href="dashboard.html">
-          Return to Dashboard
-        </a>
-      </p>
-    </div>
-  `;
-}
-
-
-// ==============================
-// HTML SAFETY
-// ==============================
-
 function escapeHTML(value) {
+
   return String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
