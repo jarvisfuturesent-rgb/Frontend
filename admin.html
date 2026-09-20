@@ -1,290 +1,202 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PULSE — Admin Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+// PULSE — Admin Dashboard
+// Controls admin.html only.
 
-  <style>
-    .pulse-link,
-    .pulse-folder {
-      display: inline-flex;
-      align-items: center;
-      white-space: nowrap;
-      text-decoration: none;
+document.addEventListener("DOMContentLoaded", () => {
+  loadAdminDashboard();
+});
+
+
+async function loadAdminDashboard() {
+  const container =
+    document.getElementById("adminContent");
+
+  if (!container) {
+    console.error(
+      "PULSE: adminContent element not found."
+    );
+    return;
+  }
+
+  container.innerHTML =
+    "Loading admin dashboard...";
+
+  try {
+    // ==============================
+    // CHECK SUPABASE CLIENT
+    // ==============================
+
+    if (!window.supabaseClient) {
+      throw new Error(
+        "Supabase client is not available."
+      );
     }
 
-    .pulse-link span,
-    .pulse-folder span {
-      display: inline-block;
-      animation: pulseLetter 3.6s ease-in-out infinite;
-      animation-delay: calc(var(--i) * 0.08s);
+
+    // ==============================
+    // GET CURRENT USER
+    // ==============================
+
+    const user =
+      await getCurrentUser();
+
+    if (!user) {
+      container.innerHTML = `
+        <p>You must be logged in to access the Admin Dashboard.</p>
+        <a href="auth.html">Login</a>
+      `;
+
+      return;
     }
 
-    @keyframes pulseLetter {
-      0% {
-        color: inherit;
-        text-shadow: none;
-        transform: scale(1);
-      }
-      12% {
-        color: #00f6ff;
-        text-shadow: 0 0 4px #00f6ff, 0 0 10px rgba(0,246,255,.7);
-        transform: scale(1.08);
-      }
-      24% {
-        color: #008cff;
-        text-shadow: 0 0 5px #008cff, 0 0 12px rgba(0,140,255,.7);
-        transform: scale(1);
-      }
-      36% {
-        color: #5c5cff;
-        text-shadow: 0 0 5px #5c5cff, 0 0 12px rgba(92,92,255,.7);
-        transform: scale(1.06);
-      }
-      48% {
-        color: #9b4dff;
-        text-shadow: 0 0 5px #9b4dff, 0 0 12px rgba(155,77,255,.7);
-        transform: scale(1);
-      }
-      60% {
-        color: #ff3bd4;
-        text-shadow: 0 0 5px #ff3bd4, 0 0 12px rgba(255,59,212,.7);
-        transform: scale(1.08);
-      }
-      72% {
-        color: #ff4f81;
-        text-shadow: 0 0 5px #ff4f81, 0 0 12px rgba(255,79,129,.7);
-        transform: scale(1);
-      }
-      84% {
-        color: #00ffc8;
-        text-shadow: 0 0 5px #00ffc8, 0 0 12px rgba(0,255,200,.7);
-        transform: scale(1.06);
-      }
-      100% {
-        color: inherit;
-        text-shadow: none;
-        transform: scale(1);
-      }
+
+    // ==============================
+    // VERIFY ADMIN
+    // ==============================
+
+    const admin =
+      await isAdmin(user.id);
+
+    if (!admin) {
+      container.innerHTML = `
+        <p>Access denied.</p>
+        <p>This page is available to administrators only.</p>
+        <a href="dashboard.html">
+          Return to Dashboard
+        </a>
+      `;
+
+      return;
     }
 
-    .menu-logo {
-      width: 24px;
-      height: 24px;
-      object-fit: contain;
-      margin-right: 8px;
-      flex-shrink: 0;
+
+    console.log(
+      "PULSE: ADMIN DASHBOARD ACCESS GRANTED"
+    );
+
+
+    // ==============================
+    // LOAD ADMIN COUNTS
+    // ==============================
+
+    const [
+      tasksResult,
+      submissionsResult,
+      businessesResult,
+      rewardsResult
+    ] = await Promise.all([
+
+      window.supabaseClient
+        .from("tasks")
+        .select("id", {
+          count: "exact",
+          head: true
+        }),
+
+      window.supabaseClient
+        .from("task_submissions")
+        .select("id", {
+          count: "exact",
+          head: true
+        }),
+
+      window.supabaseClient
+        .from("businesses")
+        .select("id", {
+          count: "exact",
+          head: true
+        }),
+
+      window.supabaseClient
+        .from("redemption_requests")
+        .select("id", {
+          count: "exact",
+          head: true
+        })
+
+    ]);
+
+
+    // ==============================
+    // CHECK QUERY ERRORS
+    // ==============================
+
+    if (tasksResult.error) {
+      throw tasksResult.error;
     }
 
-    .page-link {
-      display: block;
-      text-decoration: none;
-      animation: none !important;
-      text-shadow: none !important;
-      transform: none !important;
+    if (submissionsResult.error) {
+      throw submissionsResult.error;
     }
 
-    .page-link span {
-      animation: none !important;
-      color: inherit !important;
-      text-shadow: none !important;
-      transform: none !important;
+    if (businessesResult.error) {
+      throw businessesResult.error;
     }
-  </style>
-</head>
 
-<body>
-  <main class="app-shell">
+    if (rewardsResult.error) {
+      throw rewardsResult.error;
+    }
 
-    <header class="hero">
-      <img src="pulse-logo.png" alt="PULSE Token" class="pulse-logo">
-      <h1>PULSE</h1>
-      <p class="tagline">Complete • Earn • Get Rewarded</p>
 
-      <details class="menu">
-        <summary>☰ Menu</summary>
+    // ==============================
+    // DISPLAY ADMIN DASHBOARD
+    // ==============================
 
-        <div class="menu-panel">
+    container.innerHTML = `
+      <div class="admin-summary">
 
-          <details>
-            <summary class="pulse-folder">
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              <span style="--i:0">M</span>
-              <span style="--i:1">a</span>
-              <span style="--i:2">i</span>
-              <span style="--i:3">n</span>
-            </summary>
-
-            <div>
-              <a class="page-link" href="index.html">🏠 Home</a>
-              <a class="page-link" href="how-it-works.html">ℹ️ How It Works</a>
-              <a class="page-link" href="about.html">📖 About PULSE</a>
-              <a class="page-link" href="contact.html">📩 Contact</a>
-            </div>
-          </details>
-
-          <details>
-            <summary class="pulse-folder">
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              <span style="--i:0">P</span>
-              <span style="--i:1">U</span>
-              <span style="--i:2">L</span>
-              <span style="--i:3">S</span>
-              <span style="--i:4">E</span>
-            </summary>
-
-            <div>
-              <a class="page-link" href="dashboard.html">📊 Dashboard</a>
-              <a class="page-link" href="tasks.html">📋 Available Tasks</a>
-              <a class="page-link" href="surveys.html">📝 Surveys</a>
-              <a class="page-link" href="submissions.html">📂 My Submissions</a>
-              <a class="page-link" href="earnings.html">💰 Earnings &amp; Balance</a>
-              <a class="page-link" href="notifications.html">🔔 Notifications</a>
-            </div>
-          </details>
-
-          <details>
-            <summary class="pulse-folder">
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              <span style="--i:0">A</span>
-              <span style="--i:1">c</span>
-              <span style="--i:2">c</span>
-              <span style="--i:3">o</span>
-              <span style="--i:4">u</span>
-              <span style="--i:5">n</span>
-              <span style="--i:6">t</span>
-            </summary>
-
-            <div>
-              <a class="page-link" href="profile.html">👤 Profile &amp; Account</a>
-              <a class="page-link" href="auth.html">🔐 Login / Sign Up</a>
-              <a class="page-link" href="reset-password.html">🔑 Reset Password</a>
-            </div>
-          </details>
-
-          <details>
-            <summary class="pulse-folder">
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              <span style="--i:0">L</span>
-              <span style="--i:1">e</span>
-              <span style="--i:2">g</span>
-              <span style="--i:3">a</span>
-              <span style="--i:4">l</span>
-            </summary>
-
-            <div>
-              <a class="page-link" href="terms.html">📜 Terms</a>
-              <a class="page-link" href="privacy.html">🔒 Privacy Policy</a>
-              <a class="page-link" href="disclosures.html">📢 Disclosures</a>
-            </div>
-          </details>
-
-          <details>
-            <summary class="pulse-folder">
-              <img src="pulse-logo.png" alt="PULSE" class="menu-logo">
-              <span style="--i:0">A</span>
-              <span style="--i:1">d</span>
-              <span style="--i:2">m</span>
-              <span style="--i:3">i</span>
-              <span style="--i:4">n</span>
-              <span style="--i:5">i</span>
-              <span style="--i:6">s</span>
-              <span style="--i:7">t</span>
-              <span style="--i:8">r</span>
-              <span style="--i:9">a</span>
-              <span style="--i:10">t</span>
-              <span style="--i:11">i</span>
-              <span style="--i:12">o</span>
-              <span style="--i:13">n</span>
-            </summary>
-
-            <div>
-              <a class="page-link" href="admin.html">⚙ Admin Dashboard</a>
-              <a class="page-link" href="admin-tasks.html">📋 Task Management</a>
-              <a class="page-link" href="admin-businesses.html">🏢 Business Management</a>
-              <a class="page-link" href="admin-submissions.html">📂 Submission Review</a>
-              <a class="page-link" href="admin-rewards.html">🎁 Reward Requests</a>
-              <a class="page-link" href="admin-reports.html">📊 Reports &amp; Records</a>
-            </div>
-          </details>
-
+        <div class="panel">
+          <h3>Tasks</h3>
+          <p>${tasksResult.count ?? 0}</p>
+          <a href="admin-tasks.html">
+            Manage Tasks
+          </a>
         </div>
-      </details>
-    </header>
 
-    <section id="adminDashboard" class="panel">
-      <h1>Admin Dashboard</h1>
+        <div class="panel">
+          <h3>Submissions</h3>
+          <p>${submissionsResult.count ?? 0}</p>
+          <a href="admin-submissions.html">
+            Review Submissions
+          </a>
+        </div>
 
-      <h2>⚙ Admin Panel</h2>
+        <div class="panel">
+          <h3>Businesses</h3>
+          <p>${businessesResult.count ?? 0}</p>
+          <a href="admin-businesses.html">
+            Manage Businesses
+          </a>
+        </div>
 
-      <div id="adminContent">
-        Loading admin dashboard...
+        <div class="panel">
+          <h3>Reward Requests</h3>
+          <p>${rewardsResult.count ?? 0}</p>
+          <a href="admin-rewards.html">
+            Review Rewards
+          </a>
+        </div>
+
+        <div class="panel">
+          <h3>Reports &amp; Records</h3>
+          <p>View system records and reports.</p>
+          <a href="admin-reports.html">
+            Open Reports
+          </a>
+        </div>
+
       </div>
+    `;
 
-      <a class="pulse-link" href="dashboard.html">
-        <span style="--i:0">G</span>
-        <span style="--i:1">o</span>
-        <span style="--i:2">&nbsp;</span>
-        <span style="--i:3">t</span>
-        <span style="--i:4">o</span>
-        <span style="--i:5">&nbsp;</span>
-        <span style="--i:6">D</span>
-        <span style="--i:7">a</span>
-        <span style="--i:8">s</span>
-        <span style="--i:9">h</span>
-        <span style="--i:10">b</span>
-        <span style="--i:11">o</span>
-        <span style="--i:12">a</span>
-        <span style="--i:13">r</span>
-        <span style="--i:14">d</span>
-      </a>
-    </section>
+  } catch (error) {
 
-    <footer>
-      <a class="pulse-link" href="index.html">
-        <span style="--i:0">H</span>
-        <span style="--i:1">o</span>
-        <span style="--i:2">m</span>
-        <span style="--i:3">e</span>
-      </a>
-      |
-      <a class="pulse-link" href="privacy.html">
-        <span style="--i:0">P</span>
-        <span style="--i:1">r</span>
-        <span style="--i:2">i</span>
-        <span style="--i:3">v</span>
-        <span style="--i:4">a</span>
-        <span style="--i:5">c</span>
-        <span style="--i:6">y</span>
-      </a>
-      |
-      <a class="pulse-link" href="terms.html">
-        <span style="--i:0">T</span>
-        <span style="--i:1">e</span>
-        <span style="--i:2">r</span>
-        <span style="--i:3">m</span>
-        <span style="--i:4">s</span>
-      </a>
-      |
-      <a class="pulse-link" href="contact.html">
-        <span style="--i:0">C</span>
-        <span style="--i:1">o</span>
-        <span style="--i:2">n</span>
-        <span style="--i:3">t</span>
-        <span style="--i:4">a</span>
-        <span style="--i:5">c</span>
-        <span style="--i:6">t</span>
-      </a>
-    </footer>
+    console.error(
+      "PULSE: Admin dashboard error:",
+      error
+    );
 
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="app.js"></script>
-  <script src="admin.js"></script>
-
-</body>
-</html>
+    container.innerHTML = `
+      <p>Unable to load the Admin Dashboard.</p>
+      <p>Please try again.</p>
+    `;
+  }
+}
