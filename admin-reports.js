@@ -7,41 +7,46 @@ document.addEventListener(
 );
 
 
-/* =========================
-   INITIALIZE
-========================= */
+// ==============================
+// INITIALIZE
+// ==============================
 
 async function initAdminReports() {
+
   try {
-    const supabase =
-      getSupabaseClient();
+
+    if (!window.supabaseClient) {
+      throw new Error(
+        "Supabase client is not available."
+      );
+    }
 
     const user =
-      await getLoggedInUser(
-        supabase
-      );
+      await getCurrentUser();
 
     if (!user) {
       showAccessDenied();
       return;
     }
 
-    const isAdmin =
-      await checkAdmin(
-        supabase,
-        user.id
-      );
+    const admin =
+      await isAdmin(user.id);
 
-    if (!isAdmin) {
+    if (!admin) {
       showAccessDenied();
       return;
     }
 
+    console.log(
+      "PULSE: ADMIN REPORT ACCESS GRANTED"
+    );
+
     await loadAdminReports(
-      supabase
+      window.supabaseClient
     );
 
   } catch (error) {
+
     console.error(
       "PULSE Admin Reports Error:",
       error
@@ -52,103 +57,69 @@ async function initAdminReports() {
 }
 
 
-/* =========================
-   SUPABASE
-========================= */
-
-function getSupabaseClient() {
-  if (!window.supabaseClient) {
-    throw new Error(
-      "Supabase client is not available. Check config.js."
-    );
-  }
-
-  return window.supabaseClient;
-}
-
-
-async function getLoggedInUser(
-  supabase
-) {
-  const {
-    data: { user },
-    error
-  } = await supabase.auth.getUser();
-
-  if (error) {
-    throw error;
-  }
-
-  return user || null;
-}
-
-
-async function checkAdmin(
-  supabase,
-  userId
-) {
-  const {
-    data: profile,
-    error
-  } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return profile?.role === "admin";
-}
-
-
-/* =========================
-   REPORTS
-========================= */
+// ==============================
+// LOAD REPORTS
+// ==============================
 
 async function loadAdminReports(
   supabase
 ) {
+
   await Promise.all([
+
     loadUserReport(supabase),
+
     loadTaskReport(supabase),
+
     loadSubmissionReport(supabase),
+
     loadBusinessReport(supabase),
+
     loadPendingReport(supabase),
+
     loadApprovedReport(supabase),
+
     loadSubmissionList(supabase),
+
     loadBusinessList(supabase),
+
     loadRewardList(supabase),
+
     loadActivityReport(supabase)
+
   ]);
 }
 
 
-/* =========================
-   USERS
-========================= */
+// ==============================
+// USERS
+// ==============================
 
 async function loadUserReport(
   supabase
 ) {
+
   const container =
     document.getElementById(
       "reportUsers"
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   const {
     count,
     error
   } = await supabase
     .from("profiles")
-    .select("id", {
-      count: "exact",
-      head: true
-    });
+    .select(
+      "id",
+      {
+        count: "exact",
+        head: true
+      }
+    );
 
   if (error) {
     throw error;
@@ -156,36 +127,49 @@ async function loadUserReport(
 
   container.innerHTML = `
     <div class="panel">
-      <h3>Total Users</h3>
-      <p>${Number(count || 0)}</p>
+
+      <h3>
+        Total Users
+      </h3>
+
+      <p>
+        ${Number(count || 0)}
+      </p>
+
     </div>
   `;
 }
 
 
-/* =========================
-   TASKS
-========================= */
+// ==============================
+// TASKS
+// ==============================
 
 async function loadTaskReport(
   supabase
 ) {
+
   const container =
     document.getElementById(
       "reportTasks"
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   const {
     count,
     error
   } = await supabase
     .from("tasks")
-    .select("id", {
-      count: "exact",
-      head: true
-    });
+    .select(
+      "id",
+      {
+        count: "exact",
+        head: true
+      }
+    );
 
   if (error) {
     throw error;
@@ -193,36 +177,49 @@ async function loadTaskReport(
 
   container.innerHTML = `
     <div class="panel">
-      <h3>Total Tasks</h3>
-      <p>${Number(count || 0)}</p>
+
+      <h3>
+        Total Tasks
+      </h3>
+
+      <p>
+        ${Number(count || 0)}
+      </p>
+
     </div>
   `;
 }
 
 
-/* =========================
-   SUBMISSIONS
-========================= */
+// ==============================
+// SUBMISSIONS
+// ==============================
 
 async function loadSubmissionReport(
   supabase
 ) {
+
   const container =
     document.getElementById(
       "reportSubmissions"
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   const {
     count,
     error
   } = await supabase
     .from("task_submissions")
-    .select("id", {
-      count: "exact",
-      head: true
-    });
+    .select(
+      "id",
+      {
+        count: "exact",
+        head: true
+      }
+    );
 
   if (error) {
     throw error;
@@ -230,36 +227,49 @@ async function loadSubmissionReport(
 
   container.innerHTML = `
     <div class="panel">
-      <h3>Total Submissions</h3>
-      <p>${Number(count || 0)}</p>
+
+      <h3>
+        Total Submissions
+      </h3>
+
+      <p>
+        ${Number(count || 0)}
+      </p>
+
     </div>
   `;
 }
 
 
-/* =========================
-   BUSINESSES
-========================= */
+// ==============================
+// BUSINESSES
+// ==============================
 
 async function loadBusinessReport(
   supabase
 ) {
+
   const container =
     document.getElementById(
       "reportBusinesses"
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   const {
     count,
     error
   } = await supabase
     .from("businesses")
-    .select("id", {
-      count: "exact",
-      head: true
-    });
+    .select(
+      "id",
+      {
+        count: "exact",
+        head: true
+      }
+    );
 
   if (error) {
     throw error;
@@ -267,36 +277,49 @@ async function loadBusinessReport(
 
   container.innerHTML = `
     <div class="panel">
-      <h3>Total Businesses</h3>
-      <p>${Number(count || 0)}</p>
+
+      <h3>
+        Total Businesses
+      </h3>
+
+      <p>
+        ${Number(count || 0)}
+      </p>
+
     </div>
   `;
 }
 
 
-/* =========================
-   PENDING
-========================= */
+// ==============================
+// PENDING
+// ==============================
 
 async function loadPendingReport(
   supabase
 ) {
+
   const container =
     document.getElementById(
       "reportPending"
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   const {
     count,
     error
   } = await supabase
     .from("task_submissions")
-    .select("id", {
-      count: "exact",
-      head: true
-    })
+    .select(
+      "id",
+      {
+        count: "exact",
+        head: true
+      }
+    )
     .eq(
       "status",
       "pending"
@@ -308,36 +331,49 @@ async function loadPendingReport(
 
   container.innerHTML = `
     <div class="panel">
-      <h3>Pending Submissions</h3>
-      <p>${Number(count || 0)}</p>
+
+      <h3>
+        Pending Submissions
+      </h3>
+
+      <p>
+        ${Number(count || 0)}
+      </p>
+
     </div>
   `;
 }
 
 
-/* =========================
-   APPROVED
-========================= */
+// ==============================
+// APPROVED
+// ==============================
 
 async function loadApprovedReport(
   supabase
 ) {
+
   const container =
     document.getElementById(
       "reportApproved"
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   const {
     count,
     error
   } = await supabase
     .from("task_submissions")
-    .select("id", {
-      count: "exact",
-      head: true
-    })
+    .select(
+      "id",
+      {
+        count: "exact",
+        head: true
+      }
+    )
     .eq(
       "status",
       "approved"
@@ -349,26 +385,36 @@ async function loadApprovedReport(
 
   container.innerHTML = `
     <div class="panel">
-      <h3>Approved Submissions</h3>
-      <p>${Number(count || 0)}</p>
+
+      <h3>
+        Approved Submissions
+      </h3>
+
+      <p>
+        ${Number(count || 0)}
+      </p>
+
     </div>
   `;
 }
 
 
-/* =========================
-   SUBMISSION RECORDS
-========================= */
+// ==============================
+// SUBMISSION RECORDS
+// ==============================
 
 async function loadSubmissionList(
   supabase
 ) {
+
   const container =
     document.getElementById(
       "reportSubmissionsList"
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   const {
     data,
@@ -401,10 +447,18 @@ async function loadSubmissionList(
     !data ||
     data.length === 0
   ) {
+
     container.innerHTML = `
       <div class="panel">
-        <h3>Submission Records</h3>
-        <p>No submission records found.</p>
+
+        <h3>
+          Submission Records
+        </h3>
+
+        <p>
+          No submission records found.
+        </p>
+
       </div>
     `;
 
@@ -412,7 +466,9 @@ async function loadSubmissionList(
   }
 
   container.innerHTML = `
-    <h3>Submission Records</h3>
+    <h3>
+      Submission Records
+    </h3>
 
     ${data
       .map(renderSubmission)
@@ -421,65 +477,98 @@ async function loadSubmissionList(
 }
 
 
+// ==============================
+// RENDER SUBMISSION
+// ==============================
+
 function renderSubmission(
   submission
 ) {
+
   return `
+
     <div class="panel">
 
       <p>
-        <strong>Submission ID:</strong>
+        <strong>
+          Submission ID:
+        </strong>
+
         ${escapeHTML(
           submission.id
         )}
       </p>
 
+
       <p>
-        <strong>User ID:</strong>
+        <strong>
+          User ID:
+        </strong>
+
         ${escapeHTML(
           submission.user_id
         )}
       </p>
 
+
       <p>
-        <strong>Task ID:</strong>
+        <strong>
+          Task ID:
+        </strong>
+
         ${escapeHTML(
           submission.task_id
         )}
       </p>
 
+
       <p>
-        <strong>Status:</strong>
+        <strong>
+          Status:
+        </strong>
+
         ${escapeHTML(
           submission.status ||
           "unknown"
         )}
       </p>
 
+
       <p>
-        <strong>Submitted:</strong>
+        <strong>
+          Submitted:
+        </strong>
+
         ${formatDate(
           submission.submitted_at
         )}
       </p>
 
+
       ${
         submission.reviewed_at
           ? `
             <p>
-              <strong>Reviewed:</strong>
+
+              <strong>
+                Reviewed:
+              </strong>
+
               ${formatDate(
                 submission.reviewed_at
               )}
+
             </p>
           `
           : ""
       }
 
+
       ${
         submission.reviewer_note
           ? `
             <p>
+
               <strong>
                 Reviewer Note:
               </strong>
@@ -487,28 +576,37 @@ function renderSubmission(
               ${escapeHTML(
                 submission.reviewer_note
               )}
+
             </p>
           `
           : ""
       }
+
 
       ${
         submission.proof
           ? `
             <p>
-              <strong>Proof:</strong>
+
+              <strong>
+                Proof:
+              </strong>
+
               ${escapeHTML(
                 submission.proof
               )}
+
             </p>
           `
           : ""
       }
 
+
       ${
         submission.survey_answers
           ? `
             <details>
+
               <summary>
                 View Survey Answers
               </summary>
@@ -516,28 +614,32 @@ function renderSubmission(
               ${renderAnswers(
                 submission.survey_answers
               )}
+
             </details>
           `
           : ""
       }
 
     </div>
+
   `;
 }
 
 
-/* =========================
-   SURVEY ANSWERS
-========================= */
+// ==============================
+// SURVEY ANSWERS
+// ==============================
 
 function renderAnswers(
   answers
 ) {
+
   if (
     answers === null ||
     answers === undefined ||
     answers === ""
   ) {
+
     return `
       <p>
         No answers recorded.
@@ -545,14 +647,19 @@ function renderAnswers(
     `;
   }
 
+
   if (
     typeof answers ===
     "string"
   ) {
+
     try {
+
       answers =
         JSON.parse(answers);
+
     } catch {
+
       return `
         <p>
           ${escapeHTML(
@@ -563,12 +670,15 @@ function renderAnswers(
     }
   }
 
+
   if (
     Array.isArray(answers)
   ) {
+
     if (
       answers.length === 0
     ) {
+
       return `
         <p>
           No answers recorded.
@@ -576,42 +686,49 @@ function renderAnswers(
       `;
     }
 
+
     return `
       <ul>
+
         ${answers
           .map(
             (item, index) => `
               <li>
+
                 <strong>
                   ${index + 1}.
                 </strong>
 
                 ${escapeHTML(
-                  formatAnswer(
-                    item
-                  )
+                  formatAnswer(item)
                 )}
+
               </li>
             `
           )
           .join("")}
+
       </ul>
     `;
   }
+
 
   if (
     typeof answers ===
       "object" &&
     answers !== null
   ) {
+
     const entries =
       Object.entries(
         answers
       );
 
+
     if (
       entries.length === 0
     ) {
+
       return `
         <p>
           No answers recorded.
@@ -619,12 +736,15 @@ function renderAnswers(
       `;
     }
 
+
     return `
       <ul>
+
         ${entries
           .map(
             ([question, answer]) => `
               <li>
+
                 <strong>
                   ${escapeHTML(
                     question
@@ -632,17 +752,18 @@ function renderAnswers(
                 </strong>
 
                 ${escapeHTML(
-                  formatAnswer(
-                    answer
-                  )
+                  formatAnswer(answer)
                 )}
+
               </li>
             `
           )
           .join("")}
+
       </ul>
     `;
   }
+
 
   return `
     <p>
@@ -654,19 +775,28 @@ function renderAnswers(
 }
 
 
+// ==============================
+// FORMAT ANSWER
+// ==============================
+
 function formatAnswer(
   answer
 ) {
+
   if (
     typeof answer ===
       "object" &&
     answer !== null
   ) {
+
     try {
+
       return JSON.stringify(
         answer
       );
+
     } catch {
+
       return String(answer);
     }
   }
@@ -677,19 +807,22 @@ function formatAnswer(
 }
 
 
-/* =========================
-   BUSINESS RECORDS
-========================= */
+// ==============================
+// BUSINESS RECORDS
+// ==============================
 
 async function loadBusinessList(
   supabase
 ) {
+
   const container =
     document.getElementById(
       "reportBusinessesList"
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   const {
     data,
@@ -715,22 +848,34 @@ async function loadBusinessList(
     throw error;
   }
 
+
   if (
     !data ||
     data.length === 0
   ) {
+
     container.innerHTML = `
       <div class="panel">
-        <h3>Business Records</h3>
-        <p>No business records found.</p>
+
+        <h3>
+          Business Records
+        </h3>
+
+        <p>
+          No business records found.
+        </p>
+
       </div>
     `;
 
     return;
   }
 
+
   container.innerHTML = `
-    <h3>Business Records</h3>
+    <h3>
+      Business Records
+    </h3>
 
     ${data
       .map(renderBusiness)
@@ -739,10 +884,16 @@ async function loadBusinessList(
 }
 
 
+// ==============================
+// RENDER BUSINESS
+// ==============================
+
 function renderBusiness(
   business
 ) {
+
   return `
+
     <div class="panel">
 
       <h4>
@@ -750,6 +901,7 @@ function renderBusiness(
           business.name
         )}
       </h4>
+
 
       ${
         business.description
@@ -763,52 +915,70 @@ function renderBusiness(
           : ""
       }
 
+
       <p>
-        <strong>Status:</strong>
+        <strong>
+          Status:
+        </strong>
+
         ${escapeHTML(
           business.status ||
           "unknown"
         )}
       </p>
 
+
       ${
         business.website
           ? `
             <p>
-              <strong>Website:</strong>
+
+              <strong>
+                Website:
+              </strong>
+
               ${escapeHTML(
                 business.website
               )}
+
             </p>
           `
           : ""
       }
 
+
       <p>
-        <strong>Created:</strong>
+        <strong>
+          Created:
+        </strong>
+
         ${formatDate(
           business.created_at
         )}
       </p>
 
     </div>
+
   `;
 }
 
 
-/* =========================
-   REWARD RECORDS
-========================= */
+// ==============================
+// REWARD RECORDS
+// ==============================
 
 async function loadRewardList(
   supabase
 ) {
+
   const container =
     document.getElementById(
       "reportRewardsList"
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   const {
     data,
@@ -840,12 +1010,15 @@ async function loadRewardList(
     throw error;
   }
 
+
   if (
     !data ||
     data.length === 0
   ) {
+
     container.innerHTML = `
       <div class="panel">
+
         <h3>
           Reward Request Records
         </h3>
@@ -853,11 +1026,13 @@ async function loadRewardList(
         <p>
           No reward requests found.
         </p>
+
       </div>
     `;
 
     return;
   }
+
 
   container.innerHTML = `
     <h3>
@@ -871,25 +1046,39 @@ async function loadRewardList(
 }
 
 
+// ==============================
+// RENDER REWARD
+// ==============================
+
 function renderReward(
   reward
 ) {
+
   return `
+
     <div class="panel">
 
       <p>
-        <strong>Request ID:</strong>
+        <strong>
+          Request ID:
+        </strong>
+
         ${escapeHTML(
           reward.id
         )}
       </p>
 
+
       <p>
-        <strong>User ID:</strong>
+        <strong>
+          User ID:
+        </strong>
+
         ${escapeHTML(
           reward.user_id
         )}
       </p>
+
 
       <p>
         <strong>
@@ -901,6 +1090,7 @@ function renderReward(
         )}
       </p>
 
+
       <p>
         <strong>
           Reward Type:
@@ -911,25 +1101,35 @@ function renderReward(
         )}
       </p>
 
+
       <p>
-        <strong>Status:</strong>
+        <strong>
+          Status:
+        </strong>
+
         ${escapeHTML(
           reward.status ||
           "unknown"
         )}
       </p>
 
+
       <p>
-        <strong>Created:</strong>
+        <strong>
+          Created:
+        </strong>
+
         ${formatDate(
           reward.created_at
         )}
       </p>
 
+
       ${
         reward.user_note
           ? `
             <p>
+
               <strong>
                 User Note:
               </strong>
@@ -937,15 +1137,18 @@ function renderReward(
               ${escapeHTML(
                 reward.user_note
               )}
+
             </p>
           `
           : ""
       }
 
+
       ${
         reward.admin_note
           ? `
             <p>
+
               <strong>
                 Admin Note:
               </strong>
@@ -953,15 +1156,18 @@ function renderReward(
               ${escapeHTML(
                 reward.admin_note
               )}
+
             </p>
           `
           : ""
       }
 
+
       ${
         reward.reviewed_at
           ? `
             <p>
+
               <strong>
                 Reviewed:
               </strong>
@@ -969,15 +1175,18 @@ function renderReward(
               ${formatDate(
                 reward.reviewed_at
               )}
+
             </p>
           `
           : ""
       }
 
+
       ${
         reward.paid_at
           ? `
             <p>
+
               <strong>
                 Paid:
               </strong>
@@ -985,29 +1194,34 @@ function renderReward(
               ${formatDate(
                 reward.paid_at
               )}
+
             </p>
           `
           : ""
       }
 
     </div>
+
   `;
 }
 
 
-/* =========================
-   ACTIVITY
-========================= */
+// ==============================
+// ACTIVITY
+// ==============================
 
 async function loadActivityReport(
   supabase
 ) {
+
   const container =
     document.getElementById(
       "reportActivityList"
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   const {
     data,
@@ -1034,22 +1248,34 @@ async function loadActivityReport(
     throw error;
   }
 
+
   if (
     !data ||
     data.length === 0
   ) {
+
     container.innerHTML = `
       <div class="panel">
-        <h3>Activity Records</h3>
-        <p>No activity records found.</p>
+
+        <h3>
+          Activity Records
+        </h3>
+
+        <p>
+          No activity records found.
+        </p>
+
       </div>
     `;
 
     return;
   }
 
+
   container.innerHTML = `
-    <h3>Activity Records</h3>
+    <h3>
+      Activity Records
+    </h3>
 
     ${data
       .map(renderActivity)
@@ -1058,13 +1284,20 @@ async function loadActivityReport(
 }
 
 
+// ==============================
+// RENDER ACTIVITY
+// ==============================
+
 function renderActivity(
   activity
 ) {
+
   return `
+
     <div class="panel">
 
       <p>
+
         <strong>
           Activity:
         </strong>
@@ -1074,7 +1307,9 @@ function renderActivity(
           activity.message ||
           "Notification"
         )}
+
       </p>
+
 
       ${
         activity.message &&
@@ -1089,31 +1324,42 @@ function renderActivity(
           : ""
       }
 
+
       <p>
-        <strong>Date:</strong>
+
+        <strong>
+          Date:
+        </strong>
+
         ${formatDate(
           activity.created_at
         )}
+
       </p>
 
     </div>
+
   `;
 }
 
 
-/* =========================
-   ACCESS DENIED
-========================= */
+// ==============================
+// ACCESS DENIED
+// ==============================
 
 function showAccessDenied() {
+
   const first =
     document.getElementById(
       "reportUsers"
     );
 
-  if (!first) return;
+  if (!first) {
+    return;
+  }
 
   first.innerHTML = `
+
     <div class="panel">
 
       <h3>
@@ -1131,25 +1377,35 @@ function showAccessDenied() {
       </p>
 
     </div>
+
   `;
 }
 
 
-/* =========================
-   ERROR
-========================= */
+// ==============================
+// ERROR
+// ==============================
 
 function showReportError(
   error
 ) {
+
+  console.error(
+    "PULSE Report Error Details:",
+    error
+  );
+
   const first =
     document.getElementById(
       "reportUsers"
     );
 
-  if (!first) return;
+  if (!first) {
+    return;
+  }
 
   first.innerHTML = `
+
     <div class="panel">
 
       <h3>
@@ -1166,17 +1422,19 @@ function showReportError(
       </p>
 
     </div>
+
   `;
 }
 
 
-/* =========================
-   DATE
-========================= */
+// ==============================
+// DATE
+// ==============================
 
 function formatDate(
   value
 ) {
+
   if (!value) {
     return "Unknown";
   }
@@ -1196,13 +1454,14 @@ function formatDate(
 }
 
 
-/* =========================
-   HTML ESCAPING
-========================= */
+// ==============================
+// HTML ESCAPING
+// ==============================
 
 function escapeHTML(
   value
 ) {
+
   return String(
     value ?? ""
   )
