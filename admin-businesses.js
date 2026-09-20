@@ -1,45 +1,111 @@
 // PULSE — Admin Business Management
 // Controls admin-businesses.html only.
 
-document.addEventListener("DOMContentLoaded", initAdminBusinesses);
+document.addEventListener(
+  "DOMContentLoaded",
+  initAdminBusinesses
+);
+
+
+// ==============================
+// INITIALIZE
+// ==============================
 
 async function initAdminBusinesses() {
-  const container = document.getElementById("adminBusinesses");
+  const container =
+    document.getElementById(
+      "adminBusinesses"
+    );
 
   if (!container) {
-    console.error("PULSE: #adminBusinesses was not found.");
+    console.error(
+      "PULSE: #adminBusinesses was not found."
+    );
+
     return;
   }
 
-  container.innerHTML = "<p>Loading businesses...</p>";
+  container.innerHTML =
+    "<p>Loading businesses...</p>";
 
   try {
-    const supabase = getSupabaseClient();
 
-    const user = await getLoggedInUser(supabase);
+    // ==============================
+    // CHECK SUPABASE
+    // ==============================
+
+    if (!window.supabaseClient) {
+      throw new Error(
+        "Supabase client is not available."
+      );
+    }
+
+
+    // ==============================
+    // GET CURRENT USER
+    // ==============================
+
+    const user =
+      await getCurrentUser();
 
     if (!user) {
-      showAccessDenied(container, "Please log in first.");
+      showAccessDenied(
+        container,
+        "Please log in first."
+      );
+
       return;
     }
 
-    const isAdmin = await checkAdmin(supabase, user.id);
 
-    if (!isAdmin) {
-      showAccessDenied(container, "Admin access required.");
+    // ==============================
+    // VERIFY ADMIN
+    // ==============================
+
+    const admin =
+      await isAdmin(user.id);
+
+    if (!admin) {
+      showAccessDenied(
+        container,
+        "Admin access required."
+      );
+
       return;
     }
 
-    await loadBusinesses(supabase, container);
+
+    console.log(
+      "PULSE: ADMIN BUSINESS ACCESS GRANTED"
+    );
+
+
+    // ==============================
+    // LOAD BUSINESSES
+    // ==============================
+
+    await loadBusinesses(
+      window.supabaseClient,
+      container
+    );
 
   } catch (error) {
-    console.error("PULSE Admin Business Error:", error);
+
+    console.error(
+      "PULSE Admin Business Error:",
+      error
+    );
 
     container.innerHTML = `
       <div class="panel">
         <h3>Unable to Load Businesses</h3>
-        <p>There was a problem loading the business records.</p>
-        <p>Please refresh the page and try again.</p>
+        <p>
+          There was a problem loading the
+          business records.
+        </p>
+        <p>
+          Please refresh the page and try again.
+        </p>
       </div>
     `;
   }
@@ -47,65 +113,13 @@ async function initAdminBusinesses() {
 
 
 // ==============================
-// SUPABASE
-// ==============================
-
-function getSupabaseClient() {
-  if (!window.supabaseClient) {
-    throw new Error(
-      "Supabase client is not available. Check config.js."
-    );
-  }
-
-  return window.supabaseClient;
-}
-
-
-// ==============================
-// AUTHENTICATION
-// ==============================
-
-async function getLoggedInUser(supabase) {
-  const {
-    data: { user },
-    error
-  } = await supabase.auth.getUser();
-
-  if (error) {
-    throw error;
-  }
-
-  return user || null;
-}
-
-
-// ==============================
-// ADMIN CHECK
-// ==============================
-
-async function checkAdmin(supabase, userId) {
-  const {
-    data: profile,
-    error
-  } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return profile?.role === "admin";
-}
-
-
-// ==============================
 // LOAD BUSINESSES
 // ==============================
 
-async function loadBusinesses(supabase, container) {
+async function loadBusinesses(
+  supabase,
+  container
+) {
   const {
     data: businesses,
     error
@@ -119,27 +133,35 @@ async function loadBusinesses(supabase, container) {
       status,
       created_at
     `)
-    .order("created_at", {
-      ascending: false
-    });
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
 
   if (error) {
     throw error;
   }
 
-  if (!businesses || businesses.length === 0) {
+  if (
+    !businesses ||
+    businesses.length === 0
+  ) {
     container.innerHTML = `
       <div class="panel">
         <h3>Business Records</h3>
         <p>No businesses found.</p>
       </div>
     `;
+
     return;
   }
 
-  container.innerHTML = businesses
-    .map(renderBusiness)
-    .join("");
+  container.innerHTML =
+    businesses
+      .map(renderBusiness)
+      .join("");
 }
 
 
@@ -147,21 +169,30 @@ async function loadBusinesses(supabase, container) {
 // RENDER BUSINESS
 // ==============================
 
-function renderBusiness(business) {
-  const website = normalizeWebsite(business.website);
+function renderBusiness(
+  business
+) {
+  const website =
+    normalizeWebsite(
+      business.website
+    );
 
   return `
     <div class="business-card">
 
       <h3>
-        ${escapeHTML(business.name)}
+        ${escapeHTML(
+          business.name
+        )}
       </h3>
 
       ${
         business.description
           ? `
             <p>
-              ${escapeHTML(business.description)}
+              ${escapeHTML(
+                business.description
+              )}
             </p>
           `
           : ""
@@ -169,7 +200,10 @@ function renderBusiness(business) {
 
       <p>
         <strong>Status:</strong>
-        ${escapeHTML(business.status || "pending")}
+        ${escapeHTML(
+          business.status ||
+          "pending"
+        )}
       </p>
 
       ${
@@ -177,7 +211,9 @@ function renderBusiness(business) {
           ? `
             <p>
               <a
-                href="${escapeHTML(website)}"
+                href="${escapeHTML(
+                  website
+                )}"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -190,7 +226,9 @@ function renderBusiness(business) {
 
       <p>
         <strong>Created:</strong>
-        ${formatDate(business.created_at)}
+        ${formatDate(
+          business.created_at
+        )}
       </p>
 
     </div>
@@ -202,19 +240,26 @@ function renderBusiness(business) {
 // WEBSITE VALIDATION
 // ==============================
 
-function normalizeWebsite(value) {
-  const raw = String(value || "").trim();
+function normalizeWebsite(
+  value
+) {
+  const raw =
+    String(
+      value || ""
+    ).trim();
 
   if (!raw) {
     return "";
   }
 
   try {
-    const url = new URL(
-      /^https?:\/\//i.test(raw)
-        ? raw
-        : `https://${raw}`
-    );
+
+    const url =
+      new URL(
+        /^https?:\/\//i.test(raw)
+          ? raw
+          : `https://${raw}`
+      );
 
     if (
       url.protocol !== "http:" &&
@@ -235,14 +280,21 @@ function normalizeWebsite(value) {
 // DATE FORMAT
 // ==============================
 
-function formatDate(value) {
+function formatDate(
+  value
+) {
   if (!value) {
     return "Unknown";
   }
 
-  const date = new Date(value);
+  const date =
+    new Date(value);
 
-  if (Number.isNaN(date.getTime())) {
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
     return "Unknown";
   }
 
@@ -254,11 +306,18 @@ function formatDate(value) {
 // ACCESS DENIED
 // ==============================
 
-function showAccessDenied(container, message) {
+function showAccessDenied(
+  container,
+  message
+) {
   container.innerHTML = `
     <div class="panel">
       <h3>Access Denied</h3>
-      <p>${escapeHTML(message)}</p>
+
+      <p>
+        ${escapeHTML(message)}
+      </p>
+
       <p>
         <a href="dashboard.html">
           Return to Dashboard
@@ -273,11 +332,30 @@ function showAccessDenied(container, message) {
 // HTML SAFETY
 // ==============================
 
-function escapeHTML(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+function escapeHTML(
+  value
+) {
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 }
