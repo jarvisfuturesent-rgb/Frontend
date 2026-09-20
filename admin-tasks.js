@@ -4,71 +4,86 @@
 document.addEventListener("DOMContentLoaded", () => {
   loadAdminTasks();
 
-  const form = document.getElementById("task-form");
+  const form =
+    document.getElementById("task-form");
 
   if (form) {
-    form.addEventListener("submit", createTask);
+    form.addEventListener(
+      "submit",
+      createTask
+    );
   }
 });
 
-async function getCurrentAdmin() {
+
+// ==============================
+// VERIFY ADMIN
+// ==============================
+
+async function requireAdmin() {
   if (!window.supabaseClient) {
-    throw new Error("Supabase client is not available.");
+    throw new Error(
+      "Supabase client is not available."
+    );
   }
 
-  const {
-    data: { user },
-    error: userError
-  } = await window.supabaseClient.auth.getUser();
-
-  if (userError) {
-    throw userError;
-  }
+  const user =
+    await getCurrentUser();
 
   if (!user) {
     return null;
   }
 
-  const { data: profile, error: profileError } =
-    await window.supabaseClient
-      .from("profiles")
-      .select("name, role")
-      .eq("id", user.id)
-      .single();
+  const admin =
+    await isAdmin(user.id);
 
-  if (profileError) {
-    throw profileError;
-  }
-
-  if (!profile || profile.role !== "admin") {
+  if (!admin) {
     return null;
   }
 
   return user;
 }
 
+
+// ==============================
+// LOAD ADMIN TASKS
+// ==============================
+
 async function loadAdminTasks() {
-  const list = document.getElementById("tasks-list");
+  const list =
+    document.getElementById(
+      "tasks-list"
+    );
 
   if (!list) {
-    console.error("tasks-list element not found.");
+    console.error(
+      "PULSE: tasks-list element not found."
+    );
     return;
   }
 
-  list.innerHTML = "<p>Loading tasks...</p>";
+  list.innerHTML =
+    "<p>Loading tasks...</p>";
 
   try {
-    const admin = await getCurrentAdmin();
+    const admin =
+      await requireAdmin();
 
     if (!admin) {
       list.innerHTML = `
         <p>Access denied.</p>
-        <a href="dashboard.html">Return to Dashboard</a>
+        <a href="dashboard.html">
+          Return to Dashboard
+        </a>
       `;
+
       return;
     }
 
-    const { data: tasks, error } =
+    const {
+      data: tasks,
+      error
+    } =
       await window.supabaseClient
         .from("tasks")
         .select(`
@@ -79,32 +94,65 @@ async function loadAdminTasks() {
           status,
           created_at
         `)
-        .order("created_at", { ascending: false });
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
 
     if (error) {
       throw error;
     }
 
     if (!tasks || tasks.length === 0) {
-      list.innerHTML = "<p>No tasks found.</p>";
+      list.innerHTML =
+        "<p>No tasks found.</p>";
+
       return;
     }
 
-    list.innerHTML = tasks.map(renderTask).join("");
+    list.innerHTML =
+      tasks.map(renderTask).join("");
 
-    document.querySelectorAll("[data-task-action]").forEach(button => {
-      button.addEventListener("click", () => {
-        const taskId = button.getAttribute("data-task-id");
-        const action = button.getAttribute("data-task-action");
+    document
+      .querySelectorAll(
+        "[data-task-action]"
+      )
+      .forEach(button => {
 
-        if (action === "toggle") {
-          toggleTaskStatus(taskId);
-        }
+        button.addEventListener(
+          "click",
+          () => {
+
+            const taskId =
+              button.getAttribute(
+                "data-task-id"
+              );
+
+            const action =
+              button.getAttribute(
+                "data-task-action"
+              );
+
+            if (
+              action === "toggle"
+            ) {
+              toggleTaskStatus(
+                taskId
+              );
+            }
+          }
+        );
+
       });
-    });
 
   } catch (error) {
-    console.error("Admin task loading error:", error);
+
+    console.error(
+      "PULSE: Admin task loading error:",
+      error
+    );
 
     list.innerHTML = `
       <p>Unable to load tasks.</p>
@@ -113,31 +161,53 @@ async function loadAdminTasks() {
   }
 }
 
-function renderTask(task) {
-  const status = task.status || "draft";
 
-  let actionText = "Activate";
-  let nextAction = "active";
+// ==============================
+// RENDER TASK
+// ==============================
+
+function renderTask(task) {
+  const status =
+    task.status || "draft";
+
+  let actionText =
+    "Activate";
 
   if (status === "active") {
-    actionText = "Complete";
-    nextAction = "completed";
-  } else if (status === "completed") {
-    actionText = "Reactivate";
-    nextAction = "active";
-  } else if (status === "paused") {
-    actionText = "Reactivate";
-    nextAction = "active";
-  } else if (status === "draft") {
-    actionText = "Activate";
-    nextAction = "active";
+    actionText =
+      "Complete";
+
+  } else if (
+    status === "completed"
+  ) {
+    actionText =
+      "Reactivate";
+
+  } else if (
+    status === "paused"
+  ) {
+    actionText =
+      "Reactivate";
+
+  } else if (
+    status === "draft"
+  ) {
+    actionText =
+      "Activate";
   }
 
   return `
     <div class="task-card">
-      <h3>${escapeHTML(task.title)}</h3>
 
-      <p>${escapeHTML(task.description || "")}</p>
+      <h3>
+        ${escapeHTML(task.title)}
+      </h3>
+
+      <p>
+        ${escapeHTML(
+          task.description || ""
+        )}
+      </p>
 
       <p>
         <strong>Points:</strong>
@@ -156,52 +226,114 @@ function renderTask(task) {
       >
         ${actionText}
       </button>
+
     </div>
   `;
 }
 
+
+// ==============================
+// CREATE TASK
+// ==============================
+
 async function createTask(event) {
   event.preventDefault();
 
-  const titleInput = document.getElementById("task-title");
-  const descriptionInput = document.getElementById("task-description");
-  const pointsInput = document.getElementById("task-points");
-  const completedInput = document.getElementById("task-completed");
-  const message = document.getElementById("form-message");
+  const titleInput =
+    document.getElementById(
+      "task-title"
+    );
 
-  if (!titleInput || !descriptionInput || !pointsInput) {
-    console.error("Task form elements are missing.");
+  const descriptionInput =
+    document.getElementById(
+      "task-description"
+    );
+
+  const pointsInput =
+    document.getElementById(
+      "task-points"
+    );
+
+  const completedInput =
+    document.getElementById(
+      "task-completed"
+    );
+
+  const message =
+    document.getElementById(
+      "form-message"
+    );
+
+  if (
+    !titleInput ||
+    !descriptionInput ||
+    !pointsInput
+  ) {
+    console.error(
+      "PULSE: Task form elements are missing."
+    );
+
     return;
   }
 
-  const title = titleInput.value.trim();
-  const description = descriptionInput.value.trim();
-  const points = Number(pointsInput.value);
-  const completed = completedInput ? completedInput.checked : false;
+  const title =
+    titleInput.value.trim();
+
+  const description =
+    descriptionInput.value.trim();
+
+  const points =
+    Number(pointsInput.value);
+
+  const completed =
+    completedInput
+      ? completedInput.checked
+      : false;
 
   if (!title) {
-    showFormMessage("Enter a task title.", true);
+    showFormMessage(
+      "Enter a task title.",
+      true
+    );
+
     return;
   }
 
-  if (!Number.isInteger(points) || points <= 0) {
-    showFormMessage("Points must be a whole number greater than 0.", true);
+  if (
+    !Number.isInteger(points) ||
+    points <= 0
+  ) {
+    showFormMessage(
+      "Points must be a whole number greater than 0.",
+      true
+    );
+
     return;
   }
 
   try {
-    const admin = await getCurrentAdmin();
+
+    const admin =
+      await requireAdmin();
 
     if (!admin) {
-      showFormMessage("Access denied.", true);
+      showFormMessage(
+        "Access denied.",
+        true
+      );
+
       return;
     }
 
     if (message) {
-      message.textContent = "Creating task...";
+      message.textContent =
+        "Creating task...";
     }
 
-    const status = completed ? "completed" : "active";
+    const status =
+      completed
+        ? "completed"
+        : "active";
 
     const { error } =
       await window.supabaseClient
@@ -217,9 +349,15 @@ async function createTask(event) {
       throw error;
     }
 
-    showFormMessage("Task created successfully.", false);
+    showFormMessage(
+      "Task created successfully.",
+      false
+    );
 
-    const form = document.getElementById("task-form");
+    const form =
+      document.getElementById(
+        "task-form"
+      );
 
     if (form) {
       form.reset();
@@ -228,7 +366,11 @@ async function createTask(event) {
     await loadAdminTasks();
 
   } catch (error) {
-    console.error("Create task error:", error);
+
+    console.error(
+      "PULSE: Create task error:",
+      error
+    );
 
     showFormMessage(
       "Unable to create task. Please try again.",
@@ -237,49 +379,80 @@ async function createTask(event) {
   }
 }
 
-async function toggleTaskStatus(taskId) {
+
+// ==============================
+// TOGGLE TASK STATUS
+// ==============================
+
+async function toggleTaskStatus(
+  taskId
+) {
   if (!taskId) {
     return;
   }
 
   try {
-    const admin = await getCurrentAdmin();
+
+    const admin =
+      await requireAdmin();
 
     if (!admin) {
-      alert("Access denied.");
+      alert(
+        "Access denied."
+      );
+
       return;
     }
 
-    const { data: task, error: fetchError } =
+    const {
+      data: task,
+      error: fetchError
+    } =
       await window.supabaseClient
         .from("tasks")
-        .select("id, status")
-        .eq("id", taskId)
+        .select(
+          "id, status"
+        )
+        .eq(
+          "id",
+          taskId
+        )
         .single();
 
     if (fetchError) {
       throw fetchError;
     }
 
-    let newStatus = "active";
+    let newStatus =
+      "active";
 
-    if (task.status === "active") {
-      newStatus = "completed";
+    if (
+      task.status === "active"
+    ) {
+      newStatus =
+        "completed";
+
     } else if (
       task.status === "completed" ||
       task.status === "paused" ||
       task.status === "draft"
     ) {
-      newStatus = "active";
+      newStatus =
+        "active";
     }
 
-    const { error: updateError } =
+    const {
+      error: updateError
+    } =
       await window.supabaseClient
         .from("tasks")
         .update({
           status: newStatus
         })
-        .eq("id", taskId);
+        .eq(
+          "id",
+          taskId
+        );
 
     if (updateError) {
       throw updateError;
@@ -288,33 +461,78 @@ async function toggleTaskStatus(taskId) {
     await loadAdminTasks();
 
   } catch (error) {
-    console.error("Update task status error:", error);
 
-    alert("Unable to update the task. Please try again.");
+    console.error(
+      "PULSE: Update task status error:",
+      error
+    );
+
+    alert(
+      "Unable to update the task. Please try again."
+    );
   }
 }
 
-function showFormMessage(text, isError) {
-  const message = document.getElementById("form-message");
+
+// ==============================
+// FORM MESSAGE
+// ==============================
+
+function showFormMessage(
+  text,
+  isError
+) {
+  const message =
+    document.getElementById(
+      "form-message"
+    );
 
   if (!message) {
     return;
   }
 
-  message.textContent = text;
+  message.textContent =
+    text;
 
   if (isError) {
-    message.setAttribute("data-error", "true");
+    message.setAttribute(
+      "data-error",
+      "true"
+    );
   } else {
-    message.removeAttribute("data-error");
+    message.removeAttribute(
+      "data-error"
+    );
   }
 }
 
+
+// ==============================
+// ESCAPE HTML
+// ==============================
+
 function escapeHTML(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 }
