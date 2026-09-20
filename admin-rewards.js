@@ -7,11 +7,12 @@ document.addEventListener(
 );
 
 
-/* =========================
-   INITIALIZE
-========================= */
+// ==============================
+// INITIALIZE
+// ==============================
 
 async function initAdminRewards() {
+
   const container =
     document.getElementById(
       "adminRewards"
@@ -28,13 +29,15 @@ async function initAdminRewards() {
     "<p>Loading reward requests...</p>";
 
   try {
-    const supabase =
-      getSupabaseClient();
+
+    if (!window.supabaseClient) {
+      throw new Error(
+        "Supabase client is not available."
+      );
+    }
 
     const user =
-      await getLoggedInUser(
-        supabase
-      );
+      await getCurrentUser();
 
     if (!user) {
       showAccessDenied(
@@ -44,13 +47,10 @@ async function initAdminRewards() {
       return;
     }
 
-    const isAdmin =
-      await checkAdmin(
-        supabase,
-        user.id
-      );
+    const admin =
+      await isAdmin(user.id);
 
-    if (!isAdmin) {
+    if (!admin) {
       showAccessDenied(
         container,
         "Admin access required."
@@ -58,12 +58,17 @@ async function initAdminRewards() {
       return;
     }
 
+    console.log(
+      "PULSE: ADMIN REWARD ACCESS GRANTED"
+    );
+
     await loadRewards(
-      supabase,
+      window.supabaseClient,
       container
     );
 
   } catch (error) {
+
     console.error(
       "PULSE Admin Reward Error:",
       error
@@ -71,6 +76,7 @@ async function initAdminRewards() {
 
     container.innerHTML = `
       <div class="panel">
+
         <h3>
           Unable to Load Reward Requests
         </h3>
@@ -83,72 +89,22 @@ async function initAdminRewards() {
         <p>
           Please refresh the page and try again.
         </p>
+
       </div>
     `;
   }
 }
 
 
-/* =========================
-   SUPABASE
-========================= */
-
-function getSupabaseClient() {
-  if (!window.supabaseClient) {
-    throw new Error(
-      "Supabase client is not available. Check config.js."
-    );
-  }
-
-  return window.supabaseClient;
-}
-
-
-async function getLoggedInUser(
-  supabase
-) {
-  const {
-    data: { user },
-    error
-  } = await supabase.auth.getUser();
-
-  if (error) {
-    throw error;
-  }
-
-  return user || null;
-}
-
-
-async function checkAdmin(
-  supabase,
-  userId
-) {
-  const {
-    data: profile,
-    error
-  } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return profile?.role === "admin";
-}
-
-
-/* =========================
-   LOAD REWARDS
-========================= */
+// ==============================
+// LOAD REWARDS
+// ==============================
 
 async function loadRewards(
   supabase,
   container
 ) {
+
   const {
     data: rewards,
     error
@@ -166,9 +122,12 @@ async function loadRewards(
       reviewed_at,
       paid_at
     `)
-    .order("created_at", {
-      ascending: false
-    });
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
 
   if (error) {
     throw error;
@@ -178,8 +137,10 @@ async function loadRewards(
     !rewards ||
     rewards.length === 0
   ) {
+
     container.innerHTML = `
       <div class="panel">
+
         <h3>
           Reward Requests
         </h3>
@@ -187,6 +148,7 @@ async function loadRewards(
         <p>
           No reward requests found.
         </p>
+
       </div>
     `;
 
@@ -204,16 +166,22 @@ async function loadRewards(
 }
 
 
-/* =========================
-   RENDER
-========================= */
+// ==============================
+// RENDER REWARD
+// ==============================
 
 function renderReward(
   reward
 ) {
+
   const status =
-    reward.status ||
-    "pending";
+    String(
+      reward.status ||
+      "pending"
+    )
+      .trim()
+      .toLowerCase();
+
 
   const actionButtons =
     status === "pending"
@@ -244,7 +212,9 @@ function renderReward(
       `
       : "";
 
+
   return `
+
     <div class="reward-card">
 
       <h3>
@@ -253,6 +223,7 @@ function renderReward(
         )}
       </h3>
 
+
       <p>
         <strong>User ID:</strong>
         ${escapeHTML(
@@ -260,41 +231,50 @@ function renderReward(
         )}
       </p>
 
+
       <p>
         <strong>
           Points Requested:
         </strong>
+
         ${escapeHTML(
           reward.points_requested
         )}
       </p>
 
+
       <p>
         <strong>
           Reward Type:
         </strong>
+
         ${escapeHTML(
           reward.reward_type
         )}
       </p>
 
+
       <p>
         <strong>
           Status:
         </strong>
+
         ${escapeHTML(
           status
         )}
       </p>
 
+
       <p>
         <strong>
           Created:
         </strong>
+
         ${formatDate(
           reward.created_at
         )}
       </p>
+
 
       ${
         reward.user_note
@@ -312,6 +292,7 @@ function renderReward(
           : ""
       }
 
+
       ${
         reward.admin_note
           ? `
@@ -327,6 +308,7 @@ function renderReward(
           `
           : ""
       }
+
 
       ${
         reward.reviewed_at
@@ -344,6 +326,7 @@ function renderReward(
           : ""
       }
 
+
       ${
         reward.paid_at
           ? `
@@ -360,36 +343,46 @@ function renderReward(
           : ""
       }
 
+
       ${actionButtons}
 
     </div>
+
   `;
 }
 
 
-/* =========================
-   BUTTONS
-========================= */
+// ==============================
+// CONNECT BUTTONS
+// ==============================
 
 function connectRewardButtons(
   container
 ) {
+
   container
     .querySelectorAll(
       "[data-reward-action]"
     )
     .forEach(button => {
+
       button.addEventListener(
         "click",
         handleRewardAction
       );
+
     });
 }
 
 
+// ==============================
+// HANDLE ACTION
+// ==============================
+
 async function handleRewardAction(
   event
 ) {
+
   const button =
     event.currentTarget;
 
@@ -410,6 +403,7 @@ async function handleRewardAction(
   button.disabled = true;
 
   try {
+
     if (
       action === "approve"
     ) {
@@ -427,18 +421,21 @@ async function handleRewardAction(
     }
 
   } finally {
+
     button.disabled = false;
+
   }
 }
 
 
-/* =========================
-   APPROVE
-========================= */
+// ==============================
+// APPROVE
+// ==============================
 
 async function approveReward(
   requestId
 ) {
+
   if (!requestId) {
     return;
   }
@@ -453,13 +450,9 @@ async function approveReward(
   }
 
   try {
-    const supabase =
-      getSupabaseClient();
 
     const user =
-      await getLoggedInUser(
-        supabase
-      );
+      await getCurrentUser();
 
     if (!user) {
       alert(
@@ -468,47 +461,43 @@ async function approveReward(
       return;
     }
 
-    const isAdmin =
-      await checkAdmin(
-        supabase,
-        user.id
-      );
+    const admin =
+      await isAdmin(user.id);
 
-    if (!isAdmin) {
+    if (!admin) {
       alert(
         "Access denied."
       );
       return;
     }
 
-    /*
-     * Secure approval function.
-     *
-     * This uses the public wrapper
-     * instead of calling private functions
-     * directly from the browser.
-     */
+
     const {
       error
-    } = await supabase.rpc(
-      "process_redemption_request",
-      {
-        p_request_id:
-          Number(requestId)
-      }
-    );
+    } = await window.supabaseClient
+      .rpc(
+        "process_redemption_request",
+        {
+          p_request_id:
+            Number(requestId)
+        }
+      );
+
 
     if (error) {
       throw error;
     }
 
+
     alert(
       "Reward request approved."
     );
 
+
     await refreshRewards();
 
   } catch (error) {
+
     console.error(
       "PULSE reward approval error:",
       error
@@ -521,13 +510,14 @@ async function approveReward(
 }
 
 
-/* =========================
-   REJECT
-========================= */
+// ==============================
+// REJECT
+// ==============================
 
 async function rejectReward(
   requestId
 ) {
+
   if (!requestId) {
     return;
   }
@@ -551,14 +541,11 @@ async function rejectReward(
     return;
   }
 
+
   try {
-    const supabase =
-      getSupabaseClient();
 
     const user =
-      await getLoggedInUser(
-        supabase
-      );
+      await getCurrentUser();
 
     if (!user) {
       alert(
@@ -567,22 +554,20 @@ async function rejectReward(
       return;
     }
 
-    const isAdmin =
-      await checkAdmin(
-        supabase,
-        user.id
-      );
+    const admin =
+      await isAdmin(user.id);
 
-    if (!isAdmin) {
+    if (!admin) {
       alert(
         "Access denied."
       );
       return;
     }
 
+
     const {
       error
-    } = await supabase
+    } = await window.supabaseClient
       .from(
         "redemption_requests"
       )
@@ -602,17 +587,21 @@ async function rejectReward(
         "pending"
       );
 
+
     if (error) {
       throw error;
     }
+
 
     alert(
       "Reward request rejected."
     );
 
+
     await refreshRewards();
 
   } catch (error) {
+
     console.error(
       "PULSE reward rejection error:",
       error
@@ -625,11 +614,12 @@ async function rejectReward(
 }
 
 
-/* =========================
-   REFRESH
-========================= */
+// ==============================
+// REFRESH
+// ==============================
 
 async function refreshRewards() {
+
   const container =
     document.getElementById(
       "adminRewards"
@@ -643,15 +633,14 @@ async function refreshRewards() {
     "<p>Refreshing reward requests...</p>";
 
   try {
-    const supabase =
-      getSupabaseClient();
 
     await loadRewards(
-      supabase,
+      window.supabaseClient,
       container
     );
 
   } catch (error) {
+
     console.error(
       "PULSE reward refresh error:",
       error
@@ -659,6 +648,7 @@ async function refreshRewards() {
 
     container.innerHTML = `
       <div class="panel">
+
         <h3>
           Unable to Refresh Reward Requests
         </h3>
@@ -666,21 +656,24 @@ async function refreshRewards() {
         <p>
           Please refresh the page and try again.
         </p>
+
       </div>
     `;
   }
 }
 
 
-/* =========================
-   ACCESS DENIED
-========================= */
+// ==============================
+// ACCESS DENIED
+// ==============================
 
 function showAccessDenied(
   container,
   message
 ) {
+
   container.innerHTML = `
+
     <div class="panel">
 
       <h3>
@@ -700,17 +693,19 @@ function showAccessDenied(
       </p>
 
     </div>
+
   `;
 }
 
 
-/* =========================
-   DATE
-========================= */
+// ==============================
+// DATE
+// ==============================
 
 function formatDate(
   value
 ) {
+
   if (!value) {
     return "Unknown";
   }
@@ -730,13 +725,14 @@ function formatDate(
 }
 
 
-/* =========================
-   HTML ESCAPING
-========================= */
+// ==============================
+// HTML ESCAPING
+// ==============================
 
 function escapeHTML(
   value
 ) {
+
   return String(
     value ?? ""
   )
