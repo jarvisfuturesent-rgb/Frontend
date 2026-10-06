@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PULSE — Reward Requests</title>
   <link rel="stylesheet" href="style.css">
@@ -103,14 +104,15 @@
   </style>
 </head>
 
-<body>
-  <main class="app-shell">
+<body data-admin-page data-auth-page>
+<p id="accessStatus" role="status">Checking administrator access...</p>
+  <main class="app-shell" data-protected-content hidden>
 
     <header class="hero">
 
       <img
         src="pulse-logo.png"
-        alt="PULSE Token"
+        alt="PULSE"
         class="pulse-logo"
       >
 
@@ -120,7 +122,7 @@
         Complete • Earn • Get Rewarded
       </p>
 
-      <details class="menu">
+      <details class="menu" role="navigation" aria-label="Main navigation">
         <summary>☰ Menu</summary>
 
         <div class="menu-panel">
@@ -275,7 +277,7 @@
           </details>
 
           <!-- ADMINISTRATION -->
-          <details>
+          <details data-admin-only hidden>
             <summary class="pulse-folder">
 
               <img
@@ -303,27 +305,27 @@
 
             <div>
 
-              <a class="page-link" href="admin.html">
+              <a class="page-link" href="admin.html" data-admin-only hidden>
                 ⚙ Admin Dashboard
               </a>
 
-              <a class="page-link" href="admin-tasks.html">
+              <a class="page-link" href="admin-tasks.html" data-admin-only hidden>
                 📋 Task Management
               </a>
 
-              <a class="page-link" href="admin-businesses.html">
+              <a class="page-link" href="admin-businesses.html" data-admin-only hidden>
                 🏢 Business Management
               </a>
 
-              <a class="page-link" href="admin-submissions.html">
+              <a class="page-link" href="admin-submissions.html" data-admin-only hidden>
                 📂 Submission Review
               </a>
 
-              <a class="page-link" href="admin-rewards.html">
+              <a class="page-link" href="admin-rewards.html" data-admin-only hidden>
                 🎁 Reward Requests
               </a>
 
-              <a class="page-link" href="admin-reports.html">
+              <a class="page-link" href="admin-reports.html" data-admin-only hidden>
                 📊 Reports &amp; Records
               </a>
 
@@ -344,11 +346,11 @@
         Review and manage reward requests submitted through PULSE.
       </p>
 
-      <div id="adminRewards">
+      <div id="adminRewards" role="status" aria-live="polite">
         Loading reward requests...
       </div>
 
-      <a class="pulse-link" href="admin.html">
+      <a class="pulse-link" href="admin.html" data-admin-only hidden>
 
         <span style="--i:0">G</span>
         <span style="--i:1">o</span>
@@ -434,7 +436,7 @@
   </main>
 
   <!-- SUPABASE -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 
   <!-- PULSE CONFIG -->
   <script src="config.js"></script>

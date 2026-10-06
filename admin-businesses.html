@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PULSE — Business Management</title>
   <link rel="stylesheet" href="style.css">
@@ -119,9 +120,10 @@
   </style>
 </head>
 
-<body>
+<body data-admin-page data-auth-page>
+<p id="accessStatus" role="status">Checking administrator access...</p>
 
-<main class="app-shell">
+<main class="app-shell" data-protected-content hidden>
 
   <header class="hero">
 
@@ -138,7 +140,7 @@
     </p>
 
     <!-- LEVEL 1 -->
-    <details class="menu">
+    <details class="menu" role="navigation" aria-label="Main navigation">
 
       <summary>☰ Menu</summary>
 
@@ -264,7 +266,7 @@
         </details>
 
         <!-- ADMINISTRATION -->
-        <details>
+        <details data-admin-only hidden>
 
           <summary class="pulse-folder">
 
@@ -293,12 +295,12 @@
 
           <div>
 
-            <a class="page-link" href="admin.html">⚙ Admin Dashboard</a>
-            <a class="page-link" href="admin-tasks.html">📋 Task Management</a>
-            <a class="page-link" href="admin-businesses.html">🏢 Business Management</a>
-            <a class="page-link" href="admin-submissions.html">📂 Submission Review</a>
-            <a class="page-link" href="admin-rewards.html">🎁 Reward Requests</a>
-            <a class="page-link" href="admin-reports.html">📊 Reports &amp; Records</a>
+            <a class="page-link" href="admin.html" data-admin-only hidden>⚙ Admin Dashboard</a>
+            <a class="page-link" href="admin-tasks.html" data-admin-only hidden>📋 Task Management</a>
+            <a class="page-link" href="admin-businesses.html" data-admin-only hidden>🏢 Business Management</a>
+            <a class="page-link" href="admin-submissions.html" data-admin-only hidden>📂 Submission Review</a>
+            <a class="page-link" href="admin-rewards.html" data-admin-only hidden>🎁 Reward Requests</a>
+            <a class="page-link" href="admin-reports.html" data-admin-only hidden>📊 Reports &amp; Records</a>
 
           </div>
 
@@ -320,11 +322,11 @@
       business information and task relationships.
     </p>
 
-    <div id="adminBusinesses">
+    <div id="adminBusinesses" role="status" aria-live="polite">
       Loading businesses...
     </div>
 
-    <a class="pulse-link" href="admin.html">
+    <a class="pulse-link" href="admin.html" data-admin-only hidden>
 
       <span style="--i:0">G</span>
       <span style="--i:1">o</span>
@@ -407,7 +409,7 @@
 </main>
 
 <!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 
 <!-- PULSE CONFIG -->
 <script src="config.js"></script>

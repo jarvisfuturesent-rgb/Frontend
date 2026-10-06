@@ -61,12 +61,15 @@ let displayedUserId = null;
 async function refreshAccess() {
   const generation = ++accessGeneration;
   hideProtectedContent();
+  document.body.dataset.accessReady = "false";
   const user = await getCurrentUser();
   const admin = user ? await isAdmin(user.id) : false;
   if (generation !== accessGeneration) return;
   const protectedPage = document.body.hasAttribute("data-auth-page");
   const adminPage = document.body.hasAttribute("data-admin-page");
   if ((!user && protectedPage) || (adminPage && !admin)) {
+    document.body.dataset.accessReady = "true";
+    document.body.dataset.accessResult = user ? "denied" : "anonymous";
     const status = document.getElementById("accessStatus");
     if (status) {
       status.hidden = false;
@@ -89,6 +92,8 @@ async function refreshAccess() {
   });
   const status = document.getElementById("accessStatus");
   if (status) status.hidden = true;
+  document.body.dataset.accessReady = "true";
+  document.body.dataset.accessResult = "allowed";
 }
 
 document.addEventListener("DOMContentLoaded", () => { void refreshAccess(); });

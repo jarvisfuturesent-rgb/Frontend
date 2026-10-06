@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>PULSE Dashboard</title>
@@ -384,9 +385,10 @@
   </style>
 </head>
 
-<body>
+<body data-auth-page>
+<p id="accessStatus" role="status">Checking your session...</p>
 
-<main class="app-shell">
+<main class="app-shell" data-protected-content hidden>
 
   <header class="hero">
 
@@ -400,7 +402,7 @@
       Complete • Earn • Get Rewarded
     </p>
 
-    <details class="menu">
+    <details class="menu" role="navigation" aria-label="Main navigation">
 
       <summary>☰ Menu</summary>
 
@@ -576,7 +578,7 @@
 
 
         <!-- ADMINISTRATION -->
-        <details>
+        <details data-admin-only hidden>
 
           <summary class="pulse-folder">
 
@@ -605,27 +607,27 @@
 
           <div>
 
-            <a class="page-link" href="admin.html">
+            <a class="page-link" href="admin.html" data-admin-only hidden>
               ⚙️ Admin Dashboard
             </a>
 
-            <a class="page-link" href="admin-tasks.html">
+            <a class="page-link" href="admin-tasks.html" data-admin-only hidden>
               📋 Task Management
             </a>
 
-            <a class="page-link" href="admin-businesses.html">
+            <a class="page-link" href="admin-businesses.html" data-admin-only hidden>
               🏢 Business Management
             </a>
 
-            <a class="page-link" href="admin-submissions.html">
+            <a class="page-link" href="admin-submissions.html" data-admin-only hidden>
               📝 Submission Review
             </a>
 
-            <a class="page-link" href="admin-rewards.html">
+            <a class="page-link" href="admin-rewards.html" data-admin-only hidden>
               💰 Reward Requests
             </a>
 
-            <a class="page-link" href="admin-reports.html">
+            <a class="page-link" href="admin-reports.html" data-admin-only hidden>
               📊 Reports &amp; Records
             </a>
 
@@ -669,7 +671,7 @@
       </div>
 
       <div class="balance-unit">
-        PLS
+        Points
       </div>
 
     </div>
@@ -695,7 +697,7 @@
       <div class="stat-card">
 
         <small>
-          Pending Withdrawal
+          Pending Rewards
         </small>
 
         <strong id="pendingWithdrawal">
@@ -745,7 +747,7 @@
         Loading profile...
       </div>
 
-      <div id="profile">
+      <div id="profile" role="status" aria-live="polite">
         Loading account information...
       </div>
 
@@ -762,7 +764,7 @@
 
       <div class="folder-content">
 
-        <div id="tasks">
+        <div id="tasks" role="status" aria-live="polite">
           Loading available tasks...
         </div>
 
@@ -781,7 +783,7 @@
 
       <div class="folder-content">
 
-        <div id="submissions">
+        <div id="submissions" role="status" aria-live="polite">
           Loading your submissions...
         </div>
 
@@ -824,13 +826,13 @@
         </p>
 
         <input
-          id="redeemAmount"
+          id="redeemAmount" aria-label="Points to redeem" step="1"
           type="number"
           min="1"
           placeholder="Points to redeem"
         >
 
-        <select id="rewardType">
+        <select id="rewardType" aria-label="Reward type">
 
           <option value="">
             Select Reward Type
@@ -843,7 +845,7 @@
         </select>
 
         <input
-          id="redeemNote"
+          id="redeemNote" aria-label="Optional reward request note"
           type="text"
           placeholder="Optional note"
         >
@@ -856,7 +858,7 @@
           Request Reward
         </button>
 
-        <div id="redeemMsg"></div>
+        <div id="redeemMsg" role="status" aria-live="polite"></div>
 
         <div id="redemptions">
           Loading reward requests...
@@ -877,7 +879,7 @@
 
       <div class="folder-content">
 
-        <div id="notifications">
+        <div id="notifications" role="status" aria-live="polite">
           Loading notifications...
         </div>
 
@@ -1028,7 +1030,7 @@
 
 <!-- SHARED + PAGE JAVASCRIPT -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 
 <script src="config.js"></script>
 

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>PULSE — Admin Dashboard</title>
@@ -151,7 +152,7 @@
       Complete • Earn • Get Rewarded
     </p>
 
-    <details class="menu">
+    <details class="menu" role="navigation" aria-label="Main navigation">
 
       <summary>☰ Menu</summary>
 
@@ -332,7 +333,7 @@
 
         <!-- ADMINISTRATION -->
 
-        <details>
+        <details data-admin-only hidden>
 
           <summary class="pulse-folder">
 
@@ -361,27 +362,27 @@
 
           <div>
 
-            <a class="page-link" href="admin.html">
+            <a class="page-link" href="admin.html" data-admin-only hidden>
               ⚙️ Admin Dashboard
             </a>
 
-            <a class="page-link" href="admin-tasks.html">
+            <a class="page-link" href="admin-tasks.html" data-admin-only hidden>
               📋 Task Management
             </a>
 
-            <a class="page-link" href="admin-businesses.html">
+            <a class="page-link" href="admin-businesses.html" data-admin-only hidden>
               🏢 Business Management
             </a>
 
-            <a class="page-link" href="admin-submissions.html">
+            <a class="page-link" href="admin-submissions.html" data-admin-only hidden>
               📝 Submission Review
             </a>
 
-            <a class="page-link" href="admin-rewards.html">
+            <a class="page-link" href="admin-rewards.html" data-admin-only hidden>
               💰 Reward Requests
             </a>
 
-            <a class="page-link" href="admin-reports.html">
+            <a class="page-link" href="admin-reports.html" data-admin-only hidden>
               📊 Reports &amp; Records
             </a>
 

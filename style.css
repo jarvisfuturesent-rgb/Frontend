@@ -560,7 +560,7 @@ display: block !important;
 
 color: #f4f7ff !important;
 
-font-size: 12px !important;
+font-size: 16px;
 line-height: 1.45 !important;
 
 font-weight: 700 !important;
@@ -740,3 +740,12 @@ font-size: 9px;
 animation: none;
 }
 }
+/* Keyboard, touch, long content, and motion accessibility. */
+a { color: #55bfff; }
+a:visited { color: #b6c9e8; }
+:where(a, button, summary, input, select, textarea):focus-visible { outline: 2px solid #37e0ff; outline-offset: 3px; }
+input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: 16px; min-height: 44px; max-width: 100%; box-sizing: border-box; }
+button, .task-button, .page-link, summary { min-height: 44px; }
+.page-link { display: inline-flex; align-items: center; }
+.panel, .business-card, .reward-card, .submission-card { overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) { .pulse-link span, .pulse-folder span, .balance-amount { animation: none !important; } }

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>PULSE — Task Management</title>
@@ -134,9 +135,10 @@
   </style>
 </head>
 
-<body>
+<body data-admin-page data-auth-page>
+<p id="accessStatus" role="status">Checking administrator access...</p>
 
-<main class="app-shell">
+<main class="app-shell" data-protected-content hidden>
 
   <header class="hero">
 
@@ -152,7 +154,7 @@
       Complete • Earn • Get Rewarded
     </p>
 
-    <details class="menu">
+    <details class="menu" role="navigation" aria-label="Main navigation">
 
       <summary>☰ Menu</summary>
 
@@ -333,7 +335,7 @@
 
         <!-- ADMINISTRATION -->
 
-        <details>
+        <details data-admin-only hidden>
 
           <summary class="pulse-folder">
 
@@ -362,27 +364,27 @@
 
           <div>
 
-            <a class="page-link" href="admin.html">
+            <a class="page-link" href="admin.html" data-admin-only hidden>
               ⚙️ Admin Dashboard
             </a>
 
-            <a class="page-link" href="admin-tasks.html">
+            <a class="page-link" href="admin-tasks.html" data-admin-only hidden>
               📋 Task Management
             </a>
 
-            <a class="page-link" href="admin-businesses.html">
+            <a class="page-link" href="admin-businesses.html" data-admin-only hidden>
               🏢 Business Management
             </a>
 
-            <a class="page-link" href="admin-submissions.html">
+            <a class="page-link" href="admin-submissions.html" data-admin-only hidden>
               📝 Submission Review
             </a>
 
-            <a class="page-link" href="admin-rewards.html">
+            <a class="page-link" href="admin-rewards.html" data-admin-only hidden>
               💰 Reward Requests
             </a>
 
-            <a class="page-link" href="admin-reports.html">
+            <a class="page-link" href="admin-reports.html" data-admin-only hidden>
               📊 Reports &amp; Records
             </a>
 
@@ -510,7 +512,7 @@
 
       <summary>Tasks</summary>
 
-      <div id="tasks-list">
+      <div id="tasks-list" role="status" aria-live="polite">
 
         <p>
           Tasks will appear here.
@@ -551,7 +553,7 @@
     <a
       class="pulse-link"
       href="admin.html"
-    >
+     data-admin-only hidden>
 
       <span style="--i:0">B</span>
       <span style="--i:1">a</span>
@@ -657,7 +659,7 @@
 
 <!-- SHARED FOUNDATION -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 
