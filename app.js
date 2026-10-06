@@ -1,134 +1,108 @@
-// PULSE — Shared App Functions
-
-console.log("PULSE APP.JS IS RUNNING");
-
-
-// ==============================
-// SUPABASE CLIENT
-// ==============================
-
-if (!window.supabaseClient) {
-  window.supabaseClient =
-    window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
-}
-
-
-// ==============================
-// GET CURRENT USER
-// ==============================
-
+// PULSE — shared authentication and navigation.
+// config.js is the only Supabase client initializer.
 async function getCurrentUser() {
-  const { data, error } =
-    await window.supabaseClient.auth.getUser();
-
-  if (error) {
-    console.error(
-      "PULSE: Unable to get current user:",
-      error
-    );
-
+  try {
+    if (!window.supabaseClient) return null;
+    const { data, error } = await window.supabaseClient.auth.getUser();
+    return error ? null : data?.user || null;
+  } catch {
     return null;
   }
-
-  return data.user || null;
 }
-
-
-// ==============================
-// CHECK ADMIN ROLE
-// ==============================
 
 async function isAdmin(userId) {
-  if (!userId) {
+  if (!userId || !window.supabaseClient) return false;
+  try {
+    const { data, error } = await window.supabaseClient
+      .from("profiles").select("role").eq("id", userId).maybeSingle();
+    return !error && data?.role === "admin";
+  } catch {
     return false;
   }
-
-  const { data: profile, error } =
-    await window.supabaseClient
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .maybeSingle();
-
-  if (error) {
-    console.error(
-      "PULSE: Unable to check admin role:",
-      error
-    );
-
-    return false;
-  }
-
-  console.log(
-    "PULSE: PROFILE ROLE:",
-    profile?.role
-  );
-
-  return (
-    String(profile?.role || "")
-      .trim()
-      .toLowerCase() === "admin"
-  );
 }
 
-
-// ==============================
-// REQUIRE LOGIN
-// ==============================
-
 async function requireLogin() {
-  const user =
-    await getCurrentUser();
-
+  const user = await getCurrentUser();
   if (!user) {
-    window.location.href =
-      "auth.html";
-
-    return null;
+    hideProtectedContent();
+    window.location.replace("auth.html");
   }
-
   return user;
 }
 
-
-// ==============================
-// SIGN OUT
-// ==============================
-
+let signingOut = false;
 async function signOut() {
-  const { error } =
-    await window.supabaseClient.auth.signOut();
-
-  if (error) {
-    console.error(
-      "PULSE: Sign out error:",
-      error
-    );
-
+  if (signingOut) return false;
+  signingOut = true;
+  hideProtectedContent();
+  try {
+    const { error } = await window.supabaseClient.auth.signOut();
+    if (error) {
+      await refreshAccess();
+      return false;
+    }
+    window.location.replace("auth.html");
+    return true;
+  } catch {
+    await refreshAccess();
     return false;
+  } finally {
+    signingOut = false;
   }
-
-  window.location.href =
-    "auth.html";
-
-  return true;
 }
 
+function hideProtectedContent() {
+  document.querySelectorAll("[data-admin-only], [data-protected-content]")
+    .forEach(element => { element.hidden = true; });
+}
 
-// ==============================
-// PAGE LOAD
-// ==============================
-
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
-    console.log(
-      "PULSE: DOM READY"
-    );
-
+let accessGeneration = 0;
+let displayedUserId = null;
+async function refreshAccess() {
+  const generation = ++accessGeneration;
+  hideProtectedContent();
+  const user = await getCurrentUser();
+  const admin = user ? await isAdmin(user.id) : false;
+  if (generation !== accessGeneration) return;
+  const protectedPage = document.body.hasAttribute("data-auth-page");
+  const adminPage = document.body.hasAttribute("data-admin-page");
+  if ((!user && protectedPage) || (adminPage && !admin)) {
+    const status = document.getElementById("accessStatus");
+    if (status) {
+      status.hidden = false;
+      status.textContent = user ? "Access denied. Administrator access is required." : "Please log in to continue.";
+    }
+    if (!user && protectedPage) window.location.replace("auth.html");
+    return;
   }
-);
+  // Avoid showing data from a previous account after cross-tab auth changes.
+  if (protectedPage && displayedUserId && displayedUserId !== user?.id) {
+    window.location.reload();
+    return;
+  }
+  displayedUserId = user?.id || null;
+  document.querySelectorAll("[data-admin-only]").forEach(element => {
+    element.hidden = !admin;
+  });
+  document.querySelectorAll("[data-protected-content]").forEach(element => {
+    element.hidden = false;
+  });
+  const status = document.getElementById("accessStatus");
+  if (status) status.hidden = true;
+}
+
+document.addEventListener("DOMContentLoaded", () => { void refreshAccess(); });
+window.addEventListener("pageshow", () => { void refreshAccess(); });
+window.addEventListener("focus", () => { void refreshAccess(); });
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") void refreshAccess();
+});
+if (window.supabaseClient) {
+  window.supabaseClient.auth.onAuthStateChange(event => {
+    if (event === "SIGNED_OUT" || event === "SIGNED_IN" || event === "USER_UPDATED") {
+      hideProtectedContent();
+      // Keep SDK calls outside its synchronous auth callback.
+      setTimeout(() => { void refreshAccess(); }, 0);
+    }
+  });
+}

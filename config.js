@@ -26,8 +26,17 @@ window.SUPABASE_ANON_KEY =
 
   window.supabaseClient = window.supabase.createClient(
     window.SUPABASE_URL,
-    window.SUPABASE_ANON_KEY
+    window.SUPABASE_ANON_KEY,
+    { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
   );
 
-  console.log("PULSE: Supabase client initialized.");
+  // Register before page scripts so the recovery event cannot be missed.
+  window.supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === "PASSWORD_RECOVERY") {
+      window.pulsePasswordRecoveryUserId = session?.user?.id || null;
+    } else if (event === "SIGNED_OUT") {
+      window.pulsePasswordRecoveryUserId = null;
+    }
+  });
+
 })();
