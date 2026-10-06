@@ -1,0 +1,538 @@
+{
+  "captured_at": "2026-10-06",
+  "project_ref": "egeftdnvgcqjjavrpohd",
+  "scope": "Schema metadata only; no rows, secrets, or auth users.",
+  "metadata": {
+    "views": [
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=arwdDxtm/postgres",
+          "authenticated=r/postgres"
+        ],
+        "name": "user_balance_summary",
+        "schema": "public",
+        "options": [
+          "security_invoker=true"
+        ],
+        "definition": " SELECT id AS user_id,\n    points AS balance,\n    COALESCE(( SELECT sum(pl.amount) AS sum\n           FROM points_ledger pl\n          WHERE pl.user_id = p.id AND pl.amount > 0), 0::bigint)::integer AS total_earned,\n    COALESCE(( SELECT sum(rr.points_requested) AS sum\n           FROM redemption_requests rr\n          WHERE rr.user_id = p.id AND rr.status = 'pending'::text), 0::bigint)::integer AS pending_withdrawal,\n    (points - COALESCE(( SELECT sum(rr.points_requested) AS sum\n           FROM redemption_requests rr\n          WHERE rr.user_id = p.id AND rr.status = 'pending'::text), 0::bigint))::integer AS available_to_withdraw\n   FROM profiles p;"
+      }
+    ],
+    "triggers": [
+      {
+        "table": "users",
+        "schema": "auth",
+        "definition": "CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user()"
+      },
+      {
+        "table": "task_submissions",
+        "schema": "public",
+        "definition": "CREATE TRIGGER notify_submission_status AFTER UPDATE OF status ON public.task_submissions FOR EACH ROW EXECUTE FUNCTION notify_submission_status_change()"
+      },
+      {
+        "table": "redemption_requests",
+        "schema": "public",
+        "definition": "CREATE TRIGGER notify_redemption_status AFTER UPDATE OF status ON public.redemption_requests FOR EACH ROW EXECUTE FUNCTION notify_redemption_status_change()"
+      },
+      {
+        "table": "task_submissions",
+        "schema": "public",
+        "definition": "CREATE TRIGGER sync_survey_answers_from_proof BEFORE INSERT OR UPDATE OF proof, survey_answers ON public.task_submissions FOR EACH ROW EXECUTE FUNCTION sync_survey_answers_from_proof()"
+      },
+      {
+        "table": "notifications",
+        "schema": "public",
+        "definition": "CREATE TRIGGER protect_notification_user_update BEFORE UPDATE ON public.notifications FOR EACH ROW EXECUTE FUNCTION private.protect_notification_user_update()"
+      },
+      {
+        "table": "task_submissions",
+        "schema": "public",
+        "definition": "CREATE TRIGGER protect_task_submission_user_update BEFORE UPDATE ON public.task_submissions FOR EACH ROW EXECUTE FUNCTION private.protect_task_submission_user_update()"
+      }
+    ],
+    "functions": [
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "service_role=X/postgres"
+        ],
+        "name": "sync_survey_answers_from_proof",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "definition": "CREATE OR REPLACE FUNCTION public.sync_survey_answers_from_proof()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public'\nAS $function$\nBEGIN\n  IF (NEW.survey_answers IS NULL OR NEW.survey_answers = '{}'::jsonb)\n     AND NEW.proof IS NOT NULL THEN\n    BEGIN\n      IF (NEW.proof::jsonb ? 'answers') THEN\n        NEW.survey_answers := NEW.proof::jsonb->'answers';\n      END IF;\n    EXCEPTION WHEN others THEN\n      NULL;\n    END;\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n",
+        "security_definer": false
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "service_role=X/postgres"
+        ],
+        "name": "handle_new_user",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "definition": "CREATE OR REPLACE FUNCTION public.handle_new_user()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nbegin\n  insert into public.profiles (id, name)\n  values (new.id, coalesce(new.raw_user_meta_data ->> 'name', ''));\n  return new;\nend;\n$function$\n",
+        "security_definer": true
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "service_role=X/postgres"
+        ],
+        "name": "protect_profile_fields",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "public",
+        "definition": "CREATE OR REPLACE FUNCTION public.protect_profile_fields()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nbegin\n  if new.id <> old.id or new.points <> old.points or new.role <> old.role or new.created_at <> old.created_at then\n    raise exception 'Protected profile fields cannot be changed directly';\n  end if;\n  return new;\nend;\n$function$\n",
+        "security_definer": true
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "service_role=X/postgres",
+          "authenticated=X/postgres"
+        ],
+        "name": "is_admin",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "definition": "CREATE OR REPLACE FUNCTION public.is_admin()\n RETURNS boolean\n LANGUAGE sql\n STABLE\n SET search_path TO 'public'\nAS $function$\n  select private.is_admin();\n$function$\n",
+        "security_definer": false
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "service_role=X/postgres",
+          "authenticated=X/postgres"
+        ],
+        "name": "create_redemption_request",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "definition": "CREATE OR REPLACE FUNCTION public.create_redemption_request(p_points integer, p_reward_type text DEFAULT 'manual_reward'::text, p_user_note text DEFAULT NULL::text)\n RETURNS bigint\n LANGUAGE sql\n SET search_path TO 'public'\nAS $function$\n  select private.create_redemption_request(p_points, p_reward_type, p_user_note);\n$function$\n",
+        "security_definer": false
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "service_role=X/postgres"
+        ],
+        "name": "notify_redemption_status_change",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "public",
+        "definition": "CREATE OR REPLACE FUNCTION public.notify_redemption_status_change()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$ begin if old.status is distinct from new.status then insert into public.notifications(user_id,title,message,type) values (new.user_id, case when new.status='approved' then 'Reward approved' when new.status='paid' then 'Reward paid' when new.status='rejected' then 'Reward rejected' else 'Redemption updated' end, case when new.status='approved' then 'Your reward request was approved.' when new.status='paid' then 'Your reward has been marked as paid.' when new.status='rejected' then 'Your reward request was rejected.' else 'Your redemption status changed.' end,'redemption'); end if; return new; end; $function$\n",
+        "security_definer": true
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "authenticated=X/postgres"
+        ],
+        "name": "add_points_for_approved_submission",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "private",
+        "definition": "CREATE OR REPLACE FUNCTION private.add_points_for_approved_submission(p_submission_id bigint)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\ndeclare\n  s public.task_submissions%rowtype;\n  t_points integer;\n  existing_count integer;\nbegin\n  if not private.is_admin() then\n    raise exception 'Admin authorization required';\n  end if;\n\n  select * into s\n  from public.task_submissions\n  where id = p_submission_id\n  for update;\n\n  if not found then raise exception 'Submission not found'; end if;\n  if s.status <> 'pending' then raise exception 'Submission is not pending'; end if;\n\n  select points into t_points\n  from public.tasks\n  where id = s.task_id\n  for share;\n\n  if t_points is null then raise exception 'Task not found'; end if;\n\n  select count(*) into existing_count\n  from public.points_ledger\n  where submission_id = s.id;\n\n  if existing_count > 0 then raise exception 'Points already awarded for this submission'; end if;\n\n  update public.task_submissions\n  set status = 'approved', reviewed_at = pg_catalog.now()\n  where id = s.id;\n\n  update public.profiles\n  set points = points + t_points\n  where id = s.user_id;\n\n  if not found then raise exception 'User profile not found'; end if;\n\n  insert into public.points_ledger(user_id, submission_id, amount, reason)\n  values (s.user_id, s.id, t_points, 'Task submission approved');\nend;\n$function$\n",
+        "security_definer": true
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "service_role=X/postgres"
+        ],
+        "name": "notify_submission_status_change",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "public",
+        "definition": "CREATE OR REPLACE FUNCTION public.notify_submission_status_change()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nBEGIN\n  IF old.status IS DISTINCT FROM new.status THEN\n    INSERT INTO public.notifications(user_id,title,message,type)\n    VALUES (\n      new.user_id,\n      CASE WHEN new.status='approved' THEN 'Task approved' WHEN new.status='rejected' THEN 'Task rejected' ELSE 'Submission updated' END,\n      CASE WHEN new.status='approved' THEN 'Your task submission was approved. You can now request your reward.' WHEN new.status='rejected' THEN 'Your task submission was rejected.' ELSE 'Your task submission status changed.' END,\n      'submission'\n    );\n  END IF;\n  RETURN new;\nEND;\n$function$\n",
+        "security_definer": true
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "service_role=X/postgres",
+          "authenticated=X/postgres"
+        ],
+        "name": "process_redemption_request",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "definition": "CREATE OR REPLACE FUNCTION public.process_redemption_request(p_request_id bigint)\n RETURNS void\n LANGUAGE sql\n SET search_path TO 'public'\nAS $function$\n  select private.process_redemption_request(p_request_id);\n$function$\n",
+        "security_definer": false
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "authenticated=X/postgres"
+        ],
+        "name": "is_admin",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "private",
+        "definition": "CREATE OR REPLACE FUNCTION private.is_admin()\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\n  select exists (\n    select 1\n    from public.profiles\n    where id = (select auth.uid())\n      and role = 'admin'\n  );\n$function$\n",
+        "security_definer": true
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "service_role=X/postgres",
+          "authenticated=X/postgres"
+        ],
+        "name": "add_points_for_approved_submission",
+        "config": [
+          "search_path=public"
+        ],
+        "schema": "public",
+        "definition": "CREATE OR REPLACE FUNCTION public.add_points_for_approved_submission(p_submission_id bigint)\n RETURNS void\n LANGUAGE sql\n SET search_path TO 'public'\nAS $function$\n  select private.add_points_for_approved_submission(p_submission_id);\n$function$\n",
+        "security_definer": false
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "authenticated=X/postgres"
+        ],
+        "name": "process_redemption_request",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "private",
+        "definition": "CREATE OR REPLACE FUNCTION private.process_redemption_request(p_request_id bigint)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\ndeclare\n  r public.redemption_requests%rowtype;\n  current_points integer;\nbegin\n  if not private.is_admin() then\n    raise exception 'Admin authorization required';\n  end if;\n\n  select * into r\n  from public.redemption_requests\n  where id = p_request_id\n  for update;\n\n  if not found then raise exception 'Reward request not found'; end if;\n  if r.status <> 'pending' then raise exception 'Reward request is not pending'; end if;\n\n  select points into current_points\n  from public.profiles\n  where id = r.user_id\n  for update;\n\n  if coalesce(current_points,0) < r.points_requested then\n    raise exception 'Insufficient user balance';\n  end if;\n\n  update public.profiles\n  set points = points - r.points_requested\n  where id = r.user_id;\n\n  insert into public.points_ledger(user_id, submission_id, amount, reason)\n  values (r.user_id, null, -r.points_requested, 'Withdrawal approved');\n\n  update public.redemption_requests\n  set status = 'approved', reviewed_at = pg_catalog.now()\n  where id = r.id;\nend;\n$function$\n",
+        "security_definer": true
+      },
+      {
+        "acl": [
+          "postgres=X/postgres"
+        ],
+        "name": "protect_notification_user_update",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "private",
+        "definition": "CREATE OR REPLACE FUNCTION private.protect_notification_user_update()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nBEGIN\n  IF private.is_admin() THEN\n    RETURN NEW;\n  END IF;\n\n  IF (SELECT auth.uid()) IS NULL OR OLD.user_id IS DISTINCT FROM (SELECT auth.uid()) THEN\n    RAISE EXCEPTION 'Not authorized to update this notification';\n  END IF;\n\n  IF NEW.id IS DISTINCT FROM OLD.id\n     OR NEW.user_id IS DISTINCT FROM OLD.user_id\n     OR NEW.title IS DISTINCT FROM OLD.title\n     OR NEW.message IS DISTINCT FROM OLD.message\n     OR NEW.type IS DISTINCT FROM OLD.type\n     OR NEW.created_at IS DISTINCT FROM OLD.created_at THEN\n    RAISE EXCEPTION 'Only the read status can be changed';\n  END IF;\n\n  RETURN NEW;\nEND;\n$function$\n",
+        "security_definer": true
+      },
+      {
+        "acl": [
+          "postgres=X/postgres"
+        ],
+        "name": "protect_task_submission_user_update",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "private",
+        "definition": "CREATE OR REPLACE FUNCTION private.protect_task_submission_user_update()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nBEGIN\n  IF private.is_admin() THEN\n    RETURN NEW;\n  END IF;\n\n  IF (SELECT auth.uid()) IS NULL OR OLD.user_id IS DISTINCT FROM (SELECT auth.uid()) THEN\n    RAISE EXCEPTION 'Not authorized to update this submission';\n  END IF;\n\n  IF OLD.status IS DISTINCT FROM 'pending' OR NEW.status IS DISTINCT FROM 'pending' THEN\n    RAISE EXCEPTION 'Users may only edit pending submissions';\n  END IF;\n\n  IF NEW.id IS DISTINCT FROM OLD.id\n     OR NEW.task_id IS DISTINCT FROM OLD.task_id\n     OR NEW.user_id IS DISTINCT FROM OLD.user_id\n     OR NEW.status IS DISTINCT FROM OLD.status\n     OR NEW.reviewer_note IS DISTINCT FROM OLD.reviewer_note\n     OR NEW.submitted_at IS DISTINCT FROM OLD.submitted_at\n     OR NEW.reviewed_at IS DISTINCT FROM OLD.reviewed_at THEN\n    RAISE EXCEPTION 'Protected submission fields cannot be changed';\n  END IF;\n\n  RETURN NEW;\nEND;\n$function$\n",
+        "security_definer": true
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "authenticated=X/postgres"
+        ],
+        "name": "create_redemption_request",
+        "config": [
+          "search_path=pg_catalog, public"
+        ],
+        "schema": "private",
+        "definition": "CREATE OR REPLACE FUNCTION private.create_redemption_request(p_points integer, p_reward_type text DEFAULT 'manual_reward'::text, p_user_note text DEFAULT NULL::text)\n RETURNS bigint\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nDECLARE\n  new_id bigint;\n  current_points integer;\n  pending_points integer;\nBEGIN\n  IF auth.uid() IS NULL THEN\n    RAISE EXCEPTION 'Not authenticated';\n  END IF;\n\n  IF p_points IS NULL OR p_points <= 0 THEN\n    RAISE EXCEPTION 'Points requested must be greater than zero';\n  END IF;\n\n  -- Lock this user's profile row for the duration of the request.\n  SELECT points\n  INTO current_points\n  FROM public.profiles\n  WHERE id = auth.uid()\n  FOR UPDATE;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'Profile not found';\n  END IF;\n\n  SELECT COALESCE(SUM(points_requested), 0)::integer\n  INTO pending_points\n  FROM public.redemption_requests\n  WHERE user_id = auth.uid()\n    AND status = 'pending';\n\n  IF current_points - pending_points < p_points THEN\n    RAISE EXCEPTION 'Insufficient available reward points';\n  END IF;\n\n  INSERT INTO public.redemption_requests(\n    user_id, points_requested, reward_type, user_note\n  )\n  VALUES (\n    auth.uid(),\n    p_points,\n    COALESCE(NULLIF(BTRIM(p_reward_type), ''), 'manual_reward'),\n    NULLIF(BTRIM(p_user_note), '')\n  )\n  RETURNING id INTO new_id;\n\n  RETURN new_id;\nEND;\n$function$\n",
+        "security_definer": true
+      }
+    ],
+    "table_acl": [
+      {
+        "acl": [
+          "postgres=rwU/postgres",
+          "anon=rwU/postgres",
+          "authenticated=rwU/postgres",
+          "service_role=rwU/postgres"
+        ],
+        "rls": false,
+        "kind": "S",
+        "name": "task_submissions_id_seq",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=rwU/postgres",
+          "anon=rwU/postgres",
+          "authenticated=rwU/postgres",
+          "service_role=rwU/postgres"
+        ],
+        "rls": false,
+        "kind": "S",
+        "name": "points_ledger_id_seq",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=rwU/postgres",
+          "anon=rwU/postgres",
+          "authenticated=rwU/postgres",
+          "service_role=rwU/postgres"
+        ],
+        "rls": false,
+        "kind": "S",
+        "name": "tasks_id_seq",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=arwm/postgres",
+          "service_role=arwdDxtm/postgres"
+        ],
+        "rls": true,
+        "kind": "r",
+        "name": "tasks",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=rwU/postgres",
+          "anon=rwU/postgres",
+          "authenticated=rwU/postgres",
+          "service_role=rwU/postgres"
+        ],
+        "rls": false,
+        "kind": "S",
+        "name": "redemption_requests_id_seq",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=rwU/postgres",
+          "anon=rwU/postgres",
+          "authenticated=rwU/postgres",
+          "service_role=rwU/postgres"
+        ],
+        "rls": false,
+        "kind": "S",
+        "name": "businesses_id_seq",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=rwU/postgres",
+          "anon=rwU/postgres",
+          "authenticated=rwU/postgres",
+          "service_role=rwU/postgres"
+        ],
+        "rls": false,
+        "kind": "S",
+        "name": "task_categories_id_seq",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=rwU/postgres",
+          "anon=rwU/postgres",
+          "authenticated=rwU/postgres",
+          "service_role=rwU/postgres"
+        ],
+        "rls": false,
+        "kind": "S",
+        "name": "notifications_id_seq",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=rwU/postgres",
+          "anon=rwU/postgres",
+          "authenticated=rwU/postgres",
+          "service_role=rwU/postgres"
+        ],
+        "rls": false,
+        "kind": "S",
+        "name": "task_requirements_id_seq",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=arwm/postgres",
+          "service_role=arwdDxtm/postgres"
+        ],
+        "rls": true,
+        "kind": "r",
+        "name": "task_submissions",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=rm/postgres",
+          "service_role=arwdDxtm/postgres"
+        ],
+        "rls": true,
+        "kind": "r",
+        "name": "points_ledger",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=rwm/postgres",
+          "service_role=arwdDxtm/postgres"
+        ],
+        "rls": true,
+        "kind": "r",
+        "name": "redemption_requests",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=rm/postgres",
+          "service_role=arwdDxtm/postgres"
+        ],
+        "rls": true,
+        "kind": "r",
+        "name": "businesses",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=rwm/postgres",
+          "service_role=arwdDxtm/postgres"
+        ],
+        "rls": true,
+        "kind": "r",
+        "name": "notifications",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=rm/postgres",
+          "service_role=arwdDxtm/postgres"
+        ],
+        "rls": true,
+        "kind": "r",
+        "name": "task_categories",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=rm/postgres",
+          "service_role=arwdDxtm/postgres"
+        ],
+        "rls": true,
+        "kind": "r",
+        "name": "task_requirements",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=rm/postgres",
+          "service_role=arwdDxtm/postgres"
+        ],
+        "rls": true,
+        "kind": "r",
+        "name": "profiles",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres"
+        ],
+        "rls": true,
+        "kind": "r",
+        "name": "pulse_launch_schema_backups",
+        "schema": "private"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=arwdDxtm/postgres",
+          "authenticated=r/postgres"
+        ],
+        "rls": false,
+        "kind": "v",
+        "name": "user_balance_summary",
+        "schema": "public"
+      }
+    ],
+    "default_acl": [
+      {
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=arwdDxtm/postgres",
+          "authenticated=arwdDxtm/postgres",
+          "service_role=arwdDxtm/postgres"
+        ],
+        "role": "postgres",
+        "type": "r",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=X/postgres",
+          "anon=X/postgres",
+          "authenticated=X/postgres",
+          "service_role=X/postgres"
+        ],
+        "role": "postgres",
+        "type": "f",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=rwU/postgres",
+          "anon=rwU/postgres",
+          "authenticated=rwU/postgres",
+          "service_role=rwU/postgres"
+        ],
+        "role": "postgres",
+        "type": "S",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=rwU/supabase_admin",
+          "anon=rwU/supabase_admin",
+          "authenticated=rwU/supabase_admin",
+          "service_role=rwU/supabase_admin"
+        ],
+        "role": "supabase_admin",
+        "type": "S",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=arwdDxtm/supabase_admin",
+          "anon=arwdDxtm/supabase_admin",
+          "authenticated=arwdDxtm/supabase_admin",
+          "service_role=arwdDxtm/supabase_admin"
+        ],
+        "role": "supabase_admin",
+        "type": "r",
+        "schema": "public"
+      },
+      {
+        "acl": [
+          "postgres=X/supabase_admin",
+          "anon=X/supabase_admin",
+          "authenticated=X/supabase_admin",
+          "service_role=X/supabase_admin"
+        ],
+        "role": "supabase_admin",
+        "type": "f",
+        "schema": "public"
+      }
+    ]
+  }
+}
