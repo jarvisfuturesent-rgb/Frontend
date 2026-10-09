@@ -566,6 +566,7 @@ async function rejectReward(
 
 
     const {
+      data: rejectedRows,
       error
     } = await window.supabaseClient
       .from(
@@ -585,13 +586,19 @@ async function rejectReward(
       .eq(
         "status",
         "pending"
-      );
+      )
+      .select("id");
 
 
     if (error) {
       throw error;
     }
 
+    if (!rejectedRows || rejectedRows.length !== 1) {
+      alert("This reward request is no longer pending. Refreshing the list.");
+      await refreshRewards();
+      return;
+    }
 
     alert(
       "Reward request rejected."
