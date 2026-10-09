@@ -132,3 +132,21 @@ document.addEventListener(
 
   }
 );
+
+// Hide administration navigation by default. Only reveal it after a verified
+// signed-in account has an administrator role. This is a UI measure;
+// Supabase RLS and privileged functions remain the security boundary.
+document.addEventListener("DOMContentLoaded", async () => {
+  const adminLinks = [...document.querySelectorAll('a[href^="admin"]')];
+  if (!adminLinks.length) return;
+  const groups = [...new Set(adminLinks.map(link => link.closest("details")).filter(Boolean))];
+  const hidden = [...new Set([...groups, ...adminLinks])];
+  hidden.forEach(el => { el.hidden = true; el.style.display = "none"; });
+  try {
+    const user = await getCurrentUser();
+    if (!user || !(await isAdmin(user.id))) return;
+    hidden.forEach(el => { el.hidden = false; el.style.removeProperty("display"); });
+  } catch (error) {
+    console.error("PULSE: Admin navigation remains hidden.", error);
+  }
+});
