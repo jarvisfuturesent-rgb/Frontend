@@ -59,18 +59,32 @@ async function loadEarnings() {
             0
         );
 
+        // Calculate lifetime earned points from the immutable ledger, not the current balance.
+        const { data: ledger, error: ledgerError } = await window.supabaseClient
+            .from("points_ledger")
+            .select("amount")
+            .eq("user_id", user.id)
+            .gt("amount", 0);
+
+        if (ledgerError) throw ledgerError;
+
+        const lifetimeEarned = (ledger || []).reduce(
+            (total, entry) => total + Number(entry.amount || 0), 0
+        );
+        const spendablePoints = Math.max(0, points - pendingPLS);
+
         // Display balance
         balance.textContent = `${points} Points`;
 
         totalEarned.textContent =
-            `Total Earned: ${points} Points`;
+            `Total Earned: ${lifetimeEarned} Points`;
 
         // Display actual pending withdrawal
         pendingWithdrawal.textContent =
             `Pending Withdrawal: ${pendingPLS} PLS`;
 
         availableBalance.textContent =
-            `Available Balance: ${points} Points`;
+            `Available Balance: ${spendablePoints} Points`;
 
     } catch (error) {
         console.error("Earnings loading error:", error);
