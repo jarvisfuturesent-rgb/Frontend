@@ -145,6 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const user = await getCurrentUser();
     if (!user || !(await isAdmin(user.id))) return;
+    document.body.classList.add("pulse-admin");
     hidden.forEach(el => { el.hidden = false; el.style.removeProperty("display"); });
   } catch (error) {
     console.error("PULSE: Admin navigation remains hidden.", error);
