@@ -1,202 +1,31 @@
-// PULSE — Admin Dashboard
-// Controls admin.html only.
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadAdminDashboard();
-});
-
-
-async function loadAdminDashboard() {
-  const container =
-    document.getElementById("adminContent");
-
-  if (!container) {
-    console.error(
-      "PULSE: adminContent element not found."
-    );
-    return;
-  }
-
-  container.innerHTML =
-    "Loading admin dashboard...";
-
-  try {
-    // ==============================
-    // CHECK SUPABASE CLIENT
-    // ==============================
-
-    if (!window.supabaseClient) {
-      throw new Error(
-        "Supabase client is not available."
-      );
-    }
-
-
-    // ==============================
-    // GET CURRENT USER
-    // ==============================
-
-    const user =
-      await getCurrentUser();
-
-    if (!user) {
-      container.innerHTML = `
-        <p>You must be logged in to access the Admin Dashboard.</p>
-        <a href="auth.html">Login</a>
-      `;
-
-      return;
-    }
-
-
-    // ==============================
-    // VERIFY ADMIN
-    // ==============================
-
-    const admin =
-      await isAdmin(user.id);
-
-    if (!admin) {
-      container.innerHTML = `
-        <p>Access denied.</p>
-        <p>This page is available to administrators only.</p>
-        <a href="dashboard.html">
-          Return to Dashboard
-        </a>
-      `;
-
-      return;
-    }
-
-
-    console.log(
-      "PULSE: ADMIN DASHBOARD ACCESS GRANTED"
-    );
-
-
-    // ==============================
-    // LOAD ADMIN COUNTS
-    // ==============================
-
-    const [
-      tasksResult,
-      submissionsResult,
-      businessesResult,
-      rewardsResult
-    ] = await Promise.all([
-
-      window.supabaseClient
-        .from("tasks")
-        .select("id", {
-          count: "exact",
-          head: true
-        }),
-
-      window.supabaseClient
-        .from("task_submissions")
-        .select("id", {
-          count: "exact",
-          head: true
-        }),
-
-      window.supabaseClient
-        .from("businesses")
-        .select("id", {
-          count: "exact",
-          head: true
-        }),
-
-      window.supabaseClient
-        .from("redemption_requests")
-        .select("id", {
-          count: "exact",
-          head: true
-        })
-
-    ]);
-
-
-    // ==============================
-    // CHECK QUERY ERRORS
-    // ==============================
-
-    if (tasksResult.error) {
-      throw tasksResult.error;
-    }
-
-    if (submissionsResult.error) {
-      throw submissionsResult.error;
-    }
-
-    if (businessesResult.error) {
-      throw businessesResult.error;
-    }
-
-    if (rewardsResult.error) {
-      throw rewardsResult.error;
-    }
-
-
-    // ==============================
-    // DISPLAY ADMIN DASHBOARD
-    // ==============================
-
-    container.innerHTML = `
-      <div class="admin-summary">
-
-        <div class="panel">
-          <h3>Tasks</h3>
-          <p>${tasksResult.count ?? 0}</p>
-          <a href="admin-tasks.html">
-            Manage Tasks
-          </a>
-        </div>
-
-        <div class="panel">
-          <h3>Submissions</h3>
-          <p>${submissionsResult.count ?? 0}</p>
-          <a href="admin-submissions.html">
-            Review Submissions
-          </a>
-        </div>
-
-        <div class="panel">
-          <h3>Businesses</h3>
-          <p>${businessesResult.count ?? 0}</p>
-          <a href="admin-businesses.html">
-            Manage Businesses
-          </a>
-        </div>
-
-        <div class="panel">
-          <h3>Reward Requests</h3>
-          <p>${rewardsResult.count ?? 0}</p>
-          <a href="admin-rewards.html">
-            Review Rewards
-          </a>
-        </div>
-
-        <div class="panel">
-          <h3>Reports &amp; Records</h3>
-          <p>View system records and reports.</p>
-          <a href="admin-reports.html">
-            Open Reports
-          </a>
-        </div>
-
-      </div>
-    `;
-
-  } catch (error) {
-
-    console.error(
-      "PULSE: Admin dashboard error:",
-      error
-    );
-
-    container.innerHTML = `
-      <p>Unable to load the Admin Dashboard.</p>
-      <p>Please try again.</p>
-    `;
-  }
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PULSE — Administration</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <a href="index.html" aria-label="PULSE home"><img src="pulse-logo.png" alt="PULSE" class="pulse-logo"></a>
+      <h1>Administration</h1>
+      <p class="tagline">PULSE • Admin access only</p>
+    </header>
+    <section class="panel" aria-labelledby="admin-heading">
+      <h2 id="admin-heading">Admin Dashboard</h2>
+      <div id="adminContent" aria-live="polite">Checking administrator access...</div>
+    </section>
+    <footer>
+      <a href="dashboard.html">Dashboard</a> •
+      <a href="index.html">Home</a>
+      <p>© 2026 PULSE</p>
+    </footer>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
