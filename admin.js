@@ -57,12 +57,7 @@ async function loadAdminDashboard() {
       await isAdmin(user.id);
 
     if (!admin) {
-      container.innerHTML = `
-        <p>Access denied.</p>
-        <p>This page is available to administrators only.</p>
-        <a href="dashboard.html">Return to Dashboard</a>
-      `;
-
+      window.location.replace("dashboard.html");
       return;
     }
 
